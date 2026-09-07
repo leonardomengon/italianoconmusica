@@ -1,8 +1,15 @@
-﻿  // ==================== PROGRESSION MVP ====================
+  // ==================== PROGRESSION MVP ====================
   const PROGRESS_KEY = 'lyricalProgress';
-  const REQUIRED_NOTES = 1;
-  const REQUIRED_LISTENS = 1;
-  const REQUIRED_SFIDE = 1;
+  // Requisiti missioni DINAMICI in base al progresso:
+  // - senza canzoni completate → 1/1/1
+  // - dalla prima canzone completata in poi → 3/10/3
+  function REQUIRED_NOTES() { return hasCompletedAnySong() ? 3 : 1; }
+  function REQUIRED_LISTENS() { return hasCompletedAnySong() ? 10 : 1; }
+  function REQUIRED_SFIDE() { return hasCompletedAnySong() ? 3 : 1; }
+  function hasCompletedAnySong() {
+    const p = getProgress();
+    return (p.completedSongIds || []).length > 0;
+  }
   const ESERCIZI_PER_SFIDA = 20;
   const ONBOARDING_KEY = 'appOnboardingSeen';
   let _reviewMode = false;
@@ -34,25 +41,26 @@
     const totalVerses = uniqueMainVerseKeys(song.lyrics || []).length;
     const validKeys = new Set(uniqueMainVerseKeys(song.lyrics || []));
     const opened = [...new Set(sp.openedVerseKeys || [])].filter(k => validKeys.has(k)).length;
-    const notes = Math.min((sp.savedNoteKeys || []).length, REQUIRED_NOTES);
-    const listens = Math.min(sp.listenedCount || 0, REQUIRED_LISTENS);
-    const exercises = Math.min(sp.completedSfideCount || 0, REQUIRED_SFIDE);
+    const notes = Math.min((sp.savedNoteKeys || []).length, REQUIRED_NOTES());
+    const listens = Math.min(sp.listenedCount || 0, REQUIRED_LISTENS());
+    const exercises = Math.min(sp.completedSfideCount || 0, REQUIRED_SFIDE());
     return {
       opened, totalVerses, notes, listens, exercises,
       translationsDone: totalVerses > 0 && opened >= totalVerses,
-      notesDone: notes >= REQUIRED_NOTES,
-      listensDone: listens >= REQUIRED_LISTENS,
-      exercisesDone: exercises >= REQUIRED_SFIDE
+      notesDone: notes >= REQUIRED_NOTES(),
+      listensDone: listens >= REQUIRED_LISTENS(),
+      exercisesDone: exercises >= REQUIRED_SFIDE()
     };
   }
   function completedMissionCount(m) { return [m.translationsDone,m.notesDone,m.listensDone,m.exercisesDone].filter(Boolean).length; }
   function isSfidaUnlocked(m) { return m.translationsDone && m.notesDone && m.listensDone; }
   function missionRowsHtml(m, compact=false, group='all') {
+    const rn = REQUIRED_NOTES(), rl = REQUIRED_LISTENS(), rs = REQUIRED_SFIDE();
     const allRows = [
       ['📖','Explora las traducciones',m.opened,m.totalVerses,m.translationsDone],
-      ['⭐','Guarda 3 frases',m.notes,REQUIRED_NOTES,m.notesDone],
-      ['🎧','Escucha 10 veces',m.listens,REQUIRED_LISTENS,m.listensDone],
-      ['✏️','Completa 3 ejercicios',m.exercises,REQUIRED_SFIDE,m.exercisesDone]
+      ['⭐',`Guarda ${rn} frase${rn > 1 ? 's' : ''}`,m.notes,rn,m.notesDone],
+      ['🎧',`Escucha ${rl} vece${rl > 1 ? 's' : ''}`,m.listens,rl,m.listensDone],
+      ['✏️',`Completa ${rs} ejercicio${rs > 1 ? 's' : ''}`,m.exercises,rs,m.exercisesDone]
     ];
     const rows = group === 'basic' ? allRows.slice(0, 3)
       : group === 'sfida' ? [allRows[3]]
@@ -261,8 +269,8 @@
     const openedVerseKeys = verseKeys.slice();
     // Servono REQUIRED_NOTES frasi salvate valide; se non ce ne sono
     // abbastanza, aggiungi segnaposto per raggiungere il requisito.
-    const savedNoteKeys = verseKeys.slice(0, REQUIRED_NOTES);
-    while (savedNoteKeys.length < REQUIRED_NOTES) {
+    const savedNoteKeys = verseKeys.slice(0, REQUIRED_NOTES());
+    while (savedNoteKeys.length < REQUIRED_NOTES()) {
       savedNoteKeys.push('__test_note_' + Math.random().toString(36).slice(2, 8));
     }
     return {
@@ -270,8 +278,8 @@
       completedAt: Date.now(),
       openedVerseKeys,
       savedNoteKeys,
-      listenedCount: REQUIRED_LISTENS,
-      completedSfideCount: REQUIRED_SFIDE
+      listenedCount: REQUIRED_LISTENS(),
+      completedSfideCount: REQUIRED_SFIDE()
     };
   }
 
@@ -394,14 +402,14 @@
   function recordSavedNoteForProgress(text) {
     if (_reviewMode || !currentSongBackup) return;
     const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id), key=normalizeProgressKey(text); if(!key) return;
-    if(!(sp.savedNoteKeys||[]).includes(key) && sp.savedNoteKeys.length<REQUIRED_NOTES) sp.savedNoteKeys.push(key);
+    if(!(sp.savedNoteKeys||[]).includes(key) && sp.savedNoteKeys.length<REQUIRED_NOTES()) sp.savedNoteKeys.push(key);
     saveProgress(p); checkSongCompletion(currentSongBackup);
     trackMissionCompletion(currentSongBackup);
   }
   function recordListen(songId) {
     if (_reviewMode) return;
     const current=getCurrentSong(); if(!current || String(current.id)!==String(songId)) return;
-    const p=getProgress(), sp=p.songs[String(songId)] || ensureSongProgress(songId); sp.listenedCount=Math.min((sp.listenedCount||0)+1,REQUIRED_LISTENS); saveProgress(p);
+    const p=getProgress(), sp=p.songs[String(songId)] || ensureSongProgress(songId); sp.listenedCount=Math.min((sp.listenedCount||0)+1,REQUIRED_LISTENS()); saveProgress(p);
     checkSongCompletion(currentSongBackup||current);
     trackMissionCompletion(currentSongBackup||current);
   }
@@ -409,7 +417,7 @@
     if (_ripassoMode || _reviewMode || !currentSongBackup) return;
     if (_sfidaCountedSession) return;
     _sfidaCountedSession = true;
-    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE); saveProgress(p);
+    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE()); saveProgress(p);
     checkSongCompletion(currentSongBackup);
     trackMissionCompletion(currentSongBackup);
   }
