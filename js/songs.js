@@ -1,4 +1,4 @@
-﻿      // ==================== OVERLAY ALTERNATIVE ====================
+      // ==================== OVERLAY ALTERNATIVE ====================
       function openOverlay(e, index) {
         e.stopPropagation();
         const song = songs.find(s => String(s.id) === String(currentSongId));
@@ -281,6 +281,7 @@
         }
         updateFixedPlayer(song);
         setTimeout(markExploredTiles, 0);
+        renderFixedPlayerMissions();
       }
 
     function updateFixedPlayer(song) {
