@@ -1,4 +1,4 @@
-﻿:root {
+:root {
       --primary: #9B5DE5;
       --primary-dark: #7C3AED;
       --secondary: #5B9BF6;
@@ -636,6 +636,17 @@
     .listen-progress-box { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; font-weight:900; font-size:12px; }
     .mini-progress { height:8px; background:#EDE5F5; border-radius:999px; overflow:hidden; border-bottom:2px solid #DBCCEC; }
     .mini-progress-fill { height:100%; background:var(--secondary); border-radius:999px; transition:width .25s ease; }
+    /* --- Pannello missioni nel player fisso: chiuso = sola freccia in alto --- */
+    .mission-progress-wrap { background:#fff; border:2px solid var(--surface-border); border-radius:16px; box-shadow:0 4px 0 #DBCCEC; }
+    .mission-progress-toggle { display:flex; align-items:center; justify-content:center; width:100%; background:linear-gradient(135deg, #7C3AED, #9B5DE5)!important; color:#fff!important; border:none!important; padding:8px 0; cursor:pointer; border-radius:14px; }
+    .mission-progress-chevron { display:inline-flex; font-size:26px; line-height:1; transition:transform .2s ease; }
+    .mission-progress-wrap.open .mission-progress-chevron { transform:rotate(180deg); }
+    .mission-progress-body { padding:12px 14px; max-height:260px; overflow-y:auto; }
+    .mission-progress-body .course-missions-basic { margin-bottom:0; }
+    .mission-progress-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .mission-progress-label { font-weight:900; color:var(--primary-dark); font-size:15px; }
+    .mission-progress-count { font-weight:900; background:#E9F3FF; border:1px solid #CFE3FF; color:var(--secondary-dark); border-radius:999px; padding:3px 12px; font-size:13px; }
+    .mission-progress-wrap.open .mission-progress-count { color:var(--primary-dark); }
 .completed-card { margin-bottom:20px; }
 .completed-card .card { cursor:default; border-color:#C9A8EF!important; }
 .completed-check { color:var(--primary); font-size:34px; }
