@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -168,6 +168,19 @@
 
   <div id="fixedPlayer" class="player-fixed d-none">
     <div class="container">
+      <div id="missionProgressWrap" class="mission-progress-wrap">
+        <button id="missionProgressToggle" type="button" class="mission-progress-toggle"
+          aria-expanded="false" aria-controls="missionProgressBody" onclick="toggleMissionPanel()">
+          <span class="material-symbols-outlined mission-progress-chevron" aria-hidden="true">expand_less</span>
+        </button>
+        <div id="missionProgressBody" class="mission-progress-body" hidden>
+          <div class="mission-progress-head">
+            <span class="mission-progress-label">Misiones</span>
+            <span class="mission-progress-count" id="missionProgressCount">0/3</span>
+          </div>
+          <div id="missionProgressRows" class="course-missions-basic"></div>
+        </div>
+      </div>
       <div id="listenProgressPanel" class="listen-progress-panel"></div>
       <div id="songPlayer"></div>
     </div>
