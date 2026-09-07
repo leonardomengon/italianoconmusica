@@ -1,4 +1,4 @@
-﻿      // ==================== NUOVA MODALITÀ ESERCIZI ====================
+      // ==================== NUOVA MODALITÀ ESERCIZI ====================
       function generaCodaEsercizi(song) {
         if (!song || !song.lyrics) return;
         const currentSongId = String(song.id);
@@ -148,11 +148,11 @@
             </div>`;
           } else {
             if (_exerciseIndex > 0) recordSfidaCompleta();
-            const sfideCompleted = Math.min((currentSongBackup ? (ensureSongProgress(currentSongBackup.id).completedSfideCount || 0) : 0), REQUIRED_SFIDE);
+            const sfideCompleted = Math.min((currentSongBackup ? (ensureSongProgress(currentSongBackup.id).completedSfideCount || 0) : 0), REQUIRED_SFIDE());
             wrap.innerHTML = `
               <div class="exercise-card text-center p-4">
                 <div class="celebration-icon">🍾</div>
-                <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE})</h3>
+                <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
                 <p class="text-muted">Has completado el lote de 20 ejercicios (10 piensa, 10 completa).</p>
                 <div class="exercise-actions">
                   <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>
