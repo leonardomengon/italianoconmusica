@@ -59,7 +59,7 @@
     const allRows = [
       ['📖','Explora las traducciones',m.opened,m.totalVerses,m.translationsDone],
       ['⭐',`Guarda ${rn} frase${rn > 1 ? 's' : ''}`,m.notes,rn,m.notesDone],
-      ['🎧',`Escucha ${rl} vez${rl > 1 ? 's' : ''}`,m.listens,rl,m.listensDone],
+      ['🎧',`Escucha ${rl} ${rl > 1 ? 'veces' : 'vez'}`,m.listens,rl,m.listensDone],
       ['✏️',`Completa ${rs} ejercicio${rs > 1 ? 's' : ''}`,m.exercises,rs,m.exercisesDone]
     ];
     const rows = group === 'basic' ? allRows.slice(0, 3)
