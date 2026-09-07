@@ -1,0 +1,252 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Italiano con Musica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+  <!-- Loader iniziale: appare subito all'apertura, mentre si scaricano le risorse -->
+  <div id="appLoader" class="app-loader">
+    <span class="loading-spinner app-loader-spinner"></span>
+    <span>Cargando...</span>
+  </div>
+
+  <div class="container py-4">
+    <header id="mainHeader" class="d-flex justify-content-between align-items-center">
+      <div class="brand-duo" onclick="showHomeView()" role="button" title="Volver a la portada">Italiano con Musica</div>
+    </header>
+
+    <div class="container mt-3">
+      <button id="showSongsBtn" class="btn btn-outline-secondary" style="display:none;">🎵 Volver a las Canciones</button>
+    </div>
+
+    <div id="appuntiSection" class="d-none fade-in">
+      <h2>Notas</h2>
+
+      <div class="d-flex gap-2 mb-2 align-items-center">
+        <input type="search" id="appuntiSearchInput" placeholder="Buscar…" autocomplete="off" class="flex-grow-1">
+        <button id="appuntiFilterToggle" class="appunti-filter-toggle" aria-label="Filtrar" title="Filtrar">
+          <span class="material-symbols-outlined" aria-hidden="true">filter_list</span>
+        </button>
+      </div>
+      <div class="appunti-filters" style="display:none;">
+        <select id="appuntiFilterLang">
+          <option value="">🌐 Todos los idiomas</option>
+        </select>
+        <select id="appuntiFilterSong">
+          <option value="">🎵 Todas las canciones</option>
+        </select>
+        <select id="appuntiSort">
+          <option value="createdAt-desc">⏱ Más recientes</option>
+          <option value="createdAt-asc">⏱ Más antiguos</option>
+          <option value="testo-asc">🔤 Texto (A-Z)</option>
+          <option value="testo-desc">🔤 Texto (Z-A)</option>
+          <option value="songTitle-asc">🎵 Por canción (A-Z)</option>
+        </select>
+      </div>
+      <div class="appunti-count-info" id="appuntiCountInfo"></div>
+      <div id="listaAppunti"></div>
+      <div id="emptyAppuntiMsg">📭 No has guardado ninguna nota. Toca ☆ en una frase.</div>
+    </div>
+
+    <div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <div id="editModalBox">
+        <h5 id="editModalTitle">✏️ Editar nota</h5>
+        <label for="editModalNota">📝 Nota personal</label>
+        <textarea id="editModalNota" rows="3" placeholder="Añade una nota, una observación gramatical, un recordatorio…"></textarea>
+        <div id="editModalActions">
+          <button id="editModalCancel">Cancelar</button>
+          <button id="editModalSave">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <section id="progressionHome" class="fade-in d-none">
+      
+      <div id="currentSongHome"></div>
+      <div id="nextSongHome" class="mt-4"></div>
+    </section>
+
+    <section id="libreria" class="d-none fade-in">
+      <div class="section-heading">
+        <div>
+          
+          <h2>Biblioteca</h2>
+        </div> 
+      </div>
+      <div id="completedSongsList" class="row"></div>
+      <div id="completedEmpty" class="empty-state d-none">No has completado ninguna canción todavía.</div>
+    </section>
+
+    <!-- Sezione Impostazioni: utile per testare diversi stati di avanzamento -->
+    <section id="settings" class="d-none fade-in">
+      <div class="section-heading">
+        <div>
+          <h2>Ajustes · Progreso</h2>
+        </div>
+      </div>
+      <div class="settings-card">
+        <p class="settings-intro">Simula distintos estados de progreso reescribiendo el guardado local. Tus notas (⭐) se conservan siempre.</p>
+        <div class="settings-stats" id="settingsStats"></div>
+        <div class="settings-actions">
+          <button class="btn btn-outline-secondary" type="button" onclick="resetProgressToNewUser()">
+            🆕 Nuevo usuario<span class="settings-btn-sub">avvio completo (scelta lingua)</span>
+          </button>
+          <button class="btn btn-outline-primary" type="button" onclick="setProgressPartial()">
+            📘 Progreso parcial<span class="settings-btn-sub">primer curso completado</span>
+          </button>
+          <button class="btn btn-primary" type="button" onclick="setProgressTotal()">
+            🏁 Progreso total<span class="settings-btn-sub">todas las canciones y cursos</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sezione Backup utente -->
+      <div class="settings-card">
+        <h3 class="settings-card-title">💾 Backup</h3>
+        <p class="settings-intro">Se guarda automáticamente al abrir la app. Guarda tu código para recuperar el progreso en otro dispositivo.</p>
+        <label class="backup-label" for="userCodeDisplay">Tu código de backup</label>
+        <div class="backup-code-row">
+          <input id="userCodeDisplay" class="backup-code-input" readonly value="">
+          <button class="btn btn-outline-secondary" type="button" onclick="copiaCodiceUtente()">📋 Copiar</button>
+        </div>
+        <hr class="backup-divider">
+        <label class="backup-label" for="backupCodeInput">Restaurar desde otro dispositivo</label>
+        <div class="backup-code-row">
+          <input id="backupCodeInput" class="backup-code-input" placeholder="Código…" value="">
+          <button class="btn btn-outline-primary" type="button" onclick="handleRecuperaBackup()">⟳ Restaurar</button>
+        </div>
+      </div>
+    </section>
+
+
+
+    <div id="searchControls" class="d-none" aria-hidden="true">
+      <input type="text" id="searchInput">
+      <select id="sortSelect"><option value="title-asc">Título</option></select>
+      <select id="langFilter"><option value="">Todos</option></select>
+      <button id="showAppuntiBtn" type="button">Notas <span id="appuntiBadge" style="display:none">0</span></button>
+      <div id="message"></div>
+    </div>
+    <div id="loadingMessage" class="text-center">
+      <span class="loading-spinner"></span>
+      <span>Cargando canción...</span>
+    </div>
+
+    <div id="home" class="row d-none" aria-hidden="true"></div>
+
+    <div id="song" class="d-none fade-in">
+      <div class="card">
+        <div class="card-header">
+          <h2 id="songTitle" class="h4 mb-0"></h2>
+          <p id="songArtist" class="text-muted mb-0"></p>
+        </div>
+        <div class="card-body">
+          <div class="song-actions-header">
+            <label class="toggle-switch">
+              <input type="checkbox" id="swapLangBtn">
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Invertir Idiomas</span>
+            </label>
+          </div>
+          <div id="songLyrics" class="lyrics-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pagination" class="pagination-container d-none" aria-hidden="true"></div>
+  </div>
+
+  <div id="fixedPlayer" class="player-fixed d-none">
+    <div class="container">
+      <div id="listenProgressPanel" class="listen-progress-panel"></div>
+      <div id="songPlayer"></div>
+    </div>
+  </div>
+
+  <div id="altOverlay" class="alt-overlay" onclick="closeOverlay()">
+    <div class="alt-overlay-content" onclick="event.stopPropagation()">
+      <span class="alt-close-btn" onclick="closeOverlay()">&times;</span>
+      <h4 class="mb-3 text-primary">Estructuras y Alternativas</h4>
+      <div id="altPhrasesContainer" class="mt-2"></div>
+    </div>
+  </div>
+
+
+  <div id="completionModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="progress-modal-box">
+      <div class="celebration-icon">🎉</div>
+      <h2 id="completionTitle">Canción completada</h2>
+      <p id="completionMessage"></p>
+      <div class="progress-modal-actions">
+        <button id="completionHomeBtn" class="btn btn-outline-secondary" type="button">Volver a inicio</button>
+        <button id="completionNextBtn" class="btn btn-primary" type="button">Empezar la siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="onboardingModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+    <div class="progress-modal-box">
+      <div class="celebration-icon">🎵</div>
+      <h2 id="onboardingTitle">¡Bienvenido!</h2>
+      <p class="onboarding-lead">¿Cómo funciona Italiano con Música?</p>
+      <div class="onboarding-steps">
+        <p class="onboarding-line">Los cursos están estructurados en canciones; cada canción se enfoca en un tema.</p>
+        <p class="onboarding-line">Completa las 3 misiones de estudio para acceder a los ejercicios de una canción.</p>
+        <p class="onboarding-line"><strong>Completa los ejercicios para desbloquear la siguiente canción.</strong></p>
+      </div>
+      <div class="progress-modal-actions">
+        <button id="onboardingClose" class="btn btn-primary" type="button">¡Empezar!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sezione Esercizi (usata sia per lo studio sia per il ripasso) -->
+  <div id="esercizi" class="d-none fade-in">
+    <div id="eserciziLyrics"></div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav" aria-label="Navegación inferior">
+    <button id="bottomNavHome" class="bottom-nav-item active" type="button" onclick="showHomeView()">
+      <span class="material-symbols-outlined">home</span>
+      <span>Inicio</span>
+    </button>
+       <button id="bottomNavAppunti" class="bottom-nav-item" type="button" onclick="openNotebookView()">
+      <span class="material-symbols-outlined">description</span>
+      <span>Notas</span>
+    </button>
+     <button id="bottomNavLibrary" class="bottom-nav-item" type="button" onclick="showLibreria()">
+      <span class="material-symbols-outlined">library_music</span>
+      <span>Biblioteca</span>
+    </button>
+     <button id="bottomNavSettings" class="bottom-nav-item" type="button" onclick="openSettingsView()">
+      <span class="material-symbols-outlined">settings</span>
+      <span>Ajustes</span>
+    </button>
+  
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/songs.js"></script>
+  <script src="js/exercises.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/appunti.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/boot.js"></script>
+</body>
+</html>
