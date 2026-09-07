@@ -82,6 +82,37 @@
     panel.textContent = `${missionProgressCount(m)}/3`;
     rows.innerHTML = missionRowsHtml(m, true, 'basic');
   }
+  // Nomi delle 3 missioni di base (stesse stringhe usate nella lista).
+  function basicMissionNames() {
+    const rn = REQUIRED_NOTES(), rl = REQUIRED_LISTENS();
+    return [
+      ['translationsDone', 'Explora las traducciones'],
+      ['notesDone', `Guarda ${rn} frase${rn > 1 ? 's' : ''}`],
+      ['listensDone', `Escucha ${rl} ${rl > 1 ? 'veces' : 'vez'}`]
+    ];
+  }
+  // Se tra before e after è appena stata completata una missione base, mostra il feedback.
+  function maybeShowMissionFeedback(before, after) {
+    if (!before || !after) return;
+    const row = basicMissionNames().find(([k]) => after[k] && !before[k]);
+    if (row) showMissionFeedback(row[1]);
+  }
+  let _missionFeedbackTimer = null;
+  function showMissionFeedback(text) {
+    const chevron = document.querySelector('#missionProgressToggle .mission-progress-chevron');
+    const fb = document.getElementById('missionFeedbackText');
+    if (!chevron || !fb) return;
+    chevron.style.display = 'none';
+    fb.textContent = `${text} ✓`;
+    fb.hidden = false;
+    if (_missionFeedbackTimer) clearTimeout(_missionFeedbackTimer);
+    _missionFeedbackTimer = setTimeout(() => {
+      chevron.style.display = '';
+      fb.hidden = true;
+      _missionFeedbackTimer = null;
+      if (!document.getElementById('missionProgressBody').hidden) renderFixedPlayerMissions();
+    }, 2200);
+  }
   function toggleMissionPanel() {
     const toggle = document.getElementById('missionProgressToggle');
     const body = document.getElementById('missionProgressBody');
@@ -418,12 +449,15 @@
   async function openCompletedSong(id) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=true; await openSong(id); }
   function recordVerseExplored(index) {
     if (_reviewMode || !currentSongBackup) return;
-    const lyric=currentSongBackup.lyrics[index], key=normalizeProgressKey(lyric?.text1); if(!key) return;
-    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id);
+    const song = currentSongBackup;
+    const before = missionState(song);
+    const lyric=song.lyrics[index], key=normalizeProgressKey(lyric?.text1); if(!key) return;
+    const p=getProgress(), sp=p.songs[String(song.id)] || ensureSongProgress(song.id);
     if (!(sp.openedVerseKeys||[]).includes(key)) sp.openedVerseKeys.push(key);
-    saveProgress(p); markExploredTiles(); checkSongCompletion(currentSongBackup);
-    trackMissionCompletion(currentSongBackup);
+    saveProgress(p); markExploredTiles(); checkSongCompletion(song);
+    trackMissionCompletion(song);
     renderFixedPlayerMissions();
+    maybeShowMissionFeedback(before, missionState(song));
   }
   function markExploredTiles() {
     if(!currentSongBackup) return;
@@ -432,19 +466,25 @@
   }
   function recordSavedNoteForProgress(text) {
     if (_reviewMode || !currentSongBackup) return;
-    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id), key=normalizeProgressKey(text); if(!key) return;
+    const song = currentSongBackup;
+    const before = missionState(song);
+    const p=getProgress(), sp=p.songs[String(song.id)] || ensureSongProgress(song.id), key=normalizeProgressKey(text); if(!key) return;
     if(!(sp.savedNoteKeys||[]).includes(key) && sp.savedNoteKeys.length<REQUIRED_NOTES()) sp.savedNoteKeys.push(key);
-    saveProgress(p); checkSongCompletion(currentSongBackup);
-    trackMissionCompletion(currentSongBackup);
+    saveProgress(p); checkSongCompletion(song);
+    trackMissionCompletion(song);
     renderFixedPlayerMissions();
+    maybeShowMissionFeedback(before, missionState(song));
   }
   function recordListen(songId) {
     if (_reviewMode) return;
     const current=getCurrentSong(); if(!current || String(current.id)!==String(songId)) return;
+    const song = currentSongBackup || current;
+    const before = missionState(song);
     const p=getProgress(), sp=p.songs[String(songId)] || ensureSongProgress(songId); sp.listenedCount=Math.min((sp.listenedCount||0)+1,REQUIRED_LISTENS()); saveProgress(p);
-    checkSongCompletion(currentSongBackup||current);
-    trackMissionCompletion(currentSongBackup||current);
+    checkSongCompletion(song);
+    trackMissionCompletion(song);
     renderFixedPlayerMissions();
+    maybeShowMissionFeedback(before, missionState(song));
   }
   function recordSfidaCompleta() {
     if (_ripassoMode || _reviewMode || !currentSongBackup) return;
