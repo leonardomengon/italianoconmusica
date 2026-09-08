@@ -119,11 +119,16 @@
       setTimeout(() => {
         swap.hidden = true;
         swap.classList.remove("closing");
+        // Mostra la barra solo dopo l animazione
+        if (progress) progress.hidden = false;
+        if (rows) rows.hidden = false;
+        if (fb) fb.hidden = true;
       }, 250);
+    } else {
+      if (progress) progress.hidden = false;
+      if (rows) rows.hidden = false;
+      if (fb) fb.hidden = true;
     }
-    if (progress) progress.hidden = false;
-    if (rows) rows.hidden = false;
-    if (fb) fb.hidden = true;
   }
   // Mostra le missioni (o il feedback di una sola missione) al posto della barra.
   function openMissionsSwap(durationMs, feedbackText) {
