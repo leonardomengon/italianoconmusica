@@ -378,11 +378,6 @@
           if (audioElement.duration) {
             audioElement.currentTime = Math.min(audioElement.duration, audioElement.currentTime + 5);
           }
-          // SOLO +5s → l'ascolto non viene conteggiato
-          if (!_userSeeked[id]) {
-            _userSeeked[id] = true;
-            showToast('<span class="material-symbols-outlined mso-toast">fast_forward</span> Reproducción no contabilizada');
-          }
         });
 
         audioElement.addEventListener('ended', () => {
