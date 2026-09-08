@@ -1,13 +1,8 @@
-﻿      // ==================== AUDIO PLAYER (HTML5) ====================
+      // ==================== AUDIO PLAYER (HTML5) ====================
       function initAudioPlayer(audioElement, songId) {
-        _userSeeked[songId] = false;
-
-        // Brano concluso: conteggia ascolto (se non saltato con +5s) e riavvia (loop)
+        // Brano concluso: conteggia ascolto e riavvia (loop)
         audioElement.addEventListener('ended', () => {
-          if (!_userSeeked[songId]) {
-            recordListen(songId);
-          }
-          _userSeeked[songId] = false;
+          recordListen(songId);
           audioElement.currentTime = 0;
           audioElement.play().catch(() => {});
         });
