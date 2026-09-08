@@ -216,6 +216,7 @@
     const nextBox=document.getElementById('nextSongHome');
     if (!current) {
       box.innerHTML=`<div class="current-song-card text-center"><div class="celebration-icon">🏆</div><h2 class="current-song-title">Recorrido completado</h2><p>Has completado todas las canciones disponibles.</p><div class="current-actions" style="align-items:center;margin:20px auto 0;"><button class="btn btn-primary" onclick="openRipasso()">🔁 REPASO COMPLETO</button></div></div>`;
+      document.getElementById('ripassoHome').innerHTML=``;
       nextBox.innerHTML=``; return;
     }
     await ensureLyricsFor(current);
@@ -225,6 +226,13 @@
       ? `<button class="btn btn-challenge" onclick="openSongStudyMode()">Ejercicio</button>`
       : '';
     box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="openCurrentSong()">CANCIÓN</button></div></div><div class="course-missions-divider"></div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
+    const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
+    const ripassoBox = document.getElementById('ripassoHome');
+    if (appuntiCount > 0) {
+      ripassoBox.innerHTML=`<article class="ripasso-card"><div class="ripasso-icon"><span class="material-symbols-outlined">auto_stories</span></div><div class="ripasso-info"><h3>Ripassa le tue note</h3><p>${appuntiCount} frase${appuntiCount > 1 ? 's' : ''} guardada${appuntiCount > 1 ? 's' : ''} en tus notas</p></div><button class="btn btn-primary" onclick="openRipasso()">EJERCICIOS</button></article>`;
+    } else {
+      ripassoBox.innerHTML=``;
+    }
     const next=getNextSong(current);
     nextBox.innerHTML= (next ? `<div class="eyebrow mb-2">PRÓXIMA CANCIÓN</div><article class="next-song-card"><div class="next-song-lock"><span class="material-symbols-outlined">lock</span></div><div><h3>${escapeHtml(next.title)}</h3><p>Completa las misiones para desbloquearla.</p></div></article>` : '<div class="next-song-card"><div class="next-song-lock">🏁</div><div><h3>Última canción del recorrido</h3><p>Completa las misiones para terminar el recorrido.</p></div></div>');
   }
