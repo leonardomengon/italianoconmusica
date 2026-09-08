@@ -595,7 +595,7 @@
 /* ==================== PROGRESSION MVP ==================== */
 .eyebrow { color: var(--secondary); font-size: 12px; font-weight: 900; letter-spacing: 1.2px; }
 #progressionHome { padding-bottom: 24px; }
-.path-summary, .section-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.path-summary, .section-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom: 20px; }
 .path-summary h1, .section-heading h2 { margin:4px 0 0; color:#3D2B52; font-weight:900; }
 .overall-count { background:#E9F3FF; color:var(--secondary-dark); border:2px solid #CFE3FF; border-radius:999px; padding:10px 16px; font-weight:900; white-space:nowrap; }
 .song-box-container { border:3px solid var(--primary); border-bottom:7px solid var(--primary-dark); border-radius:24px; }
@@ -629,7 +629,7 @@
 .course-missions-sfida .mission-list { gap: 8px; }
 .course-missions-sfida .mission-row { padding: 10px 12px; grid-template-columns: 36px 1fr auto; border-radius: 14px; background: #fff; }
 .course-missions-sfida .mission-icon { width: 32px; height: 32px; font-size: 16px; border-radius: 10px; }
-.course-missions-sfida.unlocked { background: #fff; border: 3px solid #9B5DE5; box-shadow: 0 4px 0 #7C3AED, 0 8px 24px rgba(155, 93, 229, 0.3); opacity: 1; filter: none; }
+.course-missions-sfida.unlocked { background: #fff; border: 3px solid #EDE5F5; box-shadow: 0 4px 0 #DBCCEC; opacity: 1; filter: none; }
 .btn-challenge { background: linear-gradient(135deg, #7C3AED, #9B5DE5) !important; color: #fff !important; border: none !important; border-bottom: 4px solid #5B21B6 !important; padding: 12px 20px; font-size: 15px; border-radius: 14px; width: 100%; max-width: 280px; margin: 0 auto; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
 .btn-challenge:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4); }
 .btn-challenge:active { transform: translateY(1px); border-bottom-width: 2px !important; }
@@ -647,9 +647,9 @@
 .onboarding-lead { margin:10px 0 0; font-weight:900; color:#3D2B52; }
 .onboarding-line { margin:0; color:#7B6F8C; font-weight:700; }
 .missions-hint { margin:10px 0 2px; font-size:12px; color:#8A7FA3; font-weight:600; }
-.next-song-card { border:2px dashed var(--surface-border-dark); background:var(--surface-dim); border-radius:20px; padding:20px; display:flex; align-items:center; gap:16px; color:#7B6F8C; }
+.next-song-card { border:2px dashed var(--surface-border-dark); background:transparent; border-radius:20px; padding:20px; display:flex; align-items:center; gap:16px; color:var(--text-muted, #7B6F8C); }
 .next-song-lock { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#EDE5F5; color:#8A7FA3; font-size:28px; }
-.next-song-card h3 { margin:0; font-size:20px; font-weight:900; color:#6B5F7C; }
+.next-song-card h3 { margin:0; font-size:20px; font-weight:900; color:var(--text-muted, #7B6F8C); }
 .next-song-card p { margin:2px 0 0; font-size:13px; }
 .song-mission-summary { background:#fff; border:2px solid var(--surface-border); border-radius:16px; padding:12px; }
 .song-mission-summary .mission-list { gap:6px; }

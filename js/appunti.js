@@ -200,7 +200,7 @@
               vb = (vb || '').toString().toLowerCase();
               return order === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
           });
-          info.textContent = `📊 ${filtrati.length} de ${appunti.length} notas`;
+          info.textContent = `${filtrati.length} de ${appunti.length} notas`;
           if (filtrati.length === 0) {
               lista.innerHTML = '<p style="text-align:center;color:#958AAD;padding:20px 0;">No hay resultados para los filtros seleccionados.</p>';
               return;
