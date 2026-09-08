@@ -69,6 +69,20 @@
   }
   // Conta solo le 3 missioni di base che sbloccano gli esercizi.
   function missionProgressCount(m) { return [m.translationsDone, m.notesDone, m.listensDone].filter(Boolean).length; }
+  // Chip compatte (icona + conteggio x/n) delle 3 missioni di base, su una sola riga.
+  function missionIconsHtml(m) {
+    const rn = REQUIRED_NOTES(), rl = REQUIRED_LISTENS();
+    const all = [
+      ['translationsDone', '📖', m.opened, m.totalVerses, 'Explora las traducciones'],
+      ['notesDone', '⭐', m.notes, rn, `Guarda ${rn} frase${rn > 1 ? 's' : ''}`],
+      ['listensDone', '🎧', m.listens, rl, `Escucha ${rl} ${rl > 1 ? 'veces' : 'vez'}`]
+    ];
+    return `<div class="mission-icons">${all.map(([k, icon, val, max, name]) =>
+      `<div class="mission-icon-chip ${m[k] ? 'done' : ''}" title="${name}">` +
+        `<span class="mission-icon-badge">${m[k] ? '✓' : icon}</span>` +
+        `<span class="mission-icon-value">${Math.min(val, max)}/${max}</span>` +
+      `</div>`).join('')}</div>`;
+  }
   // Aggiorna il pannello missioni del player fisso (senza tornare alla home).
   function renderFixedPlayerMissions() {
     const panel = document.getElementById('missionProgressCount');
@@ -80,7 +94,7 @@
     if (!song) return;
     const m = missionState(song);
     panel.textContent = `${missionProgressCount(m)}/3`;
-    rows.innerHTML = missionRowsHtml(m, true, 'basic');
+    rows.innerHTML = missionIconsHtml(m);
   }
   // Nomi delle 3 missioni di base (stesse stringhe usate nella lista).
   function basicMissionNames() {
