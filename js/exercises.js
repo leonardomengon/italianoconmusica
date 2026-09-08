@@ -48,12 +48,13 @@
         shuffle(cat3);
         shuffle(cat4);
 
-        // Assegna quote (4-3-2-1), con redistribuzione
+        // Assegna quote (3-2-1-1 = 7 frasi), con redistribuzione
         let queue = [];
         const take = (arr, n) => { const taken = arr.splice(0, n); queue = queue.concat(taken); return taken.length; };
 
-        let taken1 = take(cat1, 4);
-        let remaining = 4 - taken1;
+        // 3 preferiti canzone corrente
+        let taken1 = take(cat1, 3);
+        let remaining = 3 - taken1;
         if (remaining > 0) {
           let taken2extra = take(cat2, remaining);
           remaining -= taken2extra;
@@ -66,40 +67,39 @@
           take(cat4, remaining);
         }
 
-        let taken2 = take(cat2, 3);
-        remaining = 3 - taken2;
-        if (remaining > 0) {
-          let taken3extra = take(cat3, remaining);
-          remaining -= taken3extra;
-        }
-        if (remaining > 0) {
-          take(cat4, remaining);
-        }
-
+        // 2 preferiti canzoni precedenti
         let taken3 = take(cat3, 2);
         remaining = 2 - taken3;
         if (remaining > 0) {
           take(cat4, remaining);
         }
 
+        // 1 frase principale canzone corrente
+        let taken2 = take(cat2, 1);
+        remaining = 1 - taken2;
+        if (remaining > 0) {
+          take(cat4, remaining);
+        }
+
+        // 1 frase alternativa canzone corrente
         take(cat4, 1);
 
         // Se la coda è vuota (nessuna frase disponibile), aggiungi un fallback
         if (queue.length === 0) {
           queue = cat2.concat(cat4).concat(cat3).concat(cat1);
           shuffle(queue);
-          queue = queue.slice(0, 10);
+          queue = queue.slice(0, 7);
         }
 
         _exerciseQueue = [];
         _exerciseIndex = 0;
         _sfidaCountedSession = false;
         _eserciziFatti = 0;
-        // Sfida: sempre 10 frasi → 20 esercizi (10 pensa + 10 completa), ripetendo se necessario
-        if (queue.length > 10) queue = queue.slice(0, 10);
+        // Sfida: 7 frasi → 14 esercizi (7 pensa + 7 completa), ripetendo se necessario
+        if (queue.length > 7) queue = queue.slice(0, 7);
         const poolFrasi = [...queue];
-        while (queue.length < 10) {
-          for (let i = 0; i < poolFrasi.length && queue.length < 10; i++) {
+        while (queue.length < 7) {
+          for (let i = 0; i < poolFrasi.length && queue.length < 7; i++) {
             queue.push({ ...poolFrasi[i] });
           }
         }
@@ -185,11 +185,9 @@ if (exercise.mode === 'review') {
                     <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
                     ${starBtnInReview}
                   </div>
-                  ${isSavedFlag && notaValue ? `
-                    <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
-                      <textarea readonly placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
-                    </div>
-                  ` : ''}
+                  <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+                    <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
+                  </div>
                   <div class="exercise-actions">
                     <button id="${proceedBtnId}" class="btn btn-primary" onclick="${proceedHandler}" disabled>5</button>
                   </div>
@@ -223,11 +221,9 @@ if (exercise.mode === 'review') {
                     ${starBtnInReview}
                   </div>
                   <div class="exercise-text"><strong>${escapeHtml(exercise.text || '')}</strong></div>
-                  ${isSavedFlag && notaValue ? `
-                    <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
-                      <textarea readonly placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
-                    </div>
-                  ` : ''}
+                  <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+                    <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
+                  </div>
                   <div class="exercise-actions">
                     <button class="btn btn-primary" onclick="${proceedHandler}">Continuar</button>
                   </div>
@@ -248,11 +244,9 @@ if (exercise.mode === 'review') {
               <button class="btn btn-sm ${btnClass} exercise-fav-btn" style="${starBtnCompleteStyle}" onclick="event.stopPropagation(); togglePreferitoFromExercise(this, ${_exerciseIndex});">${starIcon}</button>
             </div>
             ${exercise.hint ? `<div class="exercise-translation">${escapeHtml(exercise.hint)}</div>` : ''}
-            ${isSavedFlag && notaValue ? `
-              <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
-                <textarea readonly placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
-              </div>
-            ` : ''}
+            <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+              <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
+            </div>
             <div class="exercise-actions">
               <button class="btn btn-primary exercise-hint-btn" onclick="${hintHandler}" title="${hintTitle}">💡 Ayuda</button>
               <button class="btn btn-primary exercise-next-btn exercise-next-hidden" onclick="${nextHandler}">Siguiente →</button>
