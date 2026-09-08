@@ -316,7 +316,7 @@
             </div>
 
             <!-- Righe missioni / feedback: sostituiscono la barra sopra i bottoni -->
-            <div id="playerMissionsSwap" class="player-missions-swap" hidden>
+            <div id="playerMissionsSwap" class="player-missions-swap">
               <span id="missionFeedbackText" class="mission-feedback-text" hidden></span>
               <div id="missionProgressRows" class="course-missions-basic"></div>
             </div>
