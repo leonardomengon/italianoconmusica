@@ -617,17 +617,13 @@
 .btn-challenge:active { transform: translateY(1px); border-bottom-width: 2px !important; }
 .btn-challenge-locked { background: #EDE5F5 !important; color: #958AAD !important; border: 2px solid #C9B8E8 !important; padding: 12px 20px; font-size: 15px; border-radius: 14px; width: 100%; max-width: 280px; margin: 0 auto; cursor: not-allowed; opacity: 0.7; }
 /* --- Ripasso card (home) --- */
-.ripasso-card { display: flex; align-items: center; gap: 16px; background: #FFF7E6; border: 3px solid #F0BA3D; border-radius: 18px; padding: 18px 20px; box-shadow: 0 4px 0 #E5A82E; }
-.ripasso-icon { width: 48px; height: 48px; flex-shrink: 0; background: #FEF9C3; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
-.ripasso-icon .material-symbols-outlined { font-size: 26px; color: #B8860B; }
-.ripasso-info { flex: 1; min-width: 0; }
-.ripasso-info h3 { margin: 0 0 2px; font-size: 17px; font-weight: 900; color: #7a5400; }
-.ripasso-info p { margin: 0; font-size: 13px; font-weight: 700; color: #958AAD; }
-.ripasso-card .btn { white-space: nowrap; }
-@media (max-width: 768px) {
-  .ripasso-card { flex-wrap: wrap; justify-content: center; text-align: center; }
-  .ripasso-info { width: 100%; }
-}
+.ripasso-card { display: flex; flex-direction: column; align-items: center; gap: 12px; background: #E9F3FF; border: 2px solid #CFE3FF; border-radius: 16px; padding: 18px 20px; text-align: center; }
+.ripasso-icon { width: 42px; height: 42px; flex-shrink: 0; background: #D6EAFF; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.ripasso-icon .material-symbols-outlined { font-size: 22px; color: var(--secondary-dark); }
+.ripasso-info { min-width: 0; }
+.ripasso-info h3 { margin: 0 0 2px; font-size: 15px; font-weight: 900; color: var(--secondary-dark); }
+.ripasso-info p { margin: 0; font-size: 12px; font-weight: 700; color: #7B6F8C; }
+.ripasso-card .btn { width: 100%; max-width: 200px; }
 .onboarding-steps { display:flex; flex-direction:column; gap:10px; margin:16px 0 4px; font-size:14px; text-align:left; }
 .onboarding-lead { margin:10px 0 0; font-weight:900; color:#3D2B52; }
 .onboarding-line { margin:0; color:#7B6F8C; font-weight:700; }
