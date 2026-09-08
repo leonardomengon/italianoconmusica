@@ -650,8 +650,12 @@
     #custom-player { position:relative; }
     .player-controls-row { position:relative; }
 
-    .player-missions-swap { display:flex; align-items:center; justify-content:center; min-height:44px; margin-bottom:20px; padding:6px 10px 2px; background:#FFFFFF; border:2px solid #E7E4EC; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.08); }
-    .player-missions-swap:not([hidden]) { animation: missionRiseUp .3s ease-out; }
+    #playerProgressWrap { transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease; max-height: 60px; opacity: 1; overflow: hidden; }
+    #playerProgressWrap.collapsed { max-height: 0; opacity: 0; margin-bottom: 0 !important; }
+
+    .player-missions-swap { display:flex; align-items:center; justify-content:center; min-height:44px; margin-bottom:20px; padding:6px 10px 2px; background:#FFFFFF; border:2px solid #E7E4EC; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.08); transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease; max-height: 100px; opacity: 1; overflow: hidden; }
+    .player-missions-swap:not(.visible) { max-height: 0; opacity: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; min-height: 0; }
+    .player-missions-swap.visible { animation: missionRiseUp .3s ease-out; }
     .player-missions-swap.closing { animation: missionSlideDown .25s ease-in forwards; }
     @keyframes missionRiseUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     @keyframes missionSlideDown { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(12px); } }
