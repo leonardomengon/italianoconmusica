@@ -179,8 +179,7 @@ if (exercise.mode === 'review') {
           if (phase === 'translation') {
             wrap.innerHTML = `
               <div class="exercise-card">
-                <span class="exercise-counter">${num}/${tot}</span>
-                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
+                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text">
                     <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
@@ -215,8 +214,7 @@ if (exercise.mode === 'review') {
           } else {
             wrap.innerHTML = `
               <div class="exercise-card">
-                <span class="exercise-counter">${num}/${tot}</span>
-                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
+                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text">
                     <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
@@ -240,8 +238,7 @@ if (exercise.mode === 'review') {
         const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
         wrap.innerHTML = `
           <div class="exercise-card">
-            <span class="exercise-counter">${num}/${tot}</span>
-            <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
+            <div class="exercise-header"><span class="exercise-progress">Completa la frase</span><span class="exercise-counter">${num}/${tot}</span></div>
             <div class="exercise-text">
               <span class="exercise-verse-text">${textWithBlanks || '<em>Texto no disponible</em>'}</span>
               <button class="btn btn-sm ${btnClass} exercise-fav-btn" style="${starBtnCompleteStyle}" onclick="event.stopPropagation(); togglePreferitoFromExercise(this, ${_exerciseIndex});">${starIcon}</button>
@@ -283,10 +280,13 @@ if (exercise.mode === 'review') {
           clearInterval(_exerciseTimer);
           _exerciseTimer = null;
         }
+        const wasCompletedViaHint = _completedViaFullHint;
+        _completedViaFullHint = false;
         _exercisePhase = 'translation';
         _exerciseIndex++;
         renderCurrentExercise();
-        // Evidenzia il contatore per 1 secondo
+        // Evidenzia il contatore per 1 secondo (solo se non completato con aiuto)
+        if (wasCompletedViaHint) return;
         const counter = document.querySelector('#eserciziLyrics .exercise-counter');
         if (counter) {
           counter.classList.add('highlight');
@@ -420,6 +420,7 @@ if (exercise.mode === 'review') {
         if (newRevealed >= answer.length) {
           input.classList.add("is-valid");
           input.disabled = true;
+          _completedViaFullHint = true;
           if (!_ripassoMode) {
             // Solo in modalità studio: rivelare l'intera parola non conta come
             // punteggio e l'esercizio torna in fondo alla coda.

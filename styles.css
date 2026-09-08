@@ -278,12 +278,14 @@
       border-radius: 24px;
       padding: 24px;
       margin-bottom: 16px;
-      position: relative;
       animation: overlayFadeIn .2s ease-out;
     }
     .exercise-header {
       margin-bottom: 18px;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
     }
     .exercise-progress {
       background: #E9F3FF;
@@ -295,9 +297,6 @@
       display: inline-block;
     }
     .exercise-counter {
-      position: absolute;
-      top: 12px;
-      right: 12px;
       font-size: 13px;
       font-weight: 700;
       color: var(--text-muted);
@@ -306,6 +305,7 @@
       border-radius: 999px;
       padding: 4px 12px;
       transition: background 0.3s ease, color 0.3s ease;
+      flex-shrink: 0;
     }
     .exercise-counter.highlight {
       background: var(--primary, #9B5DE5);

@@ -23,6 +23,7 @@
       // indica la sola visualizzazione di una canzone già completata.
       let _exercisePhase = 'translation';
       let _exerciseTimer = null;
+      let _completedViaFullHint = false;
       let _savedTextsIndex = new Set();
       let _appuntiFilter = '';
       let _appuntiFilterLang = '';
