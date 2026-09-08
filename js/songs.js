@@ -364,20 +364,24 @@
           if (audioElement.paused) {
             audioElement.play();
             playIcon.textContent = 'pause';
+            try { logEvent('player_play', { songId: String(song.id) }); } catch (e) {}
           } else {
             audioElement.pause();
             playIcon.textContent = 'play_arrow';
+            try { logEvent('player_pause', { songId: String(song.id) }); } catch (e) {}
           }
         });
 
         backBtn.addEventListener('click', () => {
           audioElement.currentTime = Math.max(0, audioElement.currentTime - 5);
+          try { logEvent('player_skip_back', { songId: String(song.id) }); } catch (e) {}
         });
 
         forwardBtn.addEventListener('click', () => {
           if (audioElement.duration) {
             audioElement.currentTime = Math.min(audioElement.duration, audioElement.currentTime + 5);
           }
+          try { logEvent('player_skip_forward', { songId: String(song.id) }); } catch (e) {}
         });
 
         audioElement.addEventListener('ended', () => {

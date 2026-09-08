@@ -82,8 +82,31 @@
         const exercise = _exerciseQueue[exerciseIdx];
         const testo = exercise && exercise.text;
         if (!testo) return;
+        const value = textarea.value.trim();
+        if (!value) return;
         const target = normalizza(testo);
-        aggiornaNota(a => normalizza(a.testo) === target || normalizza(a.traduzione) === target, textarea.value.trim());
+        const appunti = getAppunti();
+        const idx = appunti.findIndex(a => normalizza(a.testo) === target || normalizza(a.traduzione) === target);
+        if (idx >= 0) {
+          appunti[idx].nota = value;
+          saveAppunti(appunti);
+        } else {
+          // Crea nuovo appunto dalla frase dell'esercizio
+          appunti.push({
+            id: 'ex_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+            text: testo,
+            traduzione: exercise.hint || '',
+            songId: currentSongBackup ? String(currentSongBackup.id) : '',
+            songTitle: currentSongBackup ? currentSongBackup.title : '',
+            artist: currentSongBackup ? currentSongBackup.artist : '',
+            lingua: '',
+            linguaTrad: '',
+            nota: value,
+            createdAt: Date.now()
+          });
+          saveAppunti(appunti);
+          if (currentSongBackup) recordSavedNoteForProgress(testo);
+        }
       }
       function saveNotaFromAppunto(textarea, id) {
         if (!id) return;

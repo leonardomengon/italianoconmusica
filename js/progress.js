@@ -10,7 +10,7 @@
     const p = getProgress();
     return (p.completedSongIds || []).length > 0;
   }
-  const ESERCIZI_PER_SFIDA = 20;
+  const ESERCIZI_PER_SFIDA = 14;
   const ONBOARDING_KEY = 'appOnboardingSeen';
   let _reviewMode = false;
   let _completionLock = false;

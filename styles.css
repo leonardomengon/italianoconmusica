@@ -282,16 +282,22 @@
     }
     .exercise-header {
       margin-bottom: 18px;
+      text-align: center;
     }
     .exercise-progress {
       background: #E9F3FF;
       color: var(--secondary-dark);
       border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 13px;
+      padding: 8px 18px;
+      font-size: 15px;
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .4px;
+      display: inline-block;
+    }
+    .exercise-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
     .exercise-body {
       display: flex;
