@@ -265,10 +265,10 @@
       margin-top: 12px;
       padding: 12px 15px;
       background: #FDF8FF;
+      border: 2px solid var(--surface-border);
       border-radius: 12px;
       font-style: italic;
       color: #6B5F7C;
-      border-left: 4px solid var(--secondary) !important;
     }
     /* Exercise card (new mode) */
     .exercise-card {
