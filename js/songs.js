@@ -391,6 +391,12 @@
         audioPlayers[id] = audioElement;
         _playerSongId = id;
         initAudioPlayer(audioElement, id);
+
+        // Nascondi il bottone missioni se la canzone è già completata (modalità review)
+        const missionsBtn = document.getElementById('missions-btn');
+        if (missionsBtn) {
+          missionsBtn.style.display = _reviewMode ? 'none' : '';
+        }
       } else {
         songPlayer.innerHTML = '<div class="text-center text-muted py-2">No hay reproductor de audio disponible</div>';
       }
