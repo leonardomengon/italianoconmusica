@@ -304,15 +304,7 @@
               Tu navegador no soporta el elemento de audio.
             </audio>
 
-            <!-- Controlli: -5s | Play/Pausa | +5s | Missioni -->
-            <div class="d-flex align-items-center justify-content-center gap-2">
-              <button id="btn-back" class="btn btn-primary px-4" title="Rebobinar 5 segundos"><span class="material-symbols-outlined">fast_rewind</span></button>
-              <button id="play-btn" class="btn btn-primary px-3"><span id="play-icon" class="material-symbols-outlined">play_arrow</span></button>
-              <button id="btn-forward" class="btn btn-primary px-3" title="Adelantar 5 segundos"><span class="material-symbols-outlined">fast_forward</span></button>
-              <button id="missions-btn" class="btn btn-missions px-3" title="Ver misiones" onclick="showMissionsSwap(3000)"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-            </div>
-
-            <!-- Barra di progresso (sotto i bottoni) -->
+            <!-- Barra di progresso (sopra i bottoni) -->
             <div id="playerProgressWrap" class="mb-2">
               <div class="progress" style="height: 6px; background-color: #e9ecef;">
                 <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 0%; pointer-events: none;"></div>
@@ -323,10 +315,19 @@
               </div>
             </div>
 
+            <!-- Controlli centrati + bottone missioni tutto a destra -->
+            <div class="player-controls-row d-flex align-items-center justify-content-center gap-2">
+              <button id="btn-back" class="btn btn-primary px-4" title="Rebobinar 5 segundos"><span class="material-symbols-outlined">fast_rewind</span></button>
+              <button id="play-btn" class="btn btn-primary px-3"><span id="play-icon" class="material-symbols-outlined">play_arrow</span></button>
+              <button id="btn-forward" class="btn btn-primary px-3" title="Adelantar 5 segundos"><span class="material-symbols-outlined">fast_forward</span></button>
+              <button id="missions-btn" class="btn btn-missions px-3" title="Ver misiones" onclick="toggleMissionsSwap(3000)"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+            </div>
+
             <!-- Righe missioni: sostituiscono la barra di avanzamento per qualche secondo -->
             <div id="playerMissionsSwap" class="player-missions-swap" hidden>
               <span id="missionFeedbackText" class="mission-feedback-text" hidden></span>
               <div id="missionProgressRows" class="course-missions-basic"></div>
+            </div>
             </div>
           </div>
         `;
