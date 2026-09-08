@@ -278,6 +278,7 @@
       border-radius: 24px;
       padding: 24px;
       margin-bottom: 16px;
+      position: relative;
       animation: overlayFadeIn .2s ease-out;
     }
     .exercise-header {
@@ -294,6 +295,9 @@
       display: inline-block;
     }
     .exercise-counter {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       font-size: 13px;
       font-weight: 700;
       color: var(--text-muted);
@@ -351,7 +355,7 @@
     }
     .exercise-actions {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
