@@ -228,7 +228,7 @@
     box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="openCurrentSong()">CANCIÓN</button></div></div><div class="course-missions-divider"></div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
     const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
     const ripassoBox = document.getElementById('ripassoHome');
-    if (appuntiCount > 0) {
+    if (appuntiCount >= 10) {
       ripassoBox.innerHTML=`<article class="ripasso-card"><div class="ripasso-icon"><span class="material-symbols-outlined">auto_stories</span></div><div class="ripasso-info"><h3>Repasa tus notas</h3><p>${appuntiCount} frase${appuntiCount > 1 ? 's' : ''} guardada${appuntiCount > 1 ? 's' : ''} en tus notas</p></div><button class="btn btn-primary" onclick="openRipasso()">Repasar</button></article>`;
     } else {
       ripassoBox.innerHTML=``;
