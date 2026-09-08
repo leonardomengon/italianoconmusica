@@ -116,6 +116,7 @@
     if (_missionsSwapTimer) { clearTimeout(_missionsSwapTimer); _missionsSwapTimer = null; }
     if (swap && swap.classList.contains("visible")) {
       // Animazione di chiusura
+      _animatingMissions = true;
       swap.classList.add("closing");
       swap.classList.remove("visible");
       setTimeout(() => {
@@ -152,6 +153,7 @@
     _animatingMissions = true;
     progress.classList.add("collapsed");
     swap.classList.add("visible");
+    setTimeout(() => { _animatingMissions = false; }, 300);
     if (_missionsSwapTimer) clearTimeout(_missionsSwapTimer);
     _missionsSwapTimer = setTimeout(closeMissionsSwap, durationMs || 3000);
   }
