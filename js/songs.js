@@ -297,13 +297,6 @@
       const audioUrl = song.soundcloud_link;
       if (audioUrl) {
         songPlayer.innerHTML = `
-            <!-- Righe missioni / feedback: sopra il player -->
-            <!-- Righe missioni / feedback: sostituiscono la barra sopra i bottoni -->
-            <div id="playerMissionsSwap" class="player-missions-swap" hidden>
-              <span id="missionFeedbackText" class="mission-feedback-text" hidden></span>
-              <div id="missionProgressRows" class="course-missions-basic"></div>
-            </div>
-
           <div id="custom-player" class="py-2">
             <!-- Audio nascosto -->
             <audio id="audio-element" preload="metadata">
@@ -320,6 +313,12 @@
                 <span id="current-time">0:00</span>
                 <span id="duration-time">0:00</span>
               </div>
+            </div>
+
+            <!-- Righe missioni / feedback: sostituiscono la barra sopra i bottoni -->
+            <div id="playerMissionsSwap" class="player-missions-swap" hidden>
+              <span id="missionFeedbackText" class="mission-feedback-text" hidden></span>
+              <div id="missionProgressRows" class="course-missions-basic"></div>
             </div>
 
             <!-- Controlli centrati + bottone missioni tutto a destra -->
