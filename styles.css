@@ -560,8 +560,8 @@
     #custom-player .mb-2 { margin-bottom:4px!important; }
     #custom-player .progress { height:5px !important; }
     #custom-player .d-flex.justify-content-between .text-muted { font-size:10px !important; }
-    #custom-player .btn { padding:4px 12px !important; }
-    #custom-player .btn .material-symbols-outlined { font-size:20px !important; }
+    #custom-player .btn { padding:9px 24px !important; border-radius:14px !important; }
+    #custom-player .btn .material-symbols-outlined { font-size:26px !important; }
     #custom-player .d-flex.align-items-center.justify-content-center { gap:6px !important; margin-top:2px !important; }
     #loadingMessage { text-align:center; padding:40px 20px; font-size:18px; display:none; color:var(--primary); font-weight:900; }
     .loading-spinner { display:inline-block; width:22px; height:22px; border:4px solid #EDE0FB; border-radius:50%; border-top-color:var(--primary); animation:spin 1s ease-in-out infinite; }
@@ -645,7 +645,8 @@
     .mini-progress { height:8px; background:#EDE5F5; border-radius:999px; overflow:hidden; border-bottom:2px solid #DBCCEC; }
     .mini-progress-fill { height:100%; background:var(--secondary); border-radius:999px; transition:width .25s ease; }
     /* --- Bottone missioni nel player fisso --- */
-    #custom-player .btn-missions { background:#FFFFFF !important; color:var(--primary) !important; border:2px solid var(--primary) !important; border-bottom-color:var(--primary-dark) !important; padding:4px 10px !important; }
+    #custom-player .btn-missions { position:absolute; right:0; top:50%; transform:translateY(-50%); background:#FFFFFF !important; color:var(--primary) !important; border:2px solid var(--primary) !important; border-bottom-color:var(--primary-dark) !important; padding:9px 12px !important; }
+    .player-controls-row { position:relative; }
     .player-missions-swap { display:flex; align-items:center; justify-content:center; min-height:34px; padding:4px 0 2px; }
     #playerMissionsSwap .mission-icons { justify-content:center; gap:26px; }
 
