@@ -534,7 +534,7 @@
     #editModalBox h5 { margin:0 0 14px; font-size:1.15rem; font-weight:900; }
     #editModalBox label { display:block; font-size:13px; font-weight:900; color:#7B6F8C; margin-bottom:5px; margin-top:12px; }
     #editModalActions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
-    .player-fixed { position:fixed; bottom:72px; left:0; right:0; background:#FFFFFF; padding:4px 0 6px; border-top:1px solid #E9E6EF; z-index:1070; box-shadow:none; }
+    .player-fixed { position:fixed; bottom:72px; left:0; right:0; background:#F4F3F7; padding:4px 0 6px; border-top:1px solid #E7E4EC; z-index:1070; box-shadow:none; }
     .audio-error { color:var(--danger); background:#FFE4EA; padding:10px; border-radius:12px; margin:10px 0; font-weight:900; }
 
     /* Player custom: icone Material + niente evidenziazione gialla al tap su mobile */
