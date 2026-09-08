@@ -366,7 +366,7 @@
       margin-left: 10px;
       margin-right: 10px;
     }
-    /* ESERCIZI: stella preferiti accanto al verso (modalità complete) */
+    /* ESERCIZI: stella preferiti accanto al verso (modalit� complete) */
     #eserciziLyrics .exercise-text {
       display: flex;
       align-items: flex-start;
@@ -649,7 +649,10 @@
     #custom-player .btn-missions .material-symbols-outlined { font-size:17px !important; }
     #custom-player { position:relative; }
     .player-controls-row { position:relative; }
+    
     .player-missions-swap { position:absolute; top:0; left:0; right:0; display:flex; align-items:center; justify-content:center; min-height:44px; padding:6px 10px 2px; background:#FFFFFF; border:2px solid #E7E4EC; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.08); z-index:10; }
+    .player-missions-swap:not([hidden]) { animation: missionRiseUp .3s ease-out; }
+    @keyframes missionRiseUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
     #playerMissionsSwap .mission-icons { justify-content:center; gap:26px; }
 
     .mission-feedback-text { font-weight:900; font-size:12px; color:#fff; background:linear-gradient(135deg,#7C3AED,#9B5DE5); border-radius:999px; padding:4px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100vw - 96px); animation:missionFeedbackPulse .5s ease; }
@@ -862,7 +865,7 @@
 
 /* Filas de canciones dentro del tablero del corso */
 .course-song-list { display: flex; flex-direction: column; gap: 10px; }
-/* Pestañas Canzoni / Argomenti dentro del cuerpo del curso */
+/* Pesta�as Canzoni / Argomenti dentro del cuerpo del curso */
 .course-tabs {
   display: flex;
   gap: 8px;
