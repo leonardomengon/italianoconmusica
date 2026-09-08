@@ -644,8 +644,13 @@
     @media (max-width:768px){ .mission-feedback-text{ font-size:12px; padding:4px 11px; max-width:calc(100vw - 64px); } }
     @keyframes missionFeedbackPulse { 0%{transform:scale(.85);opacity:.4} 60%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
     .mission-progress-wrap.open .mission-progress-chevron { transform:rotate(180deg); }
-    .mission-progress-body { padding:12px 14px; max-height:260px; overflow-y:auto; }
-    .mission-progress-body .course-missions-basic { margin-bottom:0; }
+    .mission-progress-body { padding:10px 12px 12px; max-height:260px; overflow-y:auto; }
+    .mission-icons { display:flex; justify-content:space-around; align-items:center; gap:10px; }
+    .mission-icon-chip { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:52px; }
+    .mission-icon-badge { display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:14px; background:#F3EDFB; font-size:22px; border:2px solid var(--surface-border); }
+    .mission-icon-chip.done .mission-icon-badge { background:#EADCFE; border-color:#C9A8EF; color:var(--primary-dark); }
+    .mission-icon-value { font-weight:900; font-size:12px; color:var(--secondary-dark); }
+    .mission-icon-chip.done .mission-icon-value { color:var(--primary-dark); }
     .mission-progress-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
     .mission-progress-label { font-weight:900; color:var(--primary-dark); font-size:15px; }
     .mission-progress-count { font-weight:900; background:#E9F3FF; border:1px solid #CFE3FF; color:var(--secondary-dark); border-radius:999px; padding:3px 12px; font-size:13px; }
