@@ -1,6 +1,6 @@
 ﻿  const API_URL = "https://script.google.com/macros/s/AKfycbykSfICz5AKMWY8S4KR2lgafDd7V82NKDGPV8mpZtGB3r_UwTfqGNvnp7ealTt6uwwJ/exec"
       // Catalogo completo (lista + lyrics) servito da Cloudinary come asset raw.
-      const CATALOGO_URL = "https://res.cloudinary.com/gh5kjl2a/raw/upload/v1788548838/catalogo.json"
+      const CATALOGO_URL = "https://res.cloudinary.com/gh5kjl2a/raw/upload/v1788871048/catalogo.json"
       let songs = [];
       let currentPage = 0;
       const songsPerPage = 10;
