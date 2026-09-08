@@ -179,6 +179,7 @@ if (exercise.mode === 'review') {
           if (phase === 'translation') {
             wrap.innerHTML = `
               <div class="exercise-card">
+                <span class="exercise-counter">${num}/${tot}</span>
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text">
@@ -190,7 +191,6 @@ if (exercise.mode === 'review') {
                   </div>
                   <div class="exercise-actions">
                     <button id="${proceedBtnId}" class="btn btn-primary" onclick="${proceedHandler}" disabled>5</button>
-                    <span class="exercise-counter">${num}/${tot}</span>
                   </div>
                 </div>
               </div>
@@ -215,6 +215,7 @@ if (exercise.mode === 'review') {
           } else {
             wrap.innerHTML = `
               <div class="exercise-card">
+                <span class="exercise-counter">${num}/${tot}</span>
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text">
@@ -227,7 +228,6 @@ if (exercise.mode === 'review') {
                   </div>
                   <div class="exercise-actions">
                     <button class="btn btn-primary" onclick="${proceedHandler}">Continuar</button>
-                    <span class="exercise-counter">${num}/${tot}</span>
                   </div>
                 </div>
               </div>
@@ -240,6 +240,7 @@ if (exercise.mode === 'review') {
         const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
         wrap.innerHTML = `
           <div class="exercise-card">
+            <span class="exercise-counter">${num}/${tot}</span>
             <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
             <div class="exercise-text">
               <span class="exercise-verse-text">${textWithBlanks || '<em>Texto no disponible</em>'}</span>
@@ -252,7 +253,6 @@ if (exercise.mode === 'review') {
             <div class="exercise-actions">
               <button class="btn btn-primary exercise-hint-btn" onclick="${hintHandler}" title="${hintTitle}">💡 Ayuda</button>
               <button class="btn btn-primary exercise-next-btn exercise-next-hidden" onclick="${nextHandler}">Siguiente →</button>
-              <span class="exercise-counter">${num}/${tot}</span>
             </div>
           </div>`;
       }
