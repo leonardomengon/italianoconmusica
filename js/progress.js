@@ -105,36 +105,28 @@
     const row = basicMissionNames().find(([k]) => after[k] && !before[k]);
     if (row) showMissionFeedback(row[1]);
   }
-  let _missionFeedbackTimer = null;
-  function showMissionFeedback(text) {
-    const chevron = document.querySelector('#missionProgressToggle .mission-progress-chevron');
-    const fb = document.getElementById('missionFeedbackText');
-    if (!chevron || !fb) return;
-    chevron.style.display = 'none';
-    fb.textContent = `${text} ✓`;
-    fb.hidden = false;
-    if (_missionFeedbackTimer) clearTimeout(_missionFeedbackTimer);
-    _missionFeedbackTimer = setTimeout(() => {
-      chevron.style.display = '';
-      fb.hidden = true;
-      _missionFeedbackTimer = null;
-      if (!document.getElementById('missionProgressBody').hidden) renderFixedPlayerMissions();
-    }, 2200);
+  let _missionsSwapTimer = null;
+  // Mostra le missioni al posto della barra di avanzamento del player per un tempo limitato.
+  function showMissionsSwap(durationMs, feedbackText) {
+    const progress = document.getElementById("playerProgressWrap");
+    const swap = document.getElementById("playerMissionsSwap");
+    const fb = document.getElementById("missionFeedbackText");
+    if (!progress || !swap) return;
+    renderFixedPlayerMissions();
+    if (fb) { if (feedbackText) { fb.textContent = feedbackText; fb.hidden = false; } else { fb.hidden = true; } }
+    progress.hidden = true;
+    swap.hidden = false;
+    if (_missionsSwapTimer) clearTimeout(_missionsSwapTimer);
+    _missionsSwapTimer = setTimeout(() => {
+      swap.hidden = true;
+      progress.hidden = false;
+      if (fb) fb.hidden = true;
+      _missionsSwapTimer = null;
+    }, durationMs || 3000);
   }
-  function toggleMissionPanel() {
-    const toggle = document.getElementById('missionProgressToggle');
-    const body = document.getElementById('missionProgressBody');
-    const wrap = document.getElementById('missionProgressWrap');
-    if (!toggle || !body || !wrap) return;
-    const open = body.hidden;
-    body.hidden = !open;
-    toggle.setAttribute('aria-expanded', String(open));
-    if (open) {
-      wrap.classList.add('open');
-      renderFixedPlayerMissions();
-    } else {
-      wrap.classList.remove('open');
-    }
+  // Se tra before e after è appena stata completata una missione base, mostra il feedback.
+  function showMissionFeedback(text) {
+    showMissionsSwap(2200, text + " ✓");
   }
   function getCurrentSong() {
     const p=getProgress();
