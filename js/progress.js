@@ -14,6 +14,7 @@
   const ONBOARDING_KEY = 'appOnboardingSeen';
   let _reviewMode = false;
   let _completionLock = false;
+  let _animatingMissions = false;
 
   function defaultProgress() {
     return { version: 1, currentSongId: null, completedSongIds: [], songs: {} };
@@ -123,6 +124,7 @@
         if (progress) progress.classList.remove("collapsed");
         if (rows) rows.hidden = false;
         if (fb) fb.hidden = true;
+        _animatingMissions = false;
       }, 250);
     } else {
       if (progress) progress.classList.remove("collapsed");
@@ -147,6 +149,7 @@
       if (fb) fb.hidden = true;
     }
     // Animazione espansione: nascondi barra e mostra missioni
+    _animatingMissions = true;
     progress.classList.add("collapsed");
     swap.classList.add("visible");
     if (_missionsSwapTimer) clearTimeout(_missionsSwapTimer);
@@ -154,6 +157,7 @@
   }
   // Bottone missioni: se aperte le chiude subito, altrimenti le apre.
   function toggleMissionsSwap(durationMs) {
+    if (_animatingMissions) return;
     const swap = document.getElementById("playerMissionsSwap");
     if (swap && swap.classList.contains("visible")) { closeMissionsSwap(); return; }
     openMissionsSwap(durationMs || 3000, null);
