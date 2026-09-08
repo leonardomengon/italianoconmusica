@@ -26,13 +26,6 @@
           renderAppuntiAuto();
       });
 
-      document.getElementById('appuntiFilterToggle').addEventListener('click', function() {
-          const filters = document.querySelector('.appunti-filters');
-          const isHidden = !filters.style.display || filters.style.display === 'none';
-          filters.style.display = isHidden ? 'flex' : 'none';
-          this.classList.toggle('active', isHidden);
-      });
-
       document.getElementById('showAppuntiBtn').addEventListener('click', openNotebookView);
       document.getElementById('showSongsBtn').addEventListener('click', showHomeView);
 
