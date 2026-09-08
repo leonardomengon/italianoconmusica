@@ -67,9 +67,6 @@
       : allRows;
     return `<div class="mission-list">${rows.map(r => `<div class="mission-row ${r[4]?'done':''}"><div class="mission-icon">${r[4]?'✓':r[0]}</div><div><div class="mission-name">${r[1]}</div></div><div class="mission-value">${Math.min(r[2],r[3])} / ${r[3]}</div></div>`).join('')}</div>`;
   }
-  // Conta solo le 3 missioni di base che sbloccano gli esercizi.
-  function missionProgressCount(m) { return [m.translationsDone, m.notesDone, m.listensDone].filter(Boolean).length; }
-  // Chip compatte (icona + conteggio x/n) delle 3 missioni di base, su una sola riga.
   function missionIconsHtml(m) {
     const rn = REQUIRED_NOTES(), rl = REQUIRED_LISTENS();
     const all = [
@@ -79,22 +76,19 @@
     ];
     return `<div class="mission-icons">${all.map(([k, icon, val, max, name]) =>
       `<div class="mission-icon-chip ${m[k] ? 'done' : ''}" title="${name}">` +
-        `<span class="mission-icon-badge">${m[k] ? '✓' : icon}</span>` +
-        `<span class="mission-icon-value">${Math.min(val, max)}/${max}</span>` +
+        `<span class="mission-icon-badge">${icon}</span>` +
+        `<span class="mission-icon-status">${m[k] ? '✓' : `${Math.min(val, max)}/${max}`}</span>` +
       `</div>`).join('')}</div>`;
   }
   // Aggiorna il pannello missioni del player fisso (senza tornare alla home).
   function renderFixedPlayerMissions() {
-    const panel = document.getElementById('missionProgressCount');
     const rows = document.getElementById('missionProgressRows');
-    if (!panel || !rows) return;
+    if (!rows) return;
     const song = (currentSongBackup && currentSongBackup.lyrics && currentSongBackup.lyrics.length)
       ? currentSongBackup
       : getCurrentSong();
     if (!song) return;
-    const m = missionState(song);
-    panel.textContent = `${missionProgressCount(m)}/3`;
-    rows.innerHTML = missionIconsHtml(m);
+    rows.innerHTML = missionIconsHtml(missionState(song));
   }
   // Nomi delle 3 missioni di base (stesse stringhe usate nella lista).
   function basicMissionNames() {
