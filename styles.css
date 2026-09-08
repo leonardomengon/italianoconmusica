@@ -322,7 +322,7 @@
       color: #3D2B52;
       font-weight: 800;
       padding: 18px;
-      background: var(--surface-dim);
+      background: #FDF8FF;
       border-radius: 16px;
       border: 2px solid var(--surface-border);
     }
