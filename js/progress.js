@@ -113,7 +113,14 @@
     const fb = document.getElementById("missionFeedbackText");
     const rows = document.getElementById("missionProgressRows");
     if (_missionsSwapTimer) { clearTimeout(_missionsSwapTimer); _missionsSwapTimer = null; }
-    if (swap) swap.hidden = true;
+    if (swap && !swap.hidden) {
+      // Animazione di chiusura prima di nascondere
+      swap.classList.add("closing");
+      setTimeout(() => {
+        swap.hidden = true;
+        swap.classList.remove("closing");
+      }, 250);
+    }
     if (progress) progress.hidden = false;
     if (rows) rows.hidden = false;
     if (fb) fb.hidden = true;
