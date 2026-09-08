@@ -534,7 +534,7 @@
     #editModalBox h5 { margin:0 0 14px; font-size:1.15rem; font-weight:900; }
     #editModalBox label { display:block; font-size:13px; font-weight:900; color:#7B6F8C; margin-bottom:5px; margin-top:12px; }
     #editModalActions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
-    .player-fixed { position:fixed; bottom:72px; left:0; right:0; background:linear-gradient(180deg,#F7F1FD,#F1E9FA); padding:4px 0 6px; border-top:2px solid #E4D8F2; z-index:1070; box-shadow:none; }
+    .player-fixed { position:fixed; bottom:72px; left:0; right:0; background:#FFFFFF; padding:4px 0 6px; border-top:1px solid #E9E6EF; z-index:1070; box-shadow:none; }
     .audio-error { color:var(--danger); background:#FFE4EA; padding:10px; border-radius:12px; margin:10px 0; font-weight:900; }
 
     /* Player custom: icone Material + niente evidenziazione gialla al tap su mobile */
@@ -644,20 +644,19 @@
     .listen-progress-box { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; font-weight:900; font-size:12px; }
     .mini-progress { height:8px; background:#EDE5F5; border-radius:999px; overflow:hidden; border-bottom:2px solid #DBCCEC; }
     .mini-progress-fill { height:100%; background:var(--secondary); border-radius:999px; transition:width .25s ease; }
-    /* --- Pannello missioni nel player fisso: chiuso = sola freccia in alto --- */
-    .mission-progress-wrap { background:transparent; border:none; border-radius:0; box-shadow:none; }
-    .mission-progress-toggle { display:flex; align-items:center; justify-content:center; width:100%; background:none; border:none; padding:2px 0 3px; cursor:pointer; font:inherit; line-height:1; }
-    .mission-progress-chevron { display:inline-flex; font-size:18px; line-height:1; color:var(--secondary-dark); transition:transform .2s ease; }
+    /* --- Bottone missioni nel player fisso --- */
+    #custom-player .btn-missions { background:#FFFFFF !important; color:var(--primary) !important; border:2px solid var(--primary) !important; border-bottom-color:var(--primary-dark) !important; padding:4px 10px !important; }
+    .player-missions-swap { display:flex; align-items:center; justify-content:center; min-height:34px; padding:4px 0 2px; }
+    #playerMissionsSwap .mission-icons { justify-content:center; gap:26px; }
+
     .mission-feedback-text { font-weight:900; font-size:12px; color:#fff; background:linear-gradient(135deg,#7C3AED,#9B5DE5); border-radius:999px; padding:4px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100vw - 96px); animation:missionFeedbackPulse .5s ease; }
     @media (max-width:768px){ .mission-feedback-text{ font-size:11px; padding:3px 10px; max-width:calc(100vw - 64px); } }
     @keyframes missionFeedbackPulse { 0%{transform:scale(.85);opacity:.4} 60%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
-    .mission-progress-wrap.open .mission-progress-chevron { transform:rotate(180deg); }
-    .mission-progress-body { padding:2px 8px 6px; max-height:130px; overflow-y:auto; }
     .mission-icons { display:flex; justify-content:space-around; align-items:center; gap:8px; }
     .mission-icon-chip { display:flex; flex-direction:column; align-items:center; gap:1px; min-width:40px; }
-    .mission-icon-badge { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:9px; background:#EADCFE; font-size:16px; line-height:1; }
-    .mission-icon-chip.done .mission-icon-badge { background:#D9C4F5; }
-    .mission-icon-status { font-weight:900; font-size:10px; color:var(--secondary-dark); line-height:1; }
+    .mission-icon-badge { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:9px; background:#F1EFF4; font-size:16px; line-height:1; }
+    .mission-icon-chip.done .mission-icon-badge { background:#E4E1EA; }
+    .mission-icon-status { font-weight:900; font-size:10px; color:#6E6880; line-height:1; }
     .mission-icon-chip.done .mission-icon-status { color:var(--primary); }
 .completed-card { margin-bottom:20px; }
 .completed-card .card { cursor:default; border-color:#C9A8EF!important; }
