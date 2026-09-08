@@ -298,6 +298,14 @@
       font-weight: 700;
       color: var(--text-muted);
       white-space: nowrap;
+      background: var(--surface-dim, #F3E8FF);
+      border-radius: 999px;
+      padding: 4px 12px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .exercise-counter.highlight {
+      background: var(--primary, #9B5DE5);
+      color: #fff;
     }
     .exercise-body {
       display: flex;

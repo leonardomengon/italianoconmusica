@@ -286,6 +286,12 @@ if (exercise.mode === 'review') {
         _exercisePhase = 'translation';
         _exerciseIndex++;
         renderCurrentExercise();
+        // Evidenzia il contatore per 1 secondo
+        const counter = document.querySelector('#eserciziLyrics .exercise-counter');
+        if (counter) {
+          counter.classList.add('highlight');
+          setTimeout(() => counter.classList.remove('highlight'), 1000);
+        }
       }
 
       function togglePreferitoFromExercise(btn, exerciseIdx) {
