@@ -328,7 +328,7 @@
     }
     .exercise-translation {
       background: #FDF8FF;
-      border-left: 4px solid var(--secondary);
+      border: 2px solid var(--surface-border);
       border-radius: 12px;
       padding: 12px 15px;
       font-style: italic;
