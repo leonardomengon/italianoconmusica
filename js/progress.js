@@ -229,7 +229,7 @@
     const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
     const ripassoBox = document.getElementById('ripassoHome');
     if (appuntiCount >= 10) {
-      ripassoBox.innerHTML=`<article class="ripasso-card"><div class="ripasso-icon"><span class="material-symbols-outlined">auto_stories</span></div><div class="ripasso-info"><h3>Repasa tus notas</h3><p>${appuntiCount} frase${appuntiCount > 1 ? 's' : ''} guardada${appuntiCount > 1 ? 's' : ''} en tus notas</p></div><button class="btn btn-primary" onclick="openRipasso()">Repasar</button></article>`;
+      ripassoBox.innerHTML=`<article class="ripasso-card"><div class="ripasso-icon"><span class="material-symbols-outlined">auto_stories</span></div><div class="ripasso-info"><h3>Repasa tus notas</h3><p>${appuntiCount} frases guardadas</p></div><button class="btn btn-primary" onclick="openRipasso()">Repasar</button></article>`;
     } else {
       ripassoBox.innerHTML=``;
     }
