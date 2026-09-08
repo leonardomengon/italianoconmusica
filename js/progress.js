@@ -113,19 +113,19 @@
     const fb = document.getElementById("missionFeedbackText");
     const rows = document.getElementById("missionProgressRows");
     if (_missionsSwapTimer) { clearTimeout(_missionsSwapTimer); _missionsSwapTimer = null; }
-    if (swap && !swap.hidden) {
-      // Animazione di chiusura prima di nascondere
+    if (swap && swap.classList.contains("visible")) {
+      // Animazione di chiusura
       swap.classList.add("closing");
+      swap.classList.remove("visible");
       setTimeout(() => {
-        swap.hidden = true;
         swap.classList.remove("closing");
-        // Mostra la barra solo dopo l animazione
-        if (progress) progress.hidden = false;
+        // Mostra la barra dopo l animazione
+        if (progress) progress.classList.remove("collapsed");
         if (rows) rows.hidden = false;
         if (fb) fb.hidden = true;
       }, 250);
     } else {
-      if (progress) progress.hidden = false;
+      if (progress) progress.classList.remove("collapsed");
       if (rows) rows.hidden = false;
       if (fb) fb.hidden = true;
     }
@@ -146,15 +146,16 @@
       if (rows) rows.hidden = false;
       if (fb) fb.hidden = true;
     }
-    progress.hidden = true;
-    swap.hidden = false;
+    // Animazione espansione: nascondi barra e mostra missioni
+    progress.classList.add("collapsed");
+    swap.classList.add("visible");
     if (_missionsSwapTimer) clearTimeout(_missionsSwapTimer);
     _missionsSwapTimer = setTimeout(closeMissionsSwap, durationMs || 3000);
   }
   // Bottone missioni: se aperte le chiude subito, altrimenti le apre.
   function toggleMissionsSwap(durationMs) {
     const swap = document.getElementById("playerMissionsSwap");
-    if (swap && !swap.hidden) { closeMissionsSwap(); return; }
+    if (swap && swap.classList.contains("visible")) { closeMissionsSwap(); return; }
     openMissionsSwap(durationMs || 3000, null);
   }
   // Se tra before e after è appena stata completata una missione base, mostra il feedback.
