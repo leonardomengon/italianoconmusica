@@ -1,4 +1,4 @@
-﻿      // ==================== PREFERITI ====================
+      // ==================== PREFERITI ====================
       // Risolve l'indice posizionale di un verso nella canzone corrente
       // cercando il testo (normalizzato) tra i versi principali (text1) e
       // le traduzioni (text2). Ritorna l'indice o null se non trovato.
@@ -69,7 +69,6 @@
               btn.innerHTML = '⭐';
               btn.classList.remove('btn-outline-secondary');
               btn.classList.add('btn-outline-warning');
-              showToast('⭐ ¡Añadido a favoritos!');
               return true;
           }
       }
