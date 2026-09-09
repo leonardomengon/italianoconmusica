@@ -690,16 +690,22 @@
     const safeId = courseSafeId(courseKey);
     return `
       <div class="course-group mp-tile" id="mp-tile-${safeId}" style="${visible ? '' : 'display:none;'}">
-        <p class="mp-copy">Las canciones de este curso siguen estando <strong>gratuitas y siempre disponibles</strong>.
-        Si te ha gustado, una pequeña propina (por ejemplo, un café) ayuda a publicar
-        las próximas canciones y las nuevas traducciones.</p>
-        <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
-          💙 Dejar una propina con Mercado Pago
-        </button>
-        <span class="mp-feedback" id="copyFeedback-${safeId}"></span>
-        <button class="btn-skip-mp" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')">
-          No, está bien — muéstrame las canciones
-        </button>
+        <div class="mp-panel" id="mp-panel-1-${safeId}">
+          <p class="mp-copy"><strong>Las canciones siempre serán gratis.</strong> Tu donación ayuda a publicar las próximas.</p>
+          <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
+            💙 Hacer una donación con Mercado Pago
+          </button>
+          <button class="btn-skip-mp" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')">
+            No, está bien
+          </button>
+        </div>
+        <div class="mp-panel mp-panel-alias" id="mp-panel-2-${safeId}" style="display:none;">
+          <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar">✕</button>
+          <div class="mp-alias-box">${escapeHtml(MP_ALIAS)}</div>
+          <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')">📋 Copiar alias</button>
+          <button class="btn-open-mp" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')">Ir a Mercado Pago</button>
+          <span class="mp-feedback" id="copyFeedback-${safeId}"></span>
+        </div>
       </div>
     `;
   }
@@ -882,10 +888,16 @@
 
   function mpDonateClick(courseKey) {
     const safeId = courseSafeId(courseKey);
-    const feedback = document.getElementById('copyFeedback-' + safeId);
-    const intentUrl = 'intent://home#Intent;scheme=mercadopago;package=com.mercadopago.wallet;' +
-      'S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.mercadopago.wallet;end';
+    // Passa dalla prima alla seconda schermata (alias + azioni).
+    const panel1 = document.getElementById('mp-panel-1-' + safeId);
+    const panel2 = document.getElementById('mp-panel-2-' + safeId);
+    if (panel1) panel1.style.display = 'none';
+    if (panel2) panel2.style.display = 'flex';
+  }
 
+  function mpCopyAlias(courseKey) {
+    const safeId = courseSafeId(courseKey);
+    const feedback = document.getElementById('copyFeedback-' + safeId);
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(MP_ALIAS).then(function() {
         if (feedback) { feedback.textContent = '✅ ¡Alias copiado!'; feedback.style.color = '#1DB954'; }
@@ -895,25 +907,12 @@
     } else if (feedback) {
       copiaFallback(feedback);
     }
+  }
 
-    // Marca el curso como ya ofertado para no volver a mostrar el botón.
-    marcarCursoOfrecido(courseKey);
-
-    // Muestra las canciones del curso y oculta el botón de propina.
-    const songsEl = document.getElementById('course-songs-' + safeId);
-    if (songsEl) songsEl.style.display = 'flex';
-    const tileEl = document.getElementById('mp-tile-' + safeId);
-    if (tileEl) tileEl.style.display = 'none';
-    // Vuelve a la vista de canciones (no temas) tras donar.
-    _cursoTabs[courseKey] = 'songs';
-    const temasEl = document.getElementById('course-temas-' + safeId);
-    if (temasEl) temasEl.style.display = 'none';
-    const grp = document.querySelector(`.course-group[data-course-key="${CSS.escape(courseKey)}"]`);
-    if (grp) grp.querySelectorAll('.course-tab').forEach(btn => {
-      const isTemas = btn.getAttribute('onclick').indexOf("'temas'") !== -1;
-      btn.classList.toggle('active', !isTemas);
-    });
-
+  function mpGoMP(courseKey) {
+    mpCopyAlias(courseKey);
+    const intentUrl = 'intent://home#Intent;scheme=mercadopago;package=com.mercadopago.wallet;' +
+      'S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.mercadopago.wallet;end';
     setTimeout(function() {
       try { window.top.location.href = intentUrl; }
       catch(e) { window.open(intentUrl, '_blank'); }
