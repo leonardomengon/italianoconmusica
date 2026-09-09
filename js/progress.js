@@ -690,8 +690,10 @@
     const safeId = courseSafeId(courseKey);
     return `
       <div class="course-group mp-tile" id="mp-tile-${safeId}" style="${visible ? '' : 'display:none;'}">
+        <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar">✕</button>
         <div class="mp-panel" id="mp-panel-1-${safeId}">
-          <p class="mp-copy"><strong>Las canciones siempre serán gratis.</strong> Tu donación ayuda a publicar las próximas.</p>
+          <p class="mp-copy"><strong>Las canciones de este curso siempre serán gratis y disponibles</strong></p>
+          <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
           <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
             💙 Hacer una donación con Mercado Pago
           </button>
@@ -700,10 +702,12 @@
           </button>
         </div>
         <div class="mp-panel mp-panel-alias" id="mp-panel-2-${safeId}" style="display:none;">
-          <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar">✕</button>
+          <span class="mp-alias-label">Alias</span>
           <div class="mp-alias-box">${escapeHtml(MP_ALIAS)}</div>
           <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')">📋 Copiar alias</button>
-          <button class="btn-open-mp" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')">Ir a Mercado Pago</button>
+          <button class="btn-open-mp" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')">
+            <img class="mp-logo" src="resources/mp-logo.png" alt=""> Ir a Mercado Pago
+          </button>
           <span class="mp-feedback" id="copyFeedback-${safeId}"></span>
         </div>
       </div>
@@ -888,11 +892,13 @@
 
   function mpDonateClick(courseKey) {
     const safeId = courseSafeId(courseKey);
-    // Passa dalla prima alla seconda schermata (alias + azioni).
+    // Passa dalla prima alla seconda schermata (alias + azioni) e mostra la X.
     const panel1 = document.getElementById('mp-panel-1-' + safeId);
     const panel2 = document.getElementById('mp-panel-2-' + safeId);
+    const closeX = document.querySelector(`#mp-tile-${safeId} .mp-close-x`);
     if (panel1) panel1.style.display = 'none';
     if (panel2) panel2.style.display = 'flex';
+    if (closeX) closeX.style.display = 'block';
   }
 
   function mpCopyAlias(courseKey) {
