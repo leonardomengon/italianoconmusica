@@ -330,6 +330,8 @@
     document.getElementById('loadingMessage').style.display = "none";
     updateBottomNav('library');
     _ripassoMode = false;
+    // Ferma la canzone in riproduzione prima di cambiare vista (navbar)
+    if (currentSongId !== null) stopSong(currentSongId);
     hidePrimaryViews();
     document.getElementById('libreria').classList.remove('d-none');
     updateNavigation('library');
@@ -690,20 +692,24 @@
     const safeId = courseSafeId(courseKey);
     return `
       <div class="course-group mp-tile" id="mp-tile-${safeId}" style="${visible ? '' : 'display:none;'}">
-        <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar">✕</button>
+        <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar"></button>
         <div class="mp-panel" id="mp-panel-1-${safeId}">
-          <p class="mp-copy">Las canciones de este curso siempre serán <strong>gratis</strong> y <strong>disponibles</strong></p>
+          <p class="mp-copy">Las canciones de este curso siempre serán <strong>gratis</strong> y <strong>disponibles</strong><br>Si te está gustando el proyecto, ayúdame a mejorarlo con una donación.</p>
           <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
-            💙 Hacer una donación con Mercado Pago
+            💙 Quiero ayudar con una donacion
           </button>
           <button class="btn-skip-mp" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')">
-            No, está bien
+            No quiero, mostrame las canciones.
           </button>
         </div>
         <div class="mp-panel mp-panel-alias" id="mp-panel-2-${safeId}" style="display:none;">
-          <p class="mp-alias">Alias: <strong>${escapeHtml(MP_ALIAS)}</strong></p>
+          <div class="mp-alias-row">
+            <p class="mp-alias">Alias: <strong>${escapeHtml(MP_ALIAS)}</strong></p>
+            <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')" aria-label="Copiar alias" title="Copiar alias">
+              <span class="material-symbols-outlined">content_copy</span>
+            </button>
+          </div>
           <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
-          <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')">📋 Copiar alias</button>
           <button class="btn-open-mp btn-logo-only" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')" aria-label="Ir a Mercado Pago" title="Ir a Mercado Pago">
             <img class="mp-logo" src="resources/mp-logo.png" alt="Ir a Mercado Pago">
           </button>
@@ -915,13 +921,26 @@
   }
 
   function mpGoMP(courseKey) {
-    mpCopyAlias(courseKey);
     const intentUrl = 'intent://home#Intent;scheme=mercadopago;package=com.mercadopago.wallet;' +
       'S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.mercadopago.wallet;end';
     setTimeout(function() {
       try { window.top.location.href = intentUrl; }
       catch(e) { window.open(intentUrl, '_blank'); }
     }, 400);
+
+    // Copia l'alias SOLO se non è già presente negli appunti.
+    const copyOnlyIfMissing = function() {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText()
+          .then(function(text) {
+            if (String(text || '').trim() !== String(MP_ALIAS)) mpCopyAlias(courseKey);
+          })
+          .catch(function() { mpCopyAlias(courseKey); });
+      } else {
+        mpCopyAlias(courseKey);
+      }
+    };
+    copyOnlyIfMissing();
   }
 
   function mpSkipClick(courseKey) {
