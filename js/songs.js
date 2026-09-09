@@ -29,7 +29,7 @@
             const hasTranslation = hiddenText && hiddenText.trim() !== '';
 
             const isSavedFlag = isSaved(original);
-            const starIcon = isSavedFlag ? '<span class="material-symbols-outlined fav-ico">bookmark</span>' : '<span class="material-symbols-outlined fav-ico">bookmark_border</span>';
+            const starIcon = isSavedFlag ? '⭐' : '☆';
             const btnClass = isSavedFlag ? 'btn-outline-warning' : 'btn-outline-secondary';
 
             return `
@@ -235,7 +235,7 @@
                 : '';
               const rawMain = swapLanguages ? (lyric.text2 || '') : (lyric.text1 || '');
               const isSavedFlag = isSaved(rawMain);
-              const starIcon = isSavedFlag ? '<span class="material-symbols-outlined fav-ico">bookmark</span>' : '<span class="material-symbols-outlined fav-ico">bookmark_border</span>';
+              const starIcon = isSavedFlag ? '⭐' : '☆';
               const btnClass = isSavedFlag ? 'btn-outline-warning' : 'btn-outline-secondary';
               const appunto = findAppuntoByTesto(rawMain);
               const notaValue = appunto ? escapeHtml(appunto.nota) : '';

@@ -107,7 +107,6 @@
       border-bottom: 4px solid var(--surface-border) !important;
     }
     .btn-outline-warning { background: #FFF4E0 !important; color: #7A5C33 !important; border: 2px solid #F5DFB0 !important; border-bottom: 4px solid #EDD19A !important; }
-    .fav-ico { font-size: 19px; line-height: 1; vertical-align: middle; }
     .btn-del-note { background: #FFE4EA !important; color: var(--danger) !important; border-bottom: 4px solid #FFC7D1 !important; }
     .btn-edit-note { background: #E9F3FF !important; color: var(--secondary) !important; border-bottom: 4px solid #CFE3FF !important; }
     /* Inputs */
