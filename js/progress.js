@@ -692,8 +692,7 @@
       <div class="course-group mp-tile" id="mp-tile-${safeId}" style="${visible ? '' : 'display:none;'}">
         <button class="mp-close-x" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')" title="Cerrar y ver las canciones" aria-label="Cerrar">✕</button>
         <div class="mp-panel" id="mp-panel-1-${safeId}">
-          <p class="mp-copy"><strong>Las canciones de este curso siempre serán gratis y disponibles</strong></p>
-          <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
+          <p class="mp-copy">Las canciones de este curso siempre serán <strong>gratis</strong> y <strong>disponibles</strong></p>
           <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
             💙 Hacer una donación con Mercado Pago
           </button>
@@ -702,11 +701,14 @@
           </button>
         </div>
         <div class="mp-panel mp-panel-alias" id="mp-panel-2-${safeId}" style="display:none;">
-          <span class="mp-alias-label">Alias</span>
-          <div class="mp-alias-box">${escapeHtml(MP_ALIAS)}</div>
+          <div class="mp-alias-box">
+            <span class="mp-alias-label">Alias</span>
+            ${escapeHtml(MP_ALIAS)}
+          </div>
+          <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
           <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')">📋 Copiar alias</button>
-          <button class="btn-open-mp" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')">
-            <img class="mp-logo" src="resources/mp-logo.png" alt=""> Ir a Mercado Pago
+          <button class="btn-open-mp btn-logo-only" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')" aria-label="Ir a Mercado Pago" title="Ir a Mercado Pago">
+            <img class="mp-logo" src="resources/mp-logo.png" alt="Ir a Mercado Pago">
           </button>
           <span class="mp-feedback" id="copyFeedback-${safeId}"></span>
         </div>
