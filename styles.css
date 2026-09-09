@@ -264,11 +264,12 @@
       display: none;
       margin-top: 12px;
       padding: 12px 15px;
-      background: #FDF8FF;
-      border: 2px solid var(--surface-border);
+      background: #fff;
+      border: 2px solid var(--surface-border-dark);
       border-radius: 12px;
       font-style: italic;
-      color: #6B5F7C;
+      color: #3D2B52;
+      font-weight: 700;
     }
     /* Exercise card (new mode) */
     .exercise-card {
@@ -327,12 +328,12 @@
       border: 2px solid var(--surface-border);
     }
     .exercise-translation {
-      background: #FDF8FF;
-      border: 2px solid var(--surface-border);
+      background: #fff;
+      border: 2px solid var(--surface-border-dark);
       border-radius: 12px;
       padding: 12px 15px;
       font-style: italic;
-      color: #6B5F7C;
+      color: #3D2B52;
       font-weight: 700;
     }
     .verse-note,
