@@ -921,26 +921,22 @@
   }
 
   function mpGoMP(courseKey) {
-    const intentUrl = 'intent://home#Intent;scheme=mercadopago;package=com.mercadopago.wallet;' +
-      'S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.mercadopago.wallet;end';
-    setTimeout(function() {
-      try { window.top.location.href = intentUrl; }
-      catch(e) { window.open(intentUrl, '_blank'); }
-    }, 400);
-
-    // Copia l'alias SOLO se non è già presente negli appunti.
-    const copyOnlyIfMissing = function() {
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        navigator.clipboard.readText()
-          .then(function(text) {
-            if (String(text || '').trim() !== String(MP_ALIAS)) mpCopyAlias(courseKey);
-          })
-          .catch(function() { mpCopyAlias(courseKey); });
-      } else {
-        mpCopyAlias(courseKey);
-      }
-    };
-    copyOnlyIfMissing();
+    // Copia sempre l'alias, prima di navigare (la navigazione può
+    // cancellare le scritture negli appunti se fatte dopo).
+    mpCopyAlias(courseKey);
+    const mpUrl = 'https://www.mercadopago.com.ar/';
+    const ua = (navigator.userAgent || '');
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    if (isMobile) {
+      // Navigazione top-level nel gesto del tap: su Android apre il wallet
+      // se installato (App Links), su iOS idem (Universal Links),
+      // altrimenti resta sul sito ufficiale.
+      try { window.top.location.href = mpUrl; }
+      catch(e) { window.location.href = mpUrl; }
+    } else {
+      // Desktop: nessuna app wallet, apri il sito in una nuova scheda.
+      window.open(mpUrl, '_blank');
+    }
   }
 
   function mpSkipClick(courseKey) {

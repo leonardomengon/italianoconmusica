@@ -1062,6 +1062,9 @@
   background: transparent;
   cursor: pointer;
   display: none;
+  z-index: 2;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .mp-close-x::before {
   content: '✕';
@@ -1142,8 +1145,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border-radius: 8px;
   font-family: var(--font-body);
@@ -1156,7 +1159,7 @@
   transition: all .1s ease;
 }
 .btn-copy-mp .material-symbols-outlined {
-  font-size: 24px;
+  font-size: 20px;
   font-variation-settings: 'FILL' 0, 'wght' 400;
 }
 .btn-copy-mp:hover { background: #E0F2FF; border-color: #0076B8; color: #005A8C; }
