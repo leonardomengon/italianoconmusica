@@ -251,7 +251,7 @@
       scroll-margin-top: 80px;
     }
     .verse:hover { background: var(--surface-dim); transform: none; border-color: var(--surface-border-dark); }
-    .verse.active { border-color: var(--primary) !important; background: #EFF5FC; }
+    .verse.active { border-color: var(--primary) !important; background: var(--surface-dim); }
     .verse .toggle-hint,
     .alt-phrase-main .toggle-hint,
     .appunto-testo .toggle-hint { font-size: 11px; color: #9A8FB5; font-weight: 900; transition: transform .2s, color .2s; }
