@@ -106,7 +106,8 @@
       border: 2px solid var(--surface-border) !important;
       border-bottom: 4px solid var(--surface-border) !important;
     }
-    .btn-outline-warning { background: #FEF9C3 !important; color: var(--orange) !important; border: 2px solid #F9D461 !important; border-bottom: 4px solid #F0BA3D !important; }
+    .btn-outline-warning { background: #FFF4E0 !important; color: #7A5C33 !important; border: 2px solid #F5DFB0 !important; border-bottom: 4px solid #EDD19A !important; }
+    .fav-ico { font-size: 19px; line-height: 1; vertical-align: middle; }
     .btn-del-note { background: #FFE4EA !important; color: var(--danger) !important; border-bottom: 4px solid #FFC7D1 !important; }
     .btn-edit-note { background: #E9F3FF !important; color: var(--secondary) !important; border-bottom: 4px solid #CFE3FF !important; }
     /* Inputs */
@@ -342,9 +343,9 @@
     .verse-note textarea,
     .exercise-note textarea {
       width: 100%;
-      background: #FEF9C3;
-      color: #7a5400;
-      border-left: 4px solid #F0BA3D;
+      background: #FFF4E0;
+      color: #7A5C33;
+      border-left: 4px solid #EDD19A;
       border-radius: 12px;
       padding: 4px 10px;
       font-family: inherit;
@@ -521,9 +522,9 @@
     .appunto-nota { margin-top:8px; }
     .appunto-nota textarea {
       width: 100%;
-      background: #FEF9C3;
-      color: #7a5400;
-      border-left: 4px solid #F0BA3D;
+      background: #FFF4E0;
+      color: #7A5C33;
+      border-left: 4px solid #EDD19A;
       border-radius: 12px;
       padding: 4px 10px;
       font-family: inherit;

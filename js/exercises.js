@@ -169,7 +169,7 @@
         const isSavedFlag = isSaved(rawMain);
         const appunto = findAppuntoByTesto(rawMain);
         const notaValue = appunto ? escapeHtml(appunto.nota) : '';
-        const starIcon = isSavedFlag ? '⭐' : '☆';
+        const starIcon = isSavedFlag ? '<span class="material-symbols-outlined fav-ico">bookmark</span>' : '<span class="material-symbols-outlined fav-ico">bookmark_border</span>';
         const btnClass = isSavedFlag ? 'btn-outline-warning' : 'btn-outline-secondary';
         // Layout identico per studio e ripasso: la stella preferito appare
         // allo stesso modo (inline) sia in modalità review sia complete.

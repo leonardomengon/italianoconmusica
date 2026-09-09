@@ -27,7 +27,7 @@
           if (index > -1) {
               appunti.splice(index, 1);
               saveAppunti(appunti);
-              btn.innerHTML = '☆';
+              btn.innerHTML = '<span class="material-symbols-outlined fav-ico">bookmark_border</span>';
               btn.classList.remove('btn-outline-warning');
               btn.classList.add('btn-outline-secondary');
               showToast('🗑️ Eliminado de favoritos');
@@ -66,7 +66,7 @@
                   index: (verseIndex !== null && verseIndex !== undefined) ? verseIndex : null
                 });
               } catch (e) {}
-              btn.innerHTML = '⭐';
+              btn.innerHTML = '<span class="material-symbols-outlined fav-ico">bookmark</span>';
               btn.classList.remove('btn-outline-secondary');
               btn.classList.add('btn-outline-warning');
               return true;
@@ -230,7 +230,7 @@
                               <strong>${escapeHtml(testoView)}</strong>
                               <span class="toggle-hint" title="Haz clic para mostrar/ocultar la traducción">▼</span>
                           </div>
-                          <button class="btn btn-sm btn-outline-warning" style="padding: 2px 8px; font-size: 14px; border-radius: 6px;" onclick="event.stopPropagation(); rimuoviAppuntoSilenzioso('${a.id}')" title="Eliminar de favoritos">⭐</button>
+                          <button class="btn btn-sm btn-outline-warning" style="padding: 2px 8px; font-size: 14px; border-radius: 6px;" onclick="event.stopPropagation(); rimuoviAppuntoSilenzioso('${a.id}')" title="Eliminar de favoritos"><span class="material-symbols-outlined fav-ico">bookmark</span></button>
                       </div>
                   </div>
                   ${notaHtml}
@@ -366,7 +366,7 @@
                   if (!lyric) return;
                   const rawMain = swapLanguages ? (lyric.text2 || '') : (lyric.text1 || '');
                   if (!isSaved(rawMain)) {
-                      btn.innerHTML = '☆';
+                      btn.innerHTML = '<span class="material-symbols-outlined fav-ico">bookmark_border</span>';
                       btn.classList.remove('btn-outline-warning');
                       btn.classList.add('btn-outline-secondary');
                   }
