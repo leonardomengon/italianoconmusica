@@ -701,10 +701,7 @@
           </button>
         </div>
         <div class="mp-panel mp-panel-alias" id="mp-panel-2-${safeId}" style="display:none;">
-          <div class="mp-alias-box">
-            <span class="mp-alias-label">Alias</span>
-            ${escapeHtml(MP_ALIAS)}
-          </div>
+          <p class="mp-alias">Alias: <strong>${escapeHtml(MP_ALIAS)}</strong></p>
           <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
           <button class="btn-copy-mp" type="button" onclick="mpCopyAlias('${escapeHtml(courseKey)}')">📋 Copiar alias</button>
           <button class="btn-open-mp btn-logo-only" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')" aria-label="Ir a Mercado Pago" title="Ir a Mercado Pago">
