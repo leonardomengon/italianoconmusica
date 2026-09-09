@@ -220,7 +220,7 @@ if (exercise.mode === 'review') {
                     <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
                     ${starBtnInReview}
                   </div>
-                  <div class="exercise-text"><strong>${escapeHtml(exercise.text || '')}</strong></div>
+                  <div class="exercise-translation">${escapeHtml(exercise.text || '')}</div>
                   <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                   </div>
