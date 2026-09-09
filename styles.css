@@ -274,8 +274,8 @@
     /* Exercise card (new mode) */
     .exercise-card {
       background: #fff;
-      border: 3px solid var(--secondary);
-      border-bottom: 7px solid var(--secondary-dark);
+      border: 3px solid var(--surface-border);
+      border-bottom: 7px solid var(--surface-border-dark);
       border-radius: 24px;
       padding: 24px;
       margin-bottom: 16px;
@@ -512,7 +512,7 @@
       transition: background .2s, border-color .2s;
     }
     .appunto-item:hover { background: var(--surface-dim); border-color: var(--surface-border-dark); }
-    .appunto-item.expanded { border-color: var(--secondary); background:#E9F3FF; }
+    .appunto-item.expanded { border-color: var(--primary); background: var(--surface-dim); }
     .appunto-item.expanded .appunto-traduzione { display: block; }
     .appunto-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
     .appunto-meta { display:flex; flex-wrap:wrap; gap:6px; }
