@@ -925,29 +925,69 @@
     // aspettare consumerebbe il gesto del tap e la navigazione potrebbe
     // cancellare le scritture negli appunti se fatte dopo).
     mpCopyAlias(courseKey);
+    // Marca il corso come offerto (persistente): alla prossima render la tile
+    // non verrà più riproposta, come faceva il vecchio mpDonateClick a 1 step.
+    try { marcarCursoOfrecido(courseKey); } catch (e) {}
+    // Nascondi subito la tile e mostra le canzoni (come il vecchio flusso):
+    // al ritorno dal wallet l'utente trova il corso sbloccato.
+    try {
+      const _safeId = courseSafeId(courseKey);
+      const _songsEl = document.getElementById('course-songs-' + _safeId);
+      if (_songsEl) _songsEl.style.display = 'flex';
+      const _tileEl = document.getElementById('mp-tile-' + _safeId);
+      if (_tileEl) _tileEl.style.display = 'none';
+      _cursoTabs[courseKey] = 'songs';
+      const _temasEl = document.getElementById('course-temas-' + _safeId);
+      if (_temasEl) _temasEl.style.display = 'none';
+    } catch (e) {}
     const mpUrl = 'https://www.mercadopago.com.ar/';
+    const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.mercadopago.wallet';
     const ua = (navigator.userAgent || '');
     const isAndroid = /Android/i.test(ua);
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
     if (isAndroid) {
-      // Intent esplicito verso il package installato: apre il wallet se
-      // presente, altrimenti usa il fallback HTTPS qui sotto.
-      const fallback = encodeURIComponent(mpUrl);
-      const intentUrl = 'intent://www.mercadopago.com.ar/#Intent;scheme=https;' +
-        'package=com.mercadopago.wallet;S.browser_fallback_url=' + fallback + ';end';
-      try { window.top.location.href = intentUrl; }
-      catch(e) { window.location.href = intentUrl; }
-      // Fallback blindato: se dopo 1s la pagina è ancora visibile, l'app
-      // non si è aperta (non installata o webview che blocca gli intent) →
-      // vai al sito ufficiale. Se il wallet si è aperto, il browser va in
-      // background e questo timeout non scatta più.
-      setTimeout(function() {
-        try {
-          if (document.visibilityState === 'visible') window.top.location.href = mpUrl;
-        } catch(e) {
-          try { window.location.href = mpUrl; } catch(e2) {}
+      // Custom-scheme registrato nativamente dal wallet (verificato come
+      // funzionante): apre l'app se installata, altrimenti va al Play Store.
+      // NON usare scheme=https://www.mercadopago.com.ar/ qui: è un App-Link
+      // che richiede assetlinks/verifica dominio e altrimenti ricade sul sito
+      // senza aprire l'app ("non parte").
+      const intentUrl = 'intent://home#Intent;scheme=mercadopago;' +
+        'package=com.mercadopago.wallet;' +
+        'S.browser_fallback_url=' + encodeURIComponent(playStoreUrl) + ';end';
+      // Una sola navigazione, dentro il gesto del tap, via <a> cliccato:
+      // più affidabile di window.top.location.href (bloccato in iframe/sandbox
+      // senza allow-top-navigation) e non sovrascritta da un secondo timeout.
+      let fallbackTimer = null;
+      const cancelFallback = function() {
+        if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+      };
+      window.addEventListener('blur', cancelFallback, { once: true });
+      document.addEventListener('visibilitychange', function onVis() {
+        if (document.visibilityState === 'hidden') {
+          cancelFallback();
+          document.removeEventListener('visibilitychange', onVis);
         }
-      }, 1000);
+      });
+      window.addEventListener('pagehide', cancelFallback, { once: true });
+      try {
+        const a = document.createElement('a');
+        a.href = intentUrl;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { try { document.body.removeChild(a); } catch (e2) {} }, 500);
+      } catch (e) {
+        try { window.location.href = intentUrl; } catch (e2) {}
+      }
+      // Fallback al Play Store (non al sito): solo se dopo 2.5s la pagina è
+      // ancora visibile = l'app non si è aperta (non installata o intent
+      // bloccato, es. WebView/in-app browser). Se il wallet si è aperto, il
+      // browser va in background e questo timeout viene cancellato sopra.
+      fallbackTimer = setTimeout(function() {
+        try {
+          if (document.visibilityState === 'visible') window.location.href = playStoreUrl;
+        } catch (e) {}
+      }, 2500);
     } else if (isIOS) {
       // iOS: Universal Link top-level nel gesto del tap.
       try { window.top.location.href = mpUrl; }
