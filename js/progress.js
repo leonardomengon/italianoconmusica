@@ -921,16 +921,35 @@
   }
 
   function mpGoMP(courseKey) {
-    // Copia sempre l'alias, prima di navigare (la navigazione può
+    // Copia sempre l'alias, prima di navigare (fire-and-forget, senza await:
+    // aspettare consumerebbe il gesto del tap e la navigazione potrebbe
     // cancellare le scritture negli appunti se fatte dopo).
     mpCopyAlias(courseKey);
     const mpUrl = 'https://www.mercadopago.com.ar/';
     const ua = (navigator.userAgent || '');
-    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-    if (isMobile) {
-      // Navigazione top-level nel gesto del tap: su Android apre il wallet
-      // se installato (App Links), su iOS idem (Universal Links),
-      // altrimenti resta sul sito ufficiale.
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    if (isAndroid) {
+      // Intent esplicito verso il package installato: apre il wallet se
+      // presente, altrimenti usa il fallback HTTPS qui sotto.
+      const fallback = encodeURIComponent(mpUrl);
+      const intentUrl = 'intent://www.mercadopago.com.ar/#Intent;scheme=https;' +
+        'package=com.mercadopago.wallet;S.browser_fallback_url=' + fallback + ';end';
+      try { window.top.location.href = intentUrl; }
+      catch(e) { window.location.href = intentUrl; }
+      // Fallback blindato: se dopo 1s la pagina è ancora visibile, l'app
+      // non si è aperta (non installata o webview che blocca gli intent) →
+      // vai al sito ufficiale. Se il wallet si è aperto, il browser va in
+      // background e questo timeout non scatta più.
+      setTimeout(function() {
+        try {
+          if (document.visibilityState === 'visible') window.top.location.href = mpUrl;
+        } catch(e) {
+          try { window.location.href = mpUrl; } catch(e2) {}
+        }
+      }, 1000);
+    } else if (isIOS) {
+      // iOS: Universal Link top-level nel gesto del tap.
       try { window.top.location.href = mpUrl; }
       catch(e) { window.location.href = mpUrl; }
     } else {
