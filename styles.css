@@ -274,8 +274,8 @@
     /* Exercise card (new mode) */
     .exercise-card {
       background: #fff;
-      border: 3px solid var(--surface-border);
-      border-bottom: 7px solid var(--surface-border-dark);
+      border: 3px solid var(--primary);
+      border-bottom: 7px solid var(--primary-dark);
       border-radius: 24px;
       padding: 24px;
       margin-bottom: 16px;
