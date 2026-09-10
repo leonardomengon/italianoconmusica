@@ -696,7 +696,7 @@
         <div class="mp-panel" id="mp-panel-1-${safeId}">
           <p class="mp-copy">Las canciones de este curso siempre serán <strong>gratis</strong> y <strong>disponibles</strong><br>Si te está gustando el proyecto, ayúdame a mejorarlo con una donación.</p>
           <button class="btn-open-mp" type="button" onclick="mpDonateClick('${escapeHtml(courseKey)}')">
-            💙 Quiero ayudar con una donacion
+            Quiero ayudar con una donacion
           </button>
           <button class="btn-skip-mp" type="button" onclick="mpSkipClick('${escapeHtml(courseKey)}')">
             No quiero, mostrame las canciones.
@@ -710,7 +710,7 @@
             </button>
           </div>
           <p class="mp-owner">Nombre: Leonardo Salvador Mengon</p>
-          <button class="btn-open-mp btn-logo-only" type="button" onclick="mpGoMP('${escapeHtml(courseKey)}')" aria-label="Ir a Mercado Pago" title="Ir a Mercado Pago">
+          <button class="btn-open-mp btn-logo-only" type="button" id="mp-open-btn-${safeId}" onclick="mpGoMP('${escapeHtml(courseKey)}')" aria-label="Ir a Mercado Pago" title="Ir a Mercado Pago">
             <img class="mp-logo" src="resources/mp-logo.png" alt="Ir a Mercado Pago">
           </button>
           <span class="mp-feedback" id="copyFeedback-${safeId}"></span>
@@ -925,21 +925,35 @@
     // aspettare consumerebbe il gesto del tap e la navigazione potrebbe
     // cancellare le scritture negli appunti se fatte dopo).
     mpCopyAlias(courseKey);
-    // Marca il corso come offerto (persistente): alla prossima render la tile
-    // non verrà più riproposta, come faceva il vecchio mpDonateClick a 1 step.
-    try { marcarCursoOfrecido(courseKey); } catch (e) {}
-    // Nascondi subito la tile e mostra le canzoni (come il vecchio flusso):
-    // al ritorno dal wallet l'utente trova il corso sbloccato.
-    try {
-      const _safeId = courseSafeId(courseKey);
-      const _songsEl = document.getElementById('course-songs-' + _safeId);
-      if (_songsEl) _songsEl.style.display = 'flex';
-      const _tileEl = document.getElementById('mp-tile-' + _safeId);
-      if (_tileEl) _tileEl.style.display = 'none';
-      _cursoTabs[courseKey] = 'songs';
-      const _temasEl = document.getElementById('course-temas-' + _safeId);
-      if (_temasEl) _temasEl.style.display = 'none';
-    } catch (e) {}
+    // Mostra subito lo stato "apertura wallet": NON mostrare le canzoni qui.
+    // Le canzoni si mostrano solo quando la webapp torna visibile (ritorno
+    // dal wallet), via listener visibilitychange qui sotto.
+    const safeId = courseSafeId(courseKey);
+    const openBtn = document.getElementById('mp-open-btn-' + safeId);
+    if (openBtn && !openBtn.disabled) {
+      openBtn.disabled = true;
+      openBtn.setAttribute('aria-disabled', 'true');
+      openBtn.innerHTML = '<span class="mp-opening"><span class="mp-spinner" aria-hidden="true"></span><span>Abriendo Mercado Pago…</span></span>';
+    }
+    // Sblocca il corso alla prima partenza verso il wallet.
+    const mpRevealCourse = function() {
+      try { marcarCursoOfrecido(courseKey); } catch (e) {}
+      try {
+        const songsEl = document.getElementById('course-songs-' + safeId);
+        if (songsEl) songsEl.style.display = 'flex';
+        const tileEl = document.getElementById('mp-tile-' + safeId);
+        if (tileEl) tileEl.style.display = 'none';
+        _cursoTabs[courseKey] = 'songs';
+        const temasEl = document.getElementById('course-temas-' + safeId);
+        if (temasEl) temasEl.style.display = 'none';
+      } catch (e) {}
+    };
+    let _mpRevealed = false;
+    const mpRevealOnce = function() {
+      if (_mpRevealed) return;
+      _mpRevealed = true;
+      mpRevealCourse();
+    };
     const mpUrl = 'https://www.mercadopago.com.ar/';
     const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.mercadopago.wallet';
     const ua = (navigator.userAgent || '');
@@ -966,6 +980,13 @@
         if (document.visibilityState === 'hidden') {
           cancelFallback();
           document.removeEventListener('visibilitychange', onVis);
+          // Al ritorno in primo piano (ritorno dal wallet), sblocca il corso.
+          document.addEventListener('visibilitychange', function onBack() {
+            if (document.visibilityState === 'visible') {
+              document.removeEventListener('visibilitychange', onBack);
+              mpRevealOnce();
+            }
+          });
         }
       });
       window.addEventListener('pagehide', cancelFallback, { once: true });
@@ -989,11 +1010,30 @@
         } catch (e) {}
       }, 2500);
     } else if (isIOS) {
-      // iOS: Universal Link top-level nel gesto del tap.
+      // iOS: Universal Link top-level nel gesto del tap. Anche qui le canzoni
+      // si mostrano solo al ritorno in primo piano (ritorno dal wallet).
+      document.addEventListener('visibilitychange', function onBackIOS() {
+        if (document.visibilityState === 'visible') {
+          document.removeEventListener('visibilitychange', onBackIOS);
+          mpRevealOnce();
+        }
+      });
       try { window.top.location.href = mpUrl; }
       catch(e) { window.location.href = mpUrl; }
     } else {
-      // Desktop: nessuna app wallet, apri il sito in una nuova scheda.
+      // Desktop: nessuna app wallet, apri il sito in una nuova scheda e
+      // sblocca al ritorno sulla scheda (o subito se la visibility API manca).
+      let revealed = false;
+      const revealOnce = function() { if (!revealed) { revealed = true; mpRevealOnce(); } };
+      document.addEventListener('visibilitychange', function onBackDesk() {
+        if (document.visibilityState === 'visible') {
+          document.removeEventListener('visibilitychange', onBackDesk);
+          revealOnce();
+        }
+      });
+      // Sicurezza: se la scheda non va mai in background, sblocca comunque
+      // dopo 3s (l'utente ha comunque cliccato verso MP).
+      setTimeout(revealOnce, 3000);
       window.open(mpUrl, '_blank');
     }
   }
