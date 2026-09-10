@@ -1051,7 +1051,7 @@
   text-align: center;
 }
 .mp-panel { display: flex; flex-direction: column; gap: 10px; }
-.mp-panel-alias { position: relative; padding-top: 50px; }
+.mp-panel-alias { position: relative; padding-top: 50px; align-items: center; }
 .mp-close-x {
   position: absolute;
   top: 2px;
