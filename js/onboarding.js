@@ -231,6 +231,7 @@
       // ==================== DISPATCHER FASI ====================
       function onbFase(n) {
         _onbPhase = n;
+        _onbAdelanteShown = false;
         let wrap;
         if (n === 1) {
           // Fase 1: verso NON interattivo. Bottone subito visibile ma in grigio,
