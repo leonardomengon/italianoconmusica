@@ -143,6 +143,49 @@
         return wrap;
       }
 
+      // Card verso. opts: { tap, onTap, showStar, onStar, starIcon }
+      function onbVerseCard(wrap, index, opts) {
+        const lyr = _onbSong.lyrics[index];
+        if (!lyr) return;
+        const main = lyr.text1 || '';
+        const trad = lyr.text2 || '';
+        const card = document.createElement('div');
+        card.className = 'onb-verse-card onb-enter';
+        const txt = document.createElement('div');
+        txt.className = 'onb-verse-text';
+        txt.textContent = main;
+        card.appendChild(txt);
+        if (opts.tap) {
+          card.classList.add('onb-tappable');
+          const trans = document.createElement('div');
+          trans.className = 'onb-verse-trans';
+          trans.style.display = 'none';
+          trans.textContent = trad;
+          card.appendChild(trans);
+          card.addEventListener('click', () => {
+            if (trans.style.display === 'block') { trans.style.display = 'none'; return; }
+            trans.style.display = 'block';
+            trans.classList.add('onb-enter');
+            if (opts.onTap && !opts._tapped) {
+              opts._tapped = true;
+              opts.onTap(main, index);
+            }
+          });
+        }
+        if (opts.showStar) {
+          const star = document.createElement('button');
+          star.type = 'button';
+          star.className = 'btn btn-sm onb-star-btn';
+          star.textContent = opts.starIcon || '☆';
+          card.appendChild(star);
+          star.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (opts.onStar) opts.onStar(star, index);
+          });
+        }
+        wrap.appendChild(card);
+      }
+
       // ==================== DISPATCHER FASI ====================
       function onbFase(n) {
         _onbPhase = n;
