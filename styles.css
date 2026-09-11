@@ -1371,3 +1371,5 @@ body.onboarding-active #onboardingSection {
 .onb-adelante-row { width: 100%; display: flex; justify-content: center; }
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf .5s ease both; }
+@keyframes onb-enable-kf { 0% { opacity: .35; filter: grayscale(1) brightness(.92); transform: scale(.96); } 100% { opacity: 1; filter: none; transform: scale(1); } }
+.onb-enable { animation: onb-enable-kf .6s ease both; }

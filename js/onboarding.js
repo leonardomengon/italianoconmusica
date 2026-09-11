@@ -149,23 +149,31 @@
         wrap.appendChild(row);
         return row;
       }
-      // Mostra il bottone Adelante dopo un ritardo (con dissolvenza in entrata).
-      function onbAddAdelanteDelayed(wrap, fn, delayMs) {
+      // Bottone Adelante visibile subito ma disabilitato (in grigio), poi si abilita
+      // con animazione dopo `delayMs`. Uso: fase "Intenta adivinar".
+      function onbAddAdelanteEnabling(wrap, fn, delayMs) {
         const row = document.createElement('div');
         row.className = 'onb-adelante-row';
-        row.style.opacity = '0';
-        row.style.pointerEvents = 'none';
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-primary onb-adelante';
+        b.textContent = 'Adelante →';
+        b.disabled = true;
+        b.style.opacity = '.35';
+        b.style.filter = 'grayscale(1) brightness(.92)';
+        b.style.transform = 'scale(.96)';
+        b.style.pointerEvents = 'none';
+        row.appendChild(b);
         wrap.appendChild(row);
         setTimeout(() => {
-          row.classList.add('onb-fade-in');
-          row.style.opacity = '';
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'btn btn-primary onb-adelante';
-          b.textContent = 'Adelante →';
-          b.addEventListener('click', fn);
-          row.appendChild(b);
-          row.style.pointerEvents = '';
+          b.style.transition = 'opacity .5s ease, filter .5s ease, transform .5s ease';
+          b.classList.add('onb-enable');
+          b.style.opacity = '';
+          b.style.filter = '';
+          b.style.transform = '';
+          b.disabled = false;
+          b.style.pointerEvents = '';
+          b.onclick = fn;
         }, delayMs || 0);
         return row;
       }
@@ -225,10 +233,13 @@
         _onbPhase = n;
         let wrap;
         if (n === 1) {
+          // Fase 1: verso NON interattivo. Bottone subito visibile ma in grigio,
+          // si abilita con animazione dopo 3s.
           wrap = onbPhaseShell('Intenta adivinar el significado');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbAddAdelanteDelayed(wrap, () => onbFase(2), 5000);
+          onbAddAdelanteEnabling(wrap, () => onbFase(2), 3000);
         } else if (n === 2) {
+          // Fase 2: toca → traduzione. Bottone appare con dissolvenza dopo il tap.
           wrap = onbPhaseShell('Toca la frase para ver la traducción');
           onbVerseCard(wrap, _onbVerses[0], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(3)) });
         } else if (n === 3) {
