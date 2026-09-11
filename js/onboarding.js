@@ -1,3 +1,16 @@
+// ===== ONBOARDING v3 (PIANO 2026-09-11) =====
+// PIANO-1: landing unica (fuse le due schermate introduttive, testo sintetico).
+// PIANO-2: barra completamento fasi in cima (step da ONB_ACTIVE_PHASES).
+// PIANO-3: bottoni timer -> animazione fluida 3s disabled->enabled, nessun countdown numerico.
+// PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
+// PIANO-5: modale finale breve.
+//
+// NOTA TECNICA: il tool editor ha problemi con old_text multi-linea su questo file;
+// le modifiche sono applicate con inserimenti + sostituzioni a riga singola.
+// Le funzioni vecchie restano ma il flusso attivo usa onbLanding1 -> onbFase(1..8 senza 6).
+// ===== FINE HEADER PIANO =====
+// Piano onboarding 2026-09-11: landing unica, progress bar, animazione 3s, stella+hint, modale breve.
+
 // ==================== ONBOARDING v2 (LANDING + FUNNEL A FASI) ====================
       // Due landing page introduttive + funnel interattivo in una SEZIONE DEDICATA
       // (#onboardingSection). Ogni fase renderizza SOLO gli elementi necessari
@@ -10,7 +23,8 @@
       const ONB_COMPLETED_KEY = 'onboardingCompleted';
       const ONB_COMPLETED_VALUE = '1';
       const ONB_VERSES_COUNT = 3; // versi tutorial A/B/C
-
+      const ONB_ACTIVE_PHASES = [1, 2, 3, 4, 5, 7, 8]; // Fase 6 (spiegazione appunti) eliminata, integrata nel salvataggio preferito
+      
       // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
       // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
       // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–20 s
@@ -37,7 +51,7 @@
         const r = onbRoot();
         if (r) r.innerHTML = '';
         if (_onbAudio) { try { _onbAudio.pause(); } catch (e) {} }
-        if (_onbExTimer) { try { clearInterval(_onbExTimer); } catch (e) {} _onbExTimer = null; }
+        if (_onbExTimer) { try { clearTimeout(_onbExTimer); } catch (e) {} _onbExTimer = null; }
         onbHidePlayer();
       }
       function onbHidePlayer() {
@@ -98,6 +112,8 @@
       }
 
       // ==================== LANDING PAGE ====================
+      // Le due landing sono state fuse in una sola (piano di modifica: riduci modali
+      // testuali). Il copy illustrativo è stato accorciato.
       function onbLanding1() {
         _onbPhase = 0;
         onbClear();
@@ -106,34 +122,61 @@
         r.innerHTML =
           '<div class="onb-landing-card"><div class="onb-brand">Italiano con Música</div>' +
           '<p class="onb-tagline">Música creada para que aprendas italiano.</p>' +
-          '<button type="button" class="btn btn-primary onb-adelante">Adelante →</button></div>';
-        r.querySelector('.onb-adelante').addEventListener('click', onbLanding2);
-      }
+          '<p class="onb-landing-copy">Cada canción te guía para aprender italiano de forma natural: escuchas, lees, guardas frases favoritas y practicas con ejercicios.</p>' +
+      // PIANO
+      // A2
+      // PIANO-1: landing unica attiva (fuse le 2 schermate, testo sintetico).
+      // PIANO-2: barra in cima di completamento fasi (vedi onbPhaseShell sotto).
+      // anchor-rimosso
+      // ---- landing page unica (le due schermate introduttive fuse in una) ----
+      // PIANO-1: landing unica (fuse le 2 schermate, testo sintetico).
 
-      function onbLanding2() {
-        _onbPhase = 0;
-        onbClear();
-        const r = onbRoot();
-        r.className = 'onb-landing';
-        r.innerHTML =
-          '<div class="onb-landing-card"><div class="onb-brand">Italiano con Música</div>' +
-          '<p class="onb-landing-copy">Cada canción y cada curso siguen un camino didáctico diseñado para que aprendas de forma natural y sin esfuerzo: escuchas, lees, guardas tus frases favoritas y practicas con ejercicios pensados para fijarlas para siempre.</p>' +
+// ONB-FIX-1: landing unificata (le due schermate introduttive fuse in una sola, testo sintetico)
+
           '<button type="button" class="btn btn-primary onb-adelante">Adelante →</button></div>';
         r.querySelector('.onb-adelante').addEventListener('click', () => onbFase(1));
       }
 
+      // onbLanding2 fusa in onbLanding1; mantenuta come redirect per sicurezza.
+      function onbLanding2() { onbFase(1); }
+
+      // PIANO-1 EDIT (landing unica): sotto, il bottone punta a onbFase(1).
+      // PIANO-1 EDIT (landing unica): la riga seguente avvia la Fase 1 invece della Landing 2.
+      // PIANO-2..5: vedi commenti dedicati nelle rispettive funzioni.
       // ==================== SHELL DI FASE ====================
-      // Renderizza: header (spiegazione fase) + wrapper contenuto + bottone Adelante.
-      function onbPhaseShell(title) {
-        onbClear();
+      // Renderizza: barra di avanzamento + header (spiegazione fase) + wrapper contenuto.
+      // La barra + header sono in onbRenderStepsHeader() per riutilizzarli anche nelle
+      // sotto-viste della Fase 8 (esercizi review/complete).
+      function onbRenderStepsHeader(title) {
         const r = onbRoot();
-        r.className = 'onb-funnel';
+        const idx = ONB_ACTIVE_PHASES.indexOf(_onbPhase);
+        const total = ONB_ACTIVE_PHASES.length;
+        const pct = ((idx + 1) / total) * 100;
+        const bar = document.createElement('div');
+        bar.className = 'onb-steps-bar onb-enter';
+        bar.innerHTML = '<div class="onb-steps-fill" style="width:' + pct + '%"></div>';
+        r.appendChild(bar);
+        const label = document.createElement('div');
+        label.className = 'onb-steps-label onb-enter';
+        label.textContent = 'Fase ' + (idx + 1) + ' de ' + total;
+        r.appendChild(label);
         const header = document.createElement('div');
         header.className = 'onb-phase-header onb-enter';
         header.textContent = title;
         r.appendChild(header);
+      }
+      function onbPhaseShell(title) {
+        onbClear();
+        const r = onbRoot();
+        r.className = 'onb-funnel';
+        onbRenderStepsHeader(title);
         const wrap = document.createElement('div');
         wrap.className = 'onb-phase-body';
+      // PIANO-1-INIZIO (implementato via insert per limite editor: vedi righe onbLanding1/onbLanding2).
+      // PIANO-2: barra completamento fasi in onbPhaseShell (step derivati da ONB_ACTIVE_PHASES).
+      // PIANO-3: bottoni timer -> animazione fluida 3s disabled->enabled senza countdown numerico.
+      // PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
+      // PIANO-5: modale finale breve in index.html (#onbEndMsg).
         r.appendChild(wrap);
         return wrap;
       }
@@ -147,34 +190,29 @@
         b.addEventListener('click', fn);
         row.appendChild(b);
         wrap.appendChild(row);
-        return row;
+      return row;
       }
-      // Bottone Adelante visibile subito ma disabilitato (in grigio), poi si abilita
-      // con animazione dopo `delayMs`. Uso: fase "Intenta adivinar".
+      // Bottone Adelante visibile subito ma disabilitato (in grigio). Si abilita con
+      // un'animazione fluida di `delayMs` (default 3s) che porta da disabled→enabled.
+      // Nessun countdown numerico: la transizione visiva comunica il tempo di attesa.
       function onbAddAdelanteEnabling(wrap, fn, delayMs) {
+        const dur = delayMs != null ? delayMs : 3000;
         const row = document.createElement('div');
         row.className = 'onb-adelante-row';
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'btn btn-primary onb-adelante';
+        b.className = 'btn btn-primary onb-adelante onb-enabling';
         b.textContent = 'Adelante →';
         b.disabled = true;
-        b.style.opacity = '.35';
-        b.style.filter = 'grayscale(1) brightness(.92)';
-        b.style.transform = 'scale(.96)';
-        b.style.pointerEvents = 'none';
+        b.style.animationDuration = dur + 'ms';
         row.appendChild(b);
         wrap.appendChild(row);
         setTimeout(() => {
-          b.style.transition = 'opacity .5s ease, filter .5s ease, transform .5s ease';
-          b.classList.add('onb-enable');
-          b.style.opacity = '';
-          b.style.filter = '';
-          b.style.transform = '';
+          b.classList.remove('onb-enabling');
           b.disabled = false;
-          b.style.pointerEvents = '';
+          b.style.animation = '';
           b.onclick = fn;
-        }, delayMs || 0);
+        }, dur);
         return row;
       }
 
@@ -232,7 +270,7 @@
       }
 
       // ==================== DISPATCHER FASI ====================
-      function onbFase(n) {
+      function onbFase(n) { // PIANO: dispatcher su fasi attive (6 rimossa, hint integrato in onbFav)
         _onbPhase = n;
         _onbAdelanteShown = false;
         let wrap;
@@ -255,11 +293,11 @@
           onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(5)) });
         } else if (n === 5) {
           wrap = onbPhaseShell('Esta frase parece complicada, guárdala en tus favoritos para estudiarla con más frecuencia');
-          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => { onbFav(starBtn, idx); onbShowAdelante(wrap, () => onbFase(6)); } });
-        } else if (n === 6) {
-          wrap = onbPhaseShell('Puedes escribir notas que te ayuden a memorizar las frases difíciles');
-          onbNoteCard(wrap, _onbVerses[1], true);
-          onbAddAdelante(wrap, () => onbFase(7));
+          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
+            onbFav(starBtn, idx);
+            onbShowSuccessBanner(wrap, '⭐ Guardada en favoritos', '💡 Podrás escribir apuntes en tus frases guardadas');
+            onbShowAdelante(wrap, () => onbFase(7));
+          }});
         } else if (n === 7) {
           wrap = onbPhaseShell('Escucha cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
@@ -315,6 +353,7 @@
       }
 
       // Salva la frase nei preferiti (conteggiato: recordSavedNoteForProgress).
+      // Il feedback di successo lo mostra il chiamante tramite onbShowSuccessBanner.
       function onbFav(starBtn, index) {
         const lyr = _onbSong.lyrics[index];
         if (!lyr) return;
@@ -331,11 +370,34 @@
             lyricIndex: index
           });
         } catch (e) { added = false; }
-        if (added) showToast('⭐ Guardada en favoritos', 2600);
+        if (added) {
+          // Animazione riempimento stella
+          starBtn.classList.remove('star-filled');
+          void starBtn.offsetWidth;
+          starBtn.classList.add('star-filled');
+        }
+        return added;
+      }
+
+      // Banner di successo persistente (sostituisce il toast) con eventuale hint.
+      function onbShowSuccessBanner(wrap, message, hint) {
+        const existing = wrap.querySelector('.onb-success-banner');
+        if (existing) existing.remove();
+        const banner = document.createElement('div');
+        banner.className = 'onb-success-banner onb-enter';
+        let html = '<div class="onb-success-msg">' + escapeHtml(message) + '</div>';
+        if (hint) html += '<div class="onb-success-hint">' + escapeHtml(hint) + '</div>';
+        banner.innerHTML = html;
+        const verse = wrap.querySelector('.verse');
+        if (verse && verse.nextSibling) {
+          wrap.insertBefore(banner, verse.nextSibling);
+        } else {
+          wrap.insertBefore(banner, wrap.firstChild);
+        }
       }
 
       // ==================== FASE 8: ESERCIZI (struttura classica: review + complete) ====================
-      // Due sotto-fasi locali: 'review' (pensa traduzione, countdown 5s) e
+      // Due sotto-fasi locali: 'review' (pensa traduzione, animazione 3s) e
       // 'complete' (completa la frase, una parola). Look identico agli esercizi
       // classici (.exercise-card / .exercise-header / .exercise-text / actions).
       let _onbExPhase = 'review';
@@ -352,40 +414,34 @@
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
         wrap.innerHTML = '';
-        const header = document.createElement('div');
-        header.className = 'onb-phase-header onb-enter';
-        header.textContent = 'Completa tu primer ejercicio';
-        wrap.appendChild(header);
+        onbRenderStepsHeader('Completa tu primer ejercicio');
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
         card.innerHTML =
           '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
           '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary" disabled>5</button></div>';
+          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary onb-enabling" disabled>Piensa...</button></div>';
         wrap.appendChild(card);
-        let s = 5;
         const btn = card.querySelector('#onbExBtn');
-        if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; }
-        _onbExTimer = setInterval(() => {
-          s--;
-          if (btn && s > 0) btn.textContent = s;
-          if (s <= 0) {
-            clearInterval(_onbExTimer); _onbExTimer = null;
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = 'Mostrar';
-              btn.onclick = () => {
-                card.innerHTML =
-                  '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-                  '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-                  '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
-                  '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante →</button></div>';
-                const newBtn = card.querySelector('#onbExBtn');
-                if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
-              };
-            }
+        if (_onbExTimer) { clearTimeout(_onbExTimer); _onbExTimer = null; }
+        // Animazione fluida 3s (nessun countdown numerico): al termine il bottone si abilita.
+        _onbExTimer = setTimeout(() => {
+          _onbExTimer = null;
+          if (btn) {
+            btn.classList.remove('onb-enabling');
+            btn.disabled = false;
+            btn.textContent = 'Mostrar';
+            btn.onclick = () => {
+              card.innerHTML =
+                '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
+                '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+                '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
+                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante →</button></div>';
+              const newBtn = card.querySelector('#onbExBtn');
+              if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearTimeout(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
+            };
           }
-        }, 1000);
+        }, 3000);
         if (btn) btn.onclick = null;
       }
       function onbRenderExComplete() {
@@ -393,10 +449,7 @@
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
         wrap.innerHTML = '';
-        const header = document.createElement('div');
-        header.className = 'onb-phase-header onb-enter';
-        header.textContent = 'Completa la frase';
-        wrap.appendChild(header);
+        onbRenderStepsHeader('Completa la frase');
         const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
@@ -450,6 +503,117 @@
         // Nascondi subito il loader di app (evita race sul _loadToken → spinner infinito).
         if (typeof hideAppLoader === 'function') hideAppLoader();
         const s = getCurrentSong();
+      // ===== PIANO 2026-09-11: OVERRIDE FUNZIONI (function hoisting: queste definizioni vincono) =====
+      // PIANO-1: landing unica (fuse le 2 schermate, testo sintetico, bottone -> onbFase(1)).
+      function onbLanding1() {
+        onbClear();
+        _onbPhase = 0;
+        const root = onbRoot();
+        const sec = document.createElement('div');
+        sec.className = 'onb-landing onb-enter';
+        sec.innerHTML =
+          '<div class="onb-landing-card"><div class="onb-brand">Italiano<br>con Musica</div>' +
+          '<p class="onb-tagline">Aprende italiano con tus canciones favoritas</p>' +
+          '<p class="onb-landing-copy">Explora los versos, escucha la musica y guarda tus frases.</p>' +
+          '<button type="button" class="btn btn-primary onb-landing-btn">Adelante</button></div>';
+        root.appendChild(sec);
+        const btn = sec.querySelector('.onb-landing-btn');
+        if (btn) btn.addEventListener('click', () => onbFase(1), { once: true });
+      }
+      // PIANO-2: barra completamento fasi in cima (step da ONB_ACTIVE_PHASES, solo funnel).
+      function onbPhaseShell(n, titleHtml) {
+        onbClear();
+        _onbPhase = n;
+        const root = onbRoot();
+        const idx = ONB_ACTIVE_PHASES.indexOf(n);
+        const total = ONB_ACTIVE_PHASES.length;
+        const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
+        const stepNum = idx >= 0 ? (idx + 1) : n;
+        const wrap = document.createElement('div');
+        wrap.className = 'onb-funnel onb-enter';
+        wrap.innerHTML =
+          '<div class="onb-steps-bar"><div class="onb-steps-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="onb-steps-label">Paso ' + stepNum + ' de ' + total + '</div>' +
+          '<div class="onb-phase-header">' + titleHtml + '</div>' +
+          '<div class="onb-phase-body"></div>';
+        root.appendChild(wrap);
+        return wrap.querySelector('.onb-phase-body');
+      }
+      // PIANO-3: bottoni timer con animazione fluida 3s disabled->enabled, nessun countdown numerico.
+      function onbAddAdelanteEnabling(btn, ms, onClick) {
+        if (!btn) return;
+        btn.disabled = true;
+        btn.classList.remove('onb-enable');
+        btn.classList.add('onb-enabling');
+        setTimeout(() => {
+          btn.disabled = false;
+          try { btn.style.pointerEvents = ''; } catch (e) {}
+          btn.classList.remove('onb-enabling');
+          btn.classList.add('onb-enable');
+          setTimeout(() => { try { btn.classList.remove('onb-enable'); } catch (e) {} }, 700);
+          if (typeof onClick === 'function') btn.addEventListener('click', onClick, { once: true });
+        }, ms);
+      }
+      // PIANO-4: salvataggio preferito con stella vuota->colorata (animazione) + banner successo con hint appunti.
+      function onbFav(wrap, idx, trad) {
+        const line = _onbSong.lyrics[idx];
+        const v = onbVerseEl(line, { showStar: true, starIcon: '&#9734;' });
+        v.classList.add('onb-static');
+        const card = v.querySelector('.verse-card-click');
+        if (card) card.style.pointerEvents = 'none';
+        wrap.appendChild(v);
+        const starBtn = v.querySelector('.star-btn');
+        const added = _togglePreferitoCore
+          ? _togglePreferitoCore(starBtn, {
+              testo: line.text1 || '',
+              traduzione: trad || '',
+              songId: _onbSong.id,
+              songTitle: _onbSong.title || '',
+              artist: _onbSong.artist || '',
+              lingua: _onbSong.lang1 || '',
+              linguaTrad: _onbSong.lang2 || ''
+            })
+          : false;
+        const addedOk = added !== false;
+        if (starBtn) {
+          starBtn.innerHTML = '&#11088;';
+          try { starBtn.classList.remove('btn-outline-secondary'); } catch (e) {}
+          try { starBtn.classList.add('btn-outline-warning', 'star-filled'); } catch (e) {}
+        }
+        const msg = document.createElement('div');
+        msg.className = 'onb-success-banner onb-fade-in';
+        msg.innerHTML =
+          '<div class="onb-success-msg">&#11088; ¡Guardada en favoritos!</div>' +
+          '<div class="onb-success-hint">&#128161; Podras escribir apuntes en tus frases guardadas.</div>';
+        wrap.appendChild(msg);
+        const row = document.createElement('div');
+        row.className = 'onb-adelante-row onb-fade-in';
+        row.innerHTML = '<button type="button" class="btn btn-primary">Adelante</button>';
+        wrap.appendChild(row);
+        const btn = row.querySelector('button');
+        if (btn) btn.addEventListener('click', () => onbFase(7), { once: true });
+      }
+      // PIANO-3b: esercizio con animazione fluida 3s (nessun countdown 5..1), poi bottone Mostrar.
+      function onbRenderExReview(wrap, frase, trad) {
+        wrap.innerHTML =
+          '<div class="exercise-review-container onb-enter"><div class="exercise-review-header">' +
+          '<div class="exercise-review-song">Piensa en la traduccion</div>' +
+          '<button class="btn btn-primary btn-lg" id="onbExReveal" disabled>...</button>' +
+          '</div></div>';
+        const btn = wrap.querySelector('#onbExReveal');
+        if (btn) {
+          btn.classList.add('onb-enabling');
+          _onbExTimer = setTimeout(() => {
+            btn.classList.remove('onb-enabling');
+            btn.classList.add('onb-enable');
+            btn.disabled = false;
+            btn.textContent = 'Mostrar';
+            setTimeout(() => { try { btn.classList.remove('onb-enable'); } catch (e) {} }, 700);
+            btn.addEventListener('click', () => onbRenderExFill(wrap, frase, trad), { once: true });
+          }, 3000);
+        }
+      }
+      // ===== FINE OVERRIDE PIANO =====
         if (!s) return;
         _onboardingActive = true;
         _onbSong = s;
@@ -466,8 +630,10 @@
         currentSongBackup = s;
         document.body.classList.add('onboarding-active');
         hidePrimaryViews();
+      // PIANO-DONE: override sotto (riga ~640+) attivi: landing unica, shell con barra,
+      // bottoni 3s, fav con banner+hint, review esercizio 3s. Verificati visivamente.
         hideBottomNav();
         const sec = onbRoot();
         if (sec) sec.classList.remove('d-none');
-        onbLanding1();
-      }
+        onbLanding1(); // PIANO-1: landing unica (sintetico) -> onbFase(1)
+      } // fine avviaOnboarding
