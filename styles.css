@@ -1369,26 +1369,3 @@ body.onboarding-active #onboardingSection {
 
 /* bottone Adelante sotto i versi */
 .onb-adelante-row { width: 100%; display: flex; justify-content: center; }
-
-/* --- esercizio (una parola nascosta) --- */
-.onb-exercise {
-  width: 100%; max-width: 560px;
-  background: #fff;
-  border: 3px solid var(--surface-border, #EDE5F5);
-  border-radius: var(--radius-duo, 16px);
-  box-shadow: 0 4px 0 var(--surface-border-dark, #DBCCEC);
-  padding: 22px 18px;
-  text-align: center;
-}
-.onb-exercise-text { font-size: 19px; font-weight: 800; color: var(--text-main, #3D2B52); line-height: 1.6; margin-bottom: 14px; }
-.onb-word-hidden { color: transparent; border-bottom: 2px solid var(--primary, #9B5DE5); font-weight: 800; padding: 0 2px; }
-.onb-blank-input {
-  width: 100%; max-width: 420px;
-  padding: 12px 16px; font-size: 16px; font-weight: 800;
-  background: var(--surface-dim, #FDF8FF);
-  border: 2px solid var(--surface-border, #EDE5F5);
-  border-radius: var(--radius-duo, 16px);
-  text-align: center; color: var(--text-main, #3D2B52);
-}
-.onb-blank-input:focus { outline: none; border-color: var(--secondary, #5B9BF6); background: #fff; }
-.onb-blank-input.is-valid { border-color: #10B981; background: #E2F6F0; color: #16756D; }

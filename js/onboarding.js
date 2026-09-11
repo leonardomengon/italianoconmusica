@@ -22,7 +22,9 @@
       let _onbVerses = [];        // indici reali dei versi tutorial A/B/C
       let _onbAudio = null;
       let _onbPlayerBtn = null;
-      let _onbPlayerRange = [0, 10];
+      let _onbExFrase = '';
+      let _onbExTrad = '';
+      let _onbExTimer = null;
       let _onbPlayerOnDone = null;
 
       function onbIsDone() {
@@ -35,6 +37,7 @@
         const r = onbRoot();
         if (r) r.innerHTML = '';
         if (_onbAudio) { try { _onbAudio.pause(); } catch (e) {} }
+        if (_onbExTimer) { try { clearInterval(_onbExTimer); } catch (e) {} _onbExTimer = null; }
         onbHidePlayer();
       }
       function onbHidePlayer() {
@@ -222,25 +225,54 @@
           onbVerseCard(wrap, _onbVerses[1], { tap: true });
           onbAddAdelante(wrap, () => onbFase(5));
         } else if (n === 5) {
-          // Fase 5: SOLO bottone ⭐ (registra preferito) + nota di aiuto.
-          wrap = onbPhaseShell('Esta frase parece difícil, guárdala en tus favoritos para estudiarla con más frecuencia');
+          // Fase 5: SOLO bottone ⭐ (registra preferito). Niente testo nota.
+          wrap = onbPhaseShell('Guarda esta frase en tus favoritos');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: onbFav });
-          const note = document.createElement('p');
-          note.className = 'onb-note-hint onb-enter';
-          note.innerHTML = 'Puedes escribir notas que te ayuden a memorizar las frases difíciles.<br><em>Ejemplo:</em> «nota de ejemplo»';
-          wrap.appendChild(note);
           onbAddAdelante(wrap, () => onbFase(6));
         } else if (n === 6) {
-          // Fase 6: SECONDO ascolto (verso 1 + verso 2, 0-20s). NON conteggiato.
-          wrap = onbPhaseShell('Escucha cómo suena');
-          const idx = _onbVerses.length > 2 ? _onbVerses[2] : _onbVerses[1];
-          onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbVerseCard(wrap, idx, { tap: false });
-          onbShowPlayer(wrap, ONB_PLAY_SECOND, null);
+          // Fase 6 (intermedia): appunto. Mostra il verso con la textarea vuota
+          // nello stile standard .verse-note e invita a scrivere un appunto.
+          wrap = onbPhaseShell('Puedes escribir notas que te ayuden a memorizar las frases difíciles');
+          onbNoteCard(wrap, _onbVerses[1]);
           onbAddAdelante(wrap, () => onbFase(7));
         } else if (n === 7) {
+          // Fase 7: SECONDO ascolto (verso 1 + verso 2, 0-20s). NON conteggiato.
+          wrap = onbPhaseShell('Escucha cómo suena');
+          onbVerseCard(wrap, _onbVerses[0], { tap: false });
+          onbVerseCard(wrap, _onbVerses[1], { tap: false });
+          onbShowPlayer(wrap, ONB_PLAY_SECOND, null);
+          onbAddAdelante(wrap, () => onbFase(8));
+        } else if (n === 8) {
           onbEsercizio();
         }
+      }
+
+      // Card verso con textarea appunto in stile standard .verse-note (vuota).
+      function onbNoteCard(wrap, index) {
+        const lyr = _onbSong.lyrics[index];
+        if (!lyr) return;
+        const main = lyr.text1 || '';
+        const verse = document.createElement('div');
+        verse.className = 'verse onb-enter';
+        verse.dataset.index = index;
+        const row = document.createElement('div');
+        row.className = 'd-flex justify-content-between align-items-center gap-2';
+        const left = document.createElement('div');
+        left.className = 'd-flex align-items-center gap-2 flex-grow-1';
+        const strong = document.createElement('strong');
+        strong.textContent = main || 'Texto no disponible';
+        left.appendChild(strong);
+        row.appendChild(left);
+        verse.appendChild(row);
+        const note = document.createElement('div');
+        note.className = 'verse-note';
+        const ta = document.createElement('textarea');
+        ta.placeholder = 'Añade nota';
+        ta.setAttribute('onblur', 'saveNotaFromVerse(this, ' + index + ')');
+        ta.setAttribute('onclick', 'event.stopPropagation()');
+        note.appendChild(ta);
+        verse.appendChild(note);
+        wrap.appendChild(verse);
       }
 
       // Salva la frase nei preferiti (conteggiato: recordSavedNoteForProgress).
@@ -263,39 +295,82 @@
         if (added) showToast('⭐ Guardada en favoritos', 2600);
       }
 
-      // ==================== FASE 7: ESERCIZIO (UNA SOLA PAROLA NASCOSTA) ====================
+      // ==================== FASE 8: ESERCIZI (struttura classica: review + complete) ====================
+      // Due sotto-fasi locali: 'review' (pensa traduzione, countdown 5s) e
+      // 'complete' (completa la frase, una parola). Look identico agli esercizi
+      // classici (.exercise-card / .exercise-header / .exercise-text / actions).
+      let _onbExPhase = 'review';
       function onbEsercizio() {
-        _onbPhase = 7;
-        const wrap = onbPhaseShell('Completa la frase con la palabra que falta');
-        // Frase bersaglio: la preferita (Fase 5), altrimenti il verso B.
+        _onbPhase = 8;
+        _onbExPhase = 'review';
         const appunti = getAppunti();
         const fav = appunti.find(a => String(a.songId) === String(_onbSong.id) && a.testo && a.testo.trim());
-        const frase = fav ? fav.testo : (_onbSong.lyrics[_onbVerses[1]].text1 || '');
-        const words = frase.split(/\s+/).filter(Boolean);
-        if (words.length < 2) { onbComplete(); return; }
-        const hiddenIdx = words.length - 1; // nascondi l'ultima parola
-        const hiddenWord = words[hiddenIdx].replace(/[^\p{L}\p{N}'’]/gu, '');
-        const displayWords = words.map((w, i) =>
-          i === hiddenIdx ? '<span class="onb-word-hidden">______</span>' : escapeHtml(w)
-        ).join(' ');
+        _onbExFrase = fav ? fav.testo : (_onbSong.lyrics[_onbVerses[1]].text1 || '');
+        _onbExTrad = (fav ? fav.traduzione : (_onbSong.lyrics[_onbVerses[1]].text2 || '')) || '';
+        onbRenderExReview();
+      }
+      function onbRenderExReview() {
+        const wrap = onbRoot();
+        wrap.className = 'onb-funnel';
+        wrap.innerHTML = '';
+        const header = document.createElement('div');
+        header.className = 'onb-phase-header onb-enter';
+        header.textContent = 'Piensa en la traducción';
+        wrap.appendChild(header);
         const card = document.createElement('div');
-        card.className = 'onb-exercise onb-enter';
+        card.className = 'exercise-card onb-enter';
         card.innerHTML =
-          '<div class="onb-exercise-text">' + displayWords + '</div>' +
-          '<input type="text" class="onb-blank-input" placeholder="Escribe la palabra…" autocomplete="off">';
+          '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
+          '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary" disabled>5</button></div>';
         wrap.appendChild(card);
-        const inp = card.querySelector('.onb-blank-input');
-        inp.addEventListener('input', () => {
-          const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-          if (norm(inp.value) === norm(hiddenWord)) {
-            inp.value = hiddenWord;
-            inp.classList.add('is-valid');
-            inp.disabled = true;
-            showToast('🎉 ¡Correcto!', 2200);
-            setTimeout(onbComplete, 700);
+        let s = 5;
+        const btn = card.querySelector('#onbExBtn');
+        if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; }
+        _onbExTimer = setInterval(() => {
+          s--;
+          if (btn) btn.textContent = s > 0 ? s : 'Mostrar';
+          if (s <= 0) {
+            clearInterval(_onbExTimer); _onbExTimer = null;
+            if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; btn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); }; }
           }
-        });
-        onbAddAdelante(wrap, onbComplete);
+        }, 1000);
+        if (btn) btn.onclick = null;
+      }
+      function onbRenderExComplete() {
+        const frase = _onbExFrase;
+        const wrap = onbRoot();
+        wrap.className = 'onb-funnel';
+        wrap.innerHTML = '';
+        const header = document.createElement('div');
+        header.className = 'onb-phase-header onb-enter';
+        header.textContent = 'Completa la frase';
+        wrap.appendChild(header);
+        const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
+        const card = document.createElement('div');
+        card.className = 'exercise-card onb-enter';
+        card.innerHTML =
+          '<div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>' +
+          '<div class="exercise-text"><span class="exercise-verse-text">' + (textWithBlanks || escapeHtml(frase)) + '</span></div>' +
+          (_onbExTrad ? '<div class="exercise-translation">' + escapeHtml(_onbExTrad) + '</div>' : '') +
+          '<div class="exercise-actions"><button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente →</button></div>';
+        wrap.appendChild(card);
+        const inp = card.querySelector('.study-input');
+        if (inp) {
+          inp.addEventListener('input', () => {
+            const normalize = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            const answer = normalize(inp.getAttribute('data-answer'));
+            if (normalize(inp.value) === answer && inp.dataset.progressCounted !== '1') {
+              inp.dataset.progressCounted = '1';
+              inp.value = inp.getAttribute('data-answer-original') || inp.value;
+              inp.classList.add('is-valid');
+              inp.disabled = true;
+              const nextBtn = document.getElementById('onbExNext');
+              if (nextBtn) nextBtn.classList.remove('exercise-next-hidden');
+            }
+          });
+          inp.focus();
+        }
       }
 
       // ==================== CHIUSURA ====================
