@@ -11,26 +11,18 @@
       const ONB_COMPLETED_VALUE = '1';
       const ONB_VERSES_COUNT = 3; // versi tutorial A/B/C
 
-      // Timestamp audio (solo versi tutorial): il karaoke NON è usato; servono
-      // per riprodurre i frammenti dei versi nelle fasi "play".
-      // TODO: sostituire con i secondi reali (start/end) dei primi versi della
-      // canzone iniziale. Chiave = song.id; valore = [ [start,end], [start,end], ... ]
-      const ONB_TS = {
-        // '1': [[0,8],[8,16],[16,24]],
-        // '2': [[0,7],[7,15],[15,22]]
-      };
-      function onbTimestampFor(songId, verseIndex) {
-        const arr = ONB_TS[String(songId)] || [];
-        const t = arr[verseIndex];
-        return (t && Array.isArray(t) && t.length === 2) ? t : [0, 10];
-      }
+      // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
+      // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
+      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–20 s
+      const ONB_PLAY_FIRST = [10, 15];
+      const ONB_PLAY_SECOND = [0, 20];
 
       let _onbPhase = 0;
       let _onbSong = null;
       let _onbVerses = [];        // indici reali dei versi tutorial A/B/C
       let _onbAudio = null;
       let _onbPlayerBtn = null;
-      let _onbPlayerVerse = -1;
+      let _onbPlayerRange = [0, 10];
       let _onbPlayerOnDone = null;
 
       function onbIsDone() {
@@ -60,33 +52,44 @@
         }
         return _onbAudio;
       }
-      function onbShowPlayer(verseIndex, onDone) {
-        let p = document.getElementById('onbPlayer');
-        if (!p) {
-          p = document.createElement('div');
-          p.id = 'onbPlayer';
-          p.className = 'onb-player';
-          p.style.display = 'none';
-          p.innerHTML = '<button type="button" class="onb-play-btn" aria-label="Reproducir">▶</button>';
-          const btnEl = p.querySelector('.onb-play-btn');
-          if (btnEl) btnEl.addEventListener('click', onbTogglePlay);
-          document.body.appendChild(p);
-        }
-        _onbPlayerBtn = p.querySelector('.onb-play-btn');
-        if (_onbPlayerBtn) _onbPlayerBtn.textContent = '▶';
-        _onbPlayerVerse = verseIndex;
+      // Player ONBOARDING: renderizzato IN-FLOW (sotto il verso) con stile standard
+      // (pulsante .btn .btn-primary + barra di progresso), senza essere fixed.
+      function onbShowPlayer(container, range, onDone) {
+        _onbPlayerRange = range || [0, 10];
         _onbPlayerOnDone = onDone;
-        p.style.display = '';
-        p.classList.add('onb-enter');
+        const p = document.createElement('div');
+        p.className = 'onb-player onb-enter';
+        p.innerHTML =
+          '<div class="progress onb-progress"><div class="progress-bar onb-progress-bar" role="progressbar" style="width:0%"></div></div>' +
+          '<div class="onb-controls">' +
+          '<button type="button" class="btn btn-primary onb-play-btn" aria-label="Reproducir">' +
+          '<span class="material-symbols-outlined onb-play-icon">play_arrow</span></button>' +
+          '</div>';
+        container.appendChild(p);
+        _onbPlayerBtn = p.querySelector('.onb-play-btn');
+        if (_onbPlayerBtn) _onbPlayerBtn.addEventListener('click', onbTogglePlay);
+      }
+      function onbSetPlayIcon(name) {
+        const ic = document.querySelector('#onboardingSection .onb-play-icon');
+        if (ic) ic.textContent = name;
       }
       function onbTogglePlay() {
-        // Se già in riproduzione il pulsante diventa pause-only: non riavvia.
         if (_onbAudio && !_onbAudio.paused && _onbAudio.currentTime > 0) return;
         const el = ensureOnbAudio();
-        const ts = onbTimestampFor(_onbSong.id, _onbPlayerVerse);
-        if (_onbPlayerBtn) _onbPlayerBtn.textContent = '⏸';
-        playVerseInterval(el, ts[0], ts[1], () => {
-          if (_onbPlayerBtn) _onbPlayerBtn.textContent = '▶';
+        const range = _onbPlayerRange || [0, 10];
+        const start = range[0], end = range[1];
+        const bar = document.querySelector('#onboardingSection .onb-progress-bar');
+        onbSetPlayIcon('pause');
+        const tick = () => {
+          if (bar && isFinite(el.duration)) {
+            bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start) / (end - start)) * 100)) + '%';
+          }
+        };
+        el.addEventListener('timeupdate', tick);
+        playVerseInterval(el, start, end, () => {
+          el.removeEventListener('timeupdate', tick);
+          if (bar) bar.style.width = '100%';
+          onbSetPlayIcon('play_arrow');
           if (typeof _onbPlayerOnDone === 'function') _onbPlayerOnDone();
         });
       }
@@ -118,7 +121,7 @@
 
       // ==================== SHELL DI FASE ====================
       // Renderizza: header (spiegazione fase) + wrapper contenuto + bottone Adelante.
-      function onbPhaseShell(title, adelanteFn) {
+      function onbPhaseShell(title) {
         onbClear();
         const r = onbRoot();
         r.className = 'onb-funnel';
@@ -129,97 +132,112 @@
         const wrap = document.createElement('div');
         wrap.className = 'onb-phase-body';
         r.appendChild(wrap);
-        if (adelanteFn) {
-          const row = document.createElement('div');
-          row.className = 'onb-adelante-row';
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'btn btn-primary onb-adelante';
-          b.textContent = 'Adelante →';
-          b.addEventListener('click', adelanteFn);
-          row.appendChild(b);
-          wrap.appendChild(row);
-        }
         return wrap;
       }
+      function onbAddAdelante(wrap, fn) {
+        const row = document.createElement('div');
+        row.className = 'onb-adelante-row onb-enter';
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-primary onb-adelante';
+        b.textContent = 'Adelante →';
+        b.addEventListener('click', fn);
+        row.appendChild(b);
+        wrap.appendChild(row);
+      }
 
-      // Card verso. opts: { tap, onTap, showStar, onStar, starIcon }
+      // Card verso con lo STESSO layout delle canzoni (.verse / .translation / ⭐).
+      // opts: { tap, showStar, onStar, starIcon }
       function onbVerseCard(wrap, index, opts) {
         const lyr = _onbSong.lyrics[index];
         if (!lyr) return;
         const main = lyr.text1 || '';
         const trad = lyr.text2 || '';
-        const card = document.createElement('div');
-        card.className = 'onb-verse-card onb-enter';
-        const txt = document.createElement('div');
-        txt.className = 'onb-verse-text';
-        txt.textContent = main;
-        card.appendChild(txt);
+        const verse = document.createElement('div');
+        verse.className = 'verse onb-enter' + (opts.tap ? '' : ' onb-static');
+        verse.dataset.index = index;
+        const row = document.createElement('div');
+        row.className = 'd-flex justify-content-between align-items-center gap-2';
+        const left = document.createElement('div');
+        left.className = 'd-flex align-items-center gap-2 flex-grow-1';
+        const strong = document.createElement('strong');
+        strong.textContent = main || 'Texto no disponible';
+        left.appendChild(strong);
         if (opts.tap) {
-          card.classList.add('onb-tappable');
-          const trans = document.createElement('div');
-          trans.className = 'onb-verse-trans';
-          trans.style.display = 'none';
-          trans.textContent = trad;
-          card.appendChild(trans);
-          card.addEventListener('click', () => {
-            if (trans.style.display === 'block') { trans.style.display = 'none'; return; }
-            trans.style.display = 'block';
-            trans.classList.add('onb-enter');
-            if (opts.onTap && !opts._tapped) {
-              opts._tapped = true;
-              opts.onTap(main, index);
-            }
-          });
+          const hint = document.createElement('span');
+          hint.className = 'toggle-hint';
+          hint.title = 'Haz clic para mostrar/ocultar la traducción';
+          hint.textContent = '▼';
+          left.appendChild(hint);
         }
+        row.appendChild(left);
         if (opts.showStar) {
           const star = document.createElement('button');
           star.type = 'button';
-          star.className = 'btn btn-sm onb-star-btn';
+          star.className = 'btn btn-sm btn-outline-secondary ms-2';
+          star.style.cssText = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
+          star.dataset.lyricIndex = index;
           star.textContent = opts.starIcon || '☆';
-          card.appendChild(star);
-          star.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (opts.onStar) opts.onStar(star, index);
-          });
+          star.addEventListener('click', (e) => { e.stopPropagation(); if (opts.onStar) opts.onStar(star, index); });
+          row.appendChild(star);
         }
-        wrap.appendChild(card);
+        verse.appendChild(row);
+        const trans = document.createElement('div');
+        trans.className = 'translation';
+        trans.id = 'translation-' + index;
+        const span = document.createElement('span');
+        span.className = 'translation-text';
+        span.textContent = trad || 'Traducción no disponible';
+        trans.appendChild(span);
+        verse.appendChild(trans);
+        if (opts.tap) {
+          verse.addEventListener('click', () => { try { toggleTranslation(index); } catch (e) {} });
+        }
+        wrap.appendChild(verse);
       }
 
       // ==================== DISPATCHER FASI ====================
       function onbFase(n) {
         _onbPhase = n;
+        let wrap;
         if (n === 1) {
           // Fase 1: primo verso NON interattivo (nessuna traduzione) + Adelante.
-          const wrap = onbPhaseShell('Intenta entender esta frase italiana', () => onbFase(2));
+          wrap = onbPhaseShell('Intenta entender esta frase italiana');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
+          onbAddAdelante(wrap, () => onbFase(2));
         } else if (n === 2) {
           // Fase 2: toca la frase → traduzione (registra verso aperto).
-          const wrap = onbPhaseShell('Toca la frase para ver la traducción', () => onbFase(3));
-          onbVerseCard(wrap, _onbVerses[0], { tap: true, onTap: (m, i) => { try { recordVerseExplored(i); } catch (e) {} } });
+          wrap = onbPhaseShell('Toca la frase para ver la traducción');
+          onbVerseCard(wrap, _onbVerses[0], { tap: true });
+          onbAddAdelante(wrap, () => onbFase(3));
         } else if (n === 3) {
-          // Fase 3: player solo play → ascolto frammento (NON conteggiato).
-          const wrap = onbPhaseShell('Haz clic en play para escuchar cómo suena', () => onbFase(4));
+          // Fase 3: player → PRIMO ascolto (verso 1, 10-15s). NON conteggiato.
+          wrap = onbPhaseShell('Haz clic en play para escuchar cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbShowPlayer(_onbVerses[0], null);
+          onbShowPlayer(wrap, ONB_PLAY_FIRST, null);
+          onbAddAdelante(wrap, () => onbFase(4));
         } else if (n === 4) {
           // Fase 4: SOLO il prossimo verso, tap → traduzione (registra).
-          const wrap = onbPhaseShell('Intenta entender y toca para ver la traducción', () => onbFase(5));
-          onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: (m, i) => { try { recordVerseExplored(i); } catch (e) {} } });
+          wrap = onbPhaseShell('Intenta entender y toca para ver la traducción');
+          onbVerseCard(wrap, _onbVerses[1], { tap: true });
+          onbAddAdelante(wrap, () => onbFase(5));
         } else if (n === 5) {
           // Fase 5: SOLO bottone ⭐ (registra preferito) + nota di aiuto.
-          const wrap = onbPhaseShell('Esta frase parece difícil, guárdala en tus favoritos para estudiarla con más frecuencia', () => onbFase(6));
+          wrap = onbPhaseShell('Esta frase parece difícil, guárdala en tus favoritos para estudiarla con más frecuencia');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: onbFav });
           const note = document.createElement('p');
           note.className = 'onb-note-hint onb-enter';
           note.innerHTML = 'Puedes escribir notas que te ayuden a memorizar las frases difíciles.<br><em>Ejemplo:</em> «nota de ejemplo»';
           wrap.appendChild(note);
+          onbAddAdelante(wrap, () => onbFase(6));
         } else if (n === 6) {
-          // Fase 6: nuovo verso + player play (NON conteggiato).
+          // Fase 6: SECONDO ascolto (verso 1 + verso 2, 0-20s). NON conteggiato.
+          wrap = onbPhaseShell('Escucha cómo suena');
           const idx = _onbVerses.length > 2 ? _onbVerses[2] : _onbVerses[1];
-          const wrap = onbPhaseShell('Escucha cómo suena', () => onbFase(7));
+          onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbVerseCard(wrap, idx, { tap: false });
-          onbShowPlayer(idx, null);
+          onbShowPlayer(wrap, ONB_PLAY_SECOND, null);
+          onbAddAdelante(wrap, () => onbFase(7));
         } else if (n === 7) {
           onbEsercizio();
         }
@@ -248,7 +266,7 @@
       // ==================== FASE 7: ESERCIZIO (UNA SOLA PAROLA NASCOSTA) ====================
       function onbEsercizio() {
         _onbPhase = 7;
-        const wrap = onbPhaseShell('Completa la frase con la palabra que falta', onbComplete);
+        const wrap = onbPhaseShell('Completa la frase con la palabra que falta');
         // Frase bersaglio: la preferita (Fase 5), altrimenti il verso B.
         const appunti = getAppunti();
         const fav = appunti.find(a => String(a.songId) === String(_onbSong.id) && a.testo && a.testo.trim());
@@ -277,6 +295,7 @@
             setTimeout(onbComplete, 700);
           }
         });
+        onbAddAdelante(wrap, onbComplete);
       }
 
       // ==================== CHIUSURA ====================
