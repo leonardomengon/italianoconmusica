@@ -371,7 +371,19 @@
           if (btn && s > 0) btn.textContent = s;
           if (s <= 0) {
             clearInterval(_onbExTimer); _onbExTimer = null;
-            if (btn) { btn.disabled = false; btn.textContent = 'Mostrar'; btn.onclick = () => { btn.textContent = 'Adelante →'; btn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); }; }; }
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = 'Mostrar';
+              btn.onclick = () => {
+                card.innerHTML =
+                  '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
+                  '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+                  '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
+                  '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante →</button></div>';
+                const newBtn = card.querySelector('#onbExBtn');
+                if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
+              };
+            }
           }
         }, 1000);
         if (btn) btn.onclick = null;
