@@ -223,7 +223,10 @@
         trans.appendChild(span);
         verse.appendChild(trans);
         if (opts.tap) {
-          verse.addEventListener('click', () => { try { toggleTranslation(index); } catch (e) {} });
+          verse.addEventListener('click', () => {
+            try { toggleTranslation(index); } catch (e) {}
+            if (opts.onTap) opts.onTap(main, index);
+          });
         }
         wrap.appendChild(verse);
       }
