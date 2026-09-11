@@ -17,11 +17,10 @@
       let _sfidaCountedSession = false;
       let _eserciziFatti = 0;
       let _ripassoMode = false;
-      // Flag dell'onboarding (funnel di primo avvio): mentre è attivo,
+      // Flag dell'onboarding (landing + funnel di primo avvio): mentre è attivo,
       // ascolti ed esercizi NON concorrono alla progressione (contano solo
-      // i versi aperti e i preferiti). _onbSfida marca la sfida guidata finale.
+      // i versi aperti e i preferiti).
       let _onboardingActive = false;
-      let _onbSfida = false;
       // Fase e timer condivisi tra esercizi "studio" e "ripasso"
       // (in precedenza erano due coppie duplicate: _ripassoPhase/_ripassoTimer
       // e _reviewPhase/_reviewTimer). _reviewMode resta un concetto separato:

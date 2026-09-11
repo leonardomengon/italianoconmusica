@@ -136,9 +136,6 @@
         const tot = isRipasso ? _exerciseQueue.length : ESERCIZI_PER_SFIDA;
 
         if (_exerciseQueue.length === 0 || _exerciseIndex >= _exerciseQueue.length) {
-          // Durante la sfida guidata dell'onboarding, al termine dei (pochi)
-          // micro-esercizi si chiude il funnel invece di conteggiare la sfida.
-          if (_onbSfida && _exerciseIndex > 0) { onbComplete(); return; }
           if (isRipasso) {
             wrap.innerHTML = `<div class="exercise-card text-center p-4">
               <div class="celebration-icon">🎉</div>
