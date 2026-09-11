@@ -49,7 +49,7 @@
       // ---- utilità DOM ----
       function onbClear() {
         const r = onbRoot();
-        if (r) r.innerHTML = '';
+        if (r) { const tb = document.getElementById('onbTopbar'); r.innerHTML = ''; if (tb) r.appendChild(tb); }
         if (_onbAudio) { try { _onbAudio.pause(); } catch (e) {} }
         if (_onbExTimer) { try { clearTimeout(_onbExTimer); } catch (e) {} _onbExTimer = null; }
         onbHidePlayer();
@@ -246,9 +246,10 @@
           star.type = 'button';
           star.className = 'btn btn-sm btn-outline-secondary ms-2';
           star.style.cssText = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
-          star.dataset.lyricIndex = index;
+          star.dataset.lyricIndex = index; // PIANO-6: stella vuota pulsante fino al click
+          star.classList.add('onb-star-attention');
           star.textContent = opts.starIcon || '☆';
-          star.addEventListener('click', (e) => { e.stopPropagation(); if (opts.onStar) opts.onStar(star, index); });
+          star.addEventListener('click', (e) => { e.stopPropagation(); try { star.classList.remove('onb-star-attention'); } catch (err) {} if (opts.onStar) opts.onStar(star, index); }); // PIANO-6: stop pulse al click
           row.appendChild(star);
         }
         verse.appendChild(row);
@@ -512,11 +513,13 @@
         const sec = document.createElement('div');
         sec.className = 'onb-landing onb-enter';
         sec.innerHTML =
-          '<div class="onb-landing-card"><div class="onb-brand">Italiano<br>con Musica</div>' +
-          '<p class="onb-tagline">Aprende italiano con tus canciones favoritas</p>' +
-          '<p class="onb-landing-copy">Explora los versos, escucha la musica y guarda tus frases.</p>' +
-          '<button type="button" class="btn btn-primary onb-landing-btn">Adelante</button></div>';
+          '<div class="onb-splash"><div class="onb-brand">Italiano<br>con Musica</div>' +
+          '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
+          '<p class="onb-splash-sub">Nuestras canciones siguen un recorrido didáctico eficaz: escucha, lee y practica.</p>' +
+          '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
+        sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
+        const btnSplash = sec.querySelector('.onb-splash-btn'); if (btnSplash) btnSplash.addEventListener('click', () => onbFase(1), { once: true }); // PIANO-1: fix selettore splash
         const btn = sec.querySelector('.onb-landing-btn');
         if (btn) btn.addEventListener('click', () => onbFase(1), { once: true });
       }
@@ -532,12 +535,38 @@
         const wrap = document.createElement('div');
         wrap.className = 'onb-funnel onb-enter';
         wrap.innerHTML =
-          '<div class="onb-steps-bar"><div class="onb-steps-fill" style="width:' + pct + '%"></div></div>' +
-          '<div class="onb-steps-label">Paso ' + stepNum + ' de ' + total + '</div>' +
-          '<div class="onb-phase-header">' + titleHtml + '</div>' +
+          '' +
+          '' +
+          '<div class="onb-phase-header onb-instruction">' + titleHtml + '</div>' +
           '<div class="onb-phase-body"></div>';
         root.appendChild(wrap);
-        return wrap.querySelector('.onb-phase-body');
+        return wrap.querySelector('.onb-phase-body'); // PIANO-2j-topbar-persistente-sotto
+      } // PIANO-2k-chiusura-onbPhaseShell
+      function onbEnsureTopbar() {
+        onbUpdateTopbar(n);
+        const root = onbRoot();
+        if (!root) return null;
+        let tb = document.getElementById('onbTopbar');
+        if (tb) return tb;
+        tb = document.createElement('div');
+        tb.id = 'onbTopbar';
+        tb.className = 'onb-topbar';
+        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        root.appendChild(tb);
+        return tb;
+      }
+      function onbUpdateTopbar(n) {
+        const root = onbRoot();
+        if (!root) return;
+        onbEnsureTopbar();
+        const idx = ONB_ACTIVE_PHASES.indexOf(n);
+        const total = ONB_ACTIVE_PHASES.length;
+        const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
+        const fill = document.getElementById('onbStepsFill');
+        if (fill) fill.style.width = pct + '%';
+      }
+      } // PIANO-2k-chiusura-onbUpdateTopbar
+      // PIANO-2k-bis: la graffa di chiusura a riga 568 chiude onbPhaseShell; gli helper topbar restano definiti sopra (hoisting).
       }
       // PIANO-3: bottoni timer con animazione fluida 3s disabled->enabled, nessun countdown numerico.
       function onbAddAdelanteEnabling(btn, ms, onClick) {
@@ -578,10 +607,10 @@
         if (starBtn) {
           starBtn.innerHTML = '&#11088;';
           try { starBtn.classList.remove('btn-outline-secondary'); } catch (e) {}
-          try { starBtn.classList.add('btn-outline-warning', 'star-filled'); } catch (e) {}
+          try { starBtn.classList.remove('onb-star-attention'); starBtn.classList.add('btn-outline-warning', 'star-filled'); } catch (e) {}
         }
         const msg = document.createElement('div');
-        msg.className = 'onb-success-banner onb-fade-in';
+        msg.className = 'onb-success-banner onb-inline onb-fade-in';
         msg.innerHTML =
           '<div class="onb-success-msg">&#11088; ¡Guardada en favoritos!</div>' +
           '<div class="onb-success-hint">&#128161; Podras escribir apuntes en tus frases guardadas.</div>';
