@@ -106,6 +106,9 @@
         hideBottomNav();
         songs = await fetchSongs();
         if (songs.length > 0) applicaSceltaLingua();
+        // Onboarding di primo avvio: se non ancora completato, avvia il funnel
+        // (avviaOnboarding è un no-op se 'onboardingCompleted' è già impostato).
+        if (typeof avviaOnboarding === 'function') { await avviaOnboarding(); }
         // Backup automatico + metrica di utilizzo: fire-and-forget, non blocca l'avvio.
         if (typeof sincronizzaBackup === 'function') { sincronizzaBackup(); }
       })();

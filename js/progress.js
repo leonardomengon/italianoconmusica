@@ -11,7 +11,6 @@
     return (p.completedSongIds || []).length > 0;
   }
   const ESERCIZI_PER_SFIDA = 14;
-  const ONBOARDING_KEY = 'appOnboardingSeen';
   let _reviewMode = false;
   let _completionLock = false;
   let _animatingMissions = false;
@@ -192,23 +191,7 @@
     try { song.lyrics=await fetchLyrics(song.id); } catch { song.lyrics=[]; }
     return song;
   }
-  function initOnboardingBanner() {
-    const modal = document.getElementById('onboardingModal');
-    if (!modal) return;
-    let seen = false;
-    try { seen = localStorage.getItem(ONBOARDING_KEY) === '1'; } catch (e) {}
-    if (seen) return;
-    modal.classList.add('open');
-    const closeBtn = document.getElementById('onboardingClose');
-    if (closeBtn) {
-      closeBtn.onclick = () => {
-        try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch (e) {}
-        modal.classList.remove('open');
-      };
-    }
-  }
   async function renderProgressionHome() {
-    initOnboardingBanner();
     initializeProgression();
     const p=getProgress();
     const current=getCurrentSong();
@@ -441,7 +424,7 @@
   // selección de idioma). Se reescribe el progresso y la elección de idioma,
   // se reinicia la propina de Mercado Pago, pero se CONSERVAN las notas.
   async function resetProgressToNewUser() {
-    try { localStorage.removeItem(ONBOARDING_KEY); } catch (e) {}
+    try { localStorage.removeItem('onboardingCompleted'); } catch (e) {}
     try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
     try { localStorage.removeItem('appLangChoice'); } catch (e) {}
     try { localStorage.removeItem('mpCursosOfertados'); } catch (e) {}
@@ -526,7 +509,7 @@
     maybeShowMissionFeedback(before, missionState(song));
   }
   function recordListen(songId) {
-    if (_reviewMode) return;
+    if (_reviewMode || _onboardingActive) return;
     const current=getCurrentSong(); if(!current || String(current.id)!==String(songId)) return;
     const song = currentSongBackup || current;
     const before = missionState(song);
@@ -537,7 +520,7 @@
     maybeShowMissionFeedback(before, missionState(song));
   }
   function recordSfidaCompleta() {
-    if (_ripassoMode || _reviewMode || !currentSongBackup) return;
+    if (_onboardingActive || _ripassoMode || _reviewMode || !currentSongBackup) return;
     if (_sfidaCountedSession) return;
     _sfidaCountedSession = true;
     const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE()); saveProgress(p);

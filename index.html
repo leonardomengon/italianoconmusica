@@ -192,18 +192,14 @@
     </div>
   </div>
 
-  <div id="onboardingModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+  <!-- Modale di chiusura onboarding (funnel di primo avvio) -->
+  <div id="onbEndModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="onbEndTitle">
     <div class="progress-modal-box">
-      <div class="celebration-icon">🎵</div>
-      <h2 id="onboardingTitle">¡Bienvenido!</h2>
-      <p class="onboarding-lead">¿Cómo funciona Italiano con Música?</p>
-      <div class="onboarding-steps">
-        <p class="onboarding-line">Los cursos están estructurados en canciones; cada canción se enfoca en un tema.</p>
-        <p class="onboarding-line">Completa las 3 misiones de estudio para acceder a los ejercicios de una canción.</p>
-        <p class="onboarding-line"><strong>Completa los ejercicios para desbloquear la siguiente canción.</strong></p>
-      </div>
+      <div class="celebration-icon">🎉</div>
+      <h2 id="onbEndTitle">¡Bienvenido a Italiano con Música!</h2>
+      <p id="onbEndMsg">Ya sabes explorar las canciones, guardar tus frases favoritas y superar tu primer desafío. Sigue con tu progreso para desbloquear nuevas canciones.</p>
       <div class="progress-modal-actions">
-        <button id="onboardingClose" class="btn btn-primary" type="button">¡Empezar!</button>
+        <button id="onbEndClose" class="btn btn-primary" type="button">¡Continuar!</button>
       </div>
     </div>
   </div>
@@ -245,6 +241,7 @@
   <script src="js/progress.js"></script>
   <script src="js/analytics.js"></script>
   <script src="js/backup.js"></script>
+  <script src="js/onboarding.js"></script>
   <script src="js/boot.js"></script>
 </body>
 </html>
