@@ -567,7 +567,7 @@
       }
       } // PIANO-2k-chiusura-onbUpdateTopbar
       // PIANO-2k-bis: la graffa di chiusura a riga 568 chiude onbPhaseShell; gli helper topbar restano definiti sopra (hoisting).
-      }
+      
       // PIANO-3: bottoni timer con animazione fluida 3s disabled->enabled, nessun countdown numerico.
       function onbAddAdelanteEnabling(wrap, fn, delayMs) {
         if (!btn) return;
