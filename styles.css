@@ -1344,11 +1344,11 @@ body.onboarding-active #onboardingSection {
 /* --- funnel --- */
 .onb-funnel { width: 100%; max-width: 560px; }
 .onb-phase-header {
-  /* PLAIN: testo semplice, nessuna card, per distinguersi dai versi cliccabili */
+  /* Istruzioni ben visibili: grandi, nero/grassetto */
   text-align: center;
-  font-size: 13px; font-weight: 900;
-  text-transform: uppercase; letter-spacing: .6px;
-  color: var(--text-muted, #8A7FA3);
+  font-size: 17px; font-weight: 900;
+  color: var(--text-main, #3D2B52);
+  line-height: 1.4;
   margin-bottom: 18px;
 }
 .onb-phase-body { display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -1369,3 +1369,5 @@ body.onboarding-active #onboardingSection {
 
 /* bottone Adelante sotto i versi */
 .onb-adelante-row { width: 100%; display: flex; justify-content: center; }
+@keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+.onb-fade-in { animation: onb-fade-in-kf .5s ease both; }

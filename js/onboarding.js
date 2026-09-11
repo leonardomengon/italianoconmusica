@@ -57,7 +57,7 @@
       }
       // Player ONBOARDING: renderizzato IN-FLOW (sotto il verso) con stile standard
       // (pulsante .btn .btn-primary + barra di progresso), senza essere fixed.
-      function onbShowPlayer(container, range, onDone) {
+      function onbShowPlayer(container, range, unused, onDone) {
         _onbPlayerRange = range || [0, 10];
         _onbPlayerOnDone = onDone;
         const p = document.createElement('div');
@@ -137,9 +137,9 @@
         r.appendChild(wrap);
         return wrap;
       }
-      function onbAddAdelante(wrap, fn) {
+      function onbAddAdelante(wrap, fn, opts) {
         const row = document.createElement('div');
-        row.className = 'onb-adelante-row onb-enter';
+        row.className = 'onb-adelante-row' + (opts && opts.fade ? ' onb-fade-in' : '');
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante';
@@ -147,6 +147,27 @@
         b.addEventListener('click', fn);
         row.appendChild(b);
         wrap.appendChild(row);
+        return row;
+      }
+      // Mostra il bottone Adelante dopo un ritardo (con dissolvenza in entrata).
+      function onbAddAdelanteDelayed(wrap, fn, delayMs) {
+        const row = document.createElement('div');
+        row.className = 'onb-adelante-row';
+        row.style.opacity = '0';
+        row.style.pointerEvents = 'none';
+        wrap.appendChild(row);
+        setTimeout(() => {
+          row.classList.add('onb-fade-in');
+          row.style.opacity = '';
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'btn btn-primary onb-adelante';
+          b.textContent = 'Adelante →';
+          b.addEventListener('click', fn);
+          row.appendChild(b);
+          row.style.pointerEvents = '';
+        }, delayMs || 0);
+        return row;
       }
 
       // Card verso con lo STESSO layout delle canzoni (.verse / .translation / ⭐).
@@ -204,51 +225,45 @@
         _onbPhase = n;
         let wrap;
         if (n === 1) {
-          // Fase 1: primo verso NON interattivo (nessuna traduzione) + Adelante.
-          wrap = onbPhaseShell('Intenta entender esta frase italiana');
+          wrap = onbPhaseShell('Intenta adivinar el significado');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbAddAdelante(wrap, () => onbFase(2));
+          onbAddAdelanteDelayed(wrap, () => onbFase(2), 5000);
         } else if (n === 2) {
-          // Fase 2: toca la frase → traduzione (registra verso aperto).
           wrap = onbPhaseShell('Toca la frase para ver la traducción');
-          onbVerseCard(wrap, _onbVerses[0], { tap: true });
-          onbAddAdelante(wrap, () => onbFase(3));
+          onbVerseCard(wrap, _onbVerses[0], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(3)) });
         } else if (n === 3) {
-          // Fase 3: player → PRIMO ascolto (verso 1, 10-15s). NON conteggiato.
           wrap = onbPhaseShell('Haz clic en play para escuchar cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbShowPlayer(wrap, ONB_PLAY_FIRST, null);
-          onbAddAdelante(wrap, () => onbFase(4));
+          onbShowPlayer(wrap, ONB_PLAY_FIRST, null, () => onbShowAdelante(wrap, () => onbFase(4)));
         } else if (n === 4) {
-          // Fase 4: SOLO il prossimo verso, tap → traduzione (registra).
           wrap = onbPhaseShell('Intenta entender y toca para ver la traducción');
-          onbVerseCard(wrap, _onbVerses[1], { tap: true });
-          onbAddAdelante(wrap, () => onbFase(5));
+          onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(5)) });
         } else if (n === 5) {
-          // Fase 5: SOLO bottone ⭐ (registra preferito). Niente testo nota.
-          wrap = onbPhaseShell('Guarda esta frase en tus favoritos');
-          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: onbFav });
-          onbAddAdelante(wrap, () => onbFase(6));
+          wrap = onbPhaseShell('Esta frase parece complicada, guárdala en tus favoritos para estudiarla con más frecuencia');
+          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => { onbFav(starBtn, idx); onbShowAdelante(wrap, () => onbFase(6)); } });
         } else if (n === 6) {
-          // Fase 6 (intermedia): appunto. Mostra il verso con la textarea vuota
-          // nello stile standard .verse-note e invita a scrivere un appunto.
           wrap = onbPhaseShell('Puedes escribir notas que te ayuden a memorizar las frases difíciles');
-          onbNoteCard(wrap, _onbVerses[1]);
+          onbNoteCard(wrap, _onbVerses[1], true);
           onbAddAdelante(wrap, () => onbFase(7));
         } else if (n === 7) {
-          // Fase 7: SECONDO ascolto (verso 1 + verso 2, 0-20s). NON conteggiato.
           wrap = onbPhaseShell('Escucha cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbVerseCard(wrap, _onbVerses[1], { tap: false });
-          onbShowPlayer(wrap, ONB_PLAY_SECOND, null);
-          onbAddAdelante(wrap, () => onbFase(8));
+          onbShowPlayer(wrap, ONB_PLAY_SECOND, null, () => onbShowAdelante(wrap, () => onbFase(8)));
         } else if (n === 8) {
           onbEsercizio();
         }
       }
+      let _onbAdelanteShown = false;
+      function onbShowAdelante(wrap, fn) {
+        if (_onbAdelanteShown) return;
+        _onbAdelanteShown = true;
+        onbAddAdelante(wrap, fn, { fade: true });
+      }
 
       // Card verso con textarea appunto in stile standard .verse-note (vuota).
-      function onbNoteCard(wrap, index) {
+      // starClicked=true → mostra la stella già salvata (preferito già aggiunto).
+      function onbNoteCard(wrap, index, starClicked) {
         const lyr = _onbSong.lyrics[index];
         if (!lyr) return;
         const main = lyr.text1 || '';
@@ -263,6 +278,15 @@
         strong.textContent = main || 'Texto no disponible';
         left.appendChild(strong);
         row.appendChild(left);
+        if (starClicked) {
+          const star = document.createElement('button');
+          star.type = 'button';
+          star.className = 'btn btn-sm btn-outline-warning ms-2';
+          star.style.cssText = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
+          star.textContent = '⭐';
+          star.disabled = true;
+          row.appendChild(star);
+        }
         verse.appendChild(row);
         const note = document.createElement('div');
         note.className = 'verse-note';
@@ -315,7 +339,7 @@
         wrap.innerHTML = '';
         const header = document.createElement('div');
         header.className = 'onb-phase-header onb-enter';
-        header.textContent = 'Piensa en la traducción';
+        header.textContent = 'Completa tu primer ejercicio';
         wrap.appendChild(header);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
@@ -329,10 +353,10 @@
         if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; }
         _onbExTimer = setInterval(() => {
           s--;
-          if (btn) btn.textContent = s > 0 ? s : 'Mostrar';
+          if (btn && s > 0) btn.textContent = s;
           if (s <= 0) {
             clearInterval(_onbExTimer); _onbExTimer = null;
-            if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; btn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); }; }
+            if (btn) { btn.disabled = false; btn.textContent = 'Mostrar'; btn.onclick = () => { btn.textContent = 'Adelante →'; btn.onclick = () => { if (_onbExTimer) { clearInterval(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); }; }; }
           }
         }, 1000);
         if (btn) btn.onclick = null;
