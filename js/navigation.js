@@ -16,6 +16,9 @@
         document.getElementById('loadingMessage').innerHTML = '<span class="loading-spinner"></span> <span>Cargando...</span>';
         document.getElementById('loadingMessage').style.display = "block";
         hideBottomNav();
+        // Difesa: in apertura canzone il loader di app non deve mai restare
+        // visibile (no-op se assente); evita blocchi con spinner infinito.
+        if (typeof hideAppLoader === 'function') hideAppLoader();
 
         try {
           const lyrics = await fetchLyrics(songId);

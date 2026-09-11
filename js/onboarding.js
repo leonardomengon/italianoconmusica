@@ -198,6 +198,10 @@
         if (onbIsDone()) return;
         const s = getCurrentSong();
         if (!s) return;
+        // Nascondi subito il loader di app: evita che la gara sul _loadToken tra
+        // showHomeView (async) e openSong lasci #appLoader visibile (spinner infinito)
+        // quando l'onboarding non è completo e l'utente ricarica la pagina.
+        if (typeof hideAppLoader === 'function') hideAppLoader();
         _onbActive = true;
         _onbSfida = false;
         _onbSong = s;
