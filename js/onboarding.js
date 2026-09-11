@@ -1,4 +1,4 @@
-// ===== ONBOARDING v3 (PIANO 2026-09-11) =====
+﻿// ===== ONBOARDING v3 (PIANO 2026-09-11) =====
 // PIANO-1: landing unica (fuse le due schermate introduttive, testo sintetico).
 // PIANO-2: barra completamento fasi in cima (step da ONB_ACTIVE_PHASES).
 // PIANO-3: bottoni timer -> animazione fluida 3s disabled->enabled, nessun countdown numerico.
@@ -26,8 +26,8 @@
       const ONB_ACTIVE_PHASES = [1, 2, 3, 4, 5, 7, 8]; // Fase 6 (spiegazione appunti) eliminata, integrata nel salvataggio preferito
       
       // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
-      // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
-      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–20 s
+      // - PRIMO ascolto (Fase 3): verso 1 â†’ 10â€“15 s
+      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 â†’ 0â€“20 s
       const ONB_PLAY_FIRST = [10, 15];
       const ONB_PLAY_SECOND = [0, 20];
 
@@ -46,7 +46,7 @@
       }
       function onbRoot() { return document.getElementById('onboardingSection'); }
 
-      // ---- utilità DOM ----
+      // ---- utilitÃ  DOM ----
       function onbClear() {
         const r = onbRoot();
         if (r) { const tb = document.getElementById('onbTopbar'); r.innerHTML = ''; if (tb) r.appendChild(tb); }
@@ -113,16 +113,16 @@
 
       // ==================== LANDING PAGE ====================
       // Le due landing sono state fuse in una sola (piano di modifica: riduci modali
-      // testuali). Il copy illustrativo è stato accorciato.
+      // testuali). Il copy illustrativo Ã¨ stato accorciato.
       function onbLanding1() {
         _onbPhase = 0;
         onbClear();
         const r = onbRoot();
         r.className = 'onb-landing';
         r.innerHTML =
-          '<div class="onb-landing-card"><div class="onb-brand">Italiano con Música</div>' +
-          '<p class="onb-tagline">Música creada para que aprendas italiano.</p>' +
-          '<p class="onb-landing-copy">Cada canción te guía para aprender italiano de forma natural: escuchas, lees, guardas frases favoritas y practicas con ejercicios.</p>' +
+          '<div class="onb-landing-card"><div class="onb-brand">Italiano con MÃºsica</div>' +
+          '<p class="onb-tagline">MÃºsica creada para que aprendas italiano.</p>' +
+          '<p class="onb-landing-copy">Cada canciÃ³n te guÃ­a para aprender italiano de forma natural: escuchas, lees, guardas frases favoritas y practicas con ejercicios.</p>' +
       // PIANO
       // A2
       // PIANO-1: landing unica attiva (fuse le 2 schermate, testo sintetico).
@@ -133,7 +133,7 @@
 
 // ONB-FIX-1: landing unificata (le due schermate introduttive fuse in una sola, testo sintetico)
 
-          '<button type="button" class="btn btn-primary onb-adelante">Adelante →</button></div>';
+          '<button type="button" class="btn btn-primary onb-adelante">Adelante â†’</button></div>';
         r.querySelector('.onb-adelante').addEventListener('click', () => onbFase(1));
       }
 
@@ -186,14 +186,14 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante';
-        b.textContent = 'Adelante →';
+        b.textContent = 'Adelante â†’';
         b.addEventListener('click', fn);
         row.appendChild(b);
         wrap.appendChild(row);
       return row;
       }
       // Bottone Adelante visibile subito ma disabilitato (in grigio). Si abilita con
-      // un'animazione fluida di `delayMs` (default 3s) che porta da disabled→enabled.
+      // un'animazione fluida di `delayMs` (default 3s) che porta da disabledâ†’enabled.
       // Nessun countdown numerico: la transizione visiva comunica il tempo di attesa.
       function onbAddAdelanteEnabling(wrap, fn, delayMs) {
         const dur = delayMs != null ? delayMs : 3000;
@@ -202,7 +202,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante onb-enabling';
-        b.textContent = 'Adelante →';
+        b.textContent = 'Adelante â†’';
         b.disabled = true;
         b.style.animationDuration = dur + 'ms';
         row.appendChild(b);
@@ -216,7 +216,7 @@
         return row;
       }
 
-      // Card verso con lo STESSO layout delle canzoni (.verse / .translation / ⭐).
+      // Card verso con lo STESSO layout delle canzoni (.verse / .translation / â­).
       // opts: { tap, showStar, onStar, starIcon }
       function onbVerseCard(wrap, index, opts) {
         const lyr = _onbSong.lyrics[index];
@@ -236,8 +236,8 @@
         if (opts.tap) {
           const hint = document.createElement('span');
           hint.className = 'toggle-hint';
-          hint.title = 'Haz clic para mostrar/ocultar la traducción';
-          hint.textContent = '▼';
+          hint.title = 'Haz clic para mostrar/ocultar la traducciÃ³n';
+          hint.textContent = 'â–¼';
           left.appendChild(hint);
         }
         row.appendChild(left);
@@ -248,7 +248,7 @@
           star.style.cssText = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
           star.dataset.lyricIndex = index; // PIANO-6: stella vuota pulsante fino al click
           star.classList.add('onb-star-attention');
-          star.textContent = opts.starIcon || '☆';
+          star.textContent = opts.starIcon || 'â˜†';
           star.addEventListener('click', (e) => { e.stopPropagation(); try { star.classList.remove('onb-star-attention'); } catch (err) {} if (opts.onStar) opts.onStar(star, index); }); // PIANO-6: stop pulse al click
           row.appendChild(star);
         }
@@ -258,7 +258,7 @@
         trans.id = 'translation-' + index;
         const span = document.createElement('span');
         span.className = 'translation-text';
-        span.textContent = trad || 'Traducción no disponible';
+        span.textContent = trad || 'TraducciÃ³n no disponible';
         trans.appendChild(span);
         verse.appendChild(trans);
         if (opts.tap) {
@@ -282,25 +282,25 @@
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbAddAdelanteEnabling(wrap, () => onbFase(2), 3000);
         } else if (n === 2) {
-          // Fase 2: toca → traduzione. Bottone appare con dissolvenza dopo il tap.
-          wrap = onbPhaseShell('Toca la frase para ver la traducción');
+          // Fase 2: toca â†’ traduzione. Bottone appare con dissolvenza dopo il tap.
+          wrap = onbPhaseShell('Toca la frase para ver la traducciÃ³n');
           onbVerseCard(wrap, _onbVerses[0], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(3)) });
         } else if (n === 3) {
-          wrap = onbPhaseShell('Haz clic en play para escuchar cómo suena');
+          wrap = onbPhaseShell('Haz clic en play para escuchar cÃ³mo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbShowPlayer(wrap, ONB_PLAY_FIRST, null, () => onbShowAdelante(wrap, () => onbFase(4)));
         } else if (n === 4) {
-          wrap = onbPhaseShell('Intenta entender y toca para ver la traducción');
+          wrap = onbPhaseShell('Intenta entender y toca para ver la traducciÃ³n');
           onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(5)) });
         } else if (n === 5) {
-          wrap = onbPhaseShell('Esta frase parece complicada, guárdala en tus favoritos para estudiarla con más frecuencia');
-          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
+          wrap = onbPhaseShell('Esta frase parece complicada, guÃ¡rdala en tus favoritos para estudiarla con mÃ¡s frecuencia');
+          onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: 'â˜†', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessBanner(wrap, '⭐ Guardada en favoritos', '💡 Podrás escribir apuntes en tus frases guardadas');
+            onbShowSuccessBanner(wrap, 'â­ Guardada en favoritos', 'ðŸ’¡ PodrÃ¡s escribir apuntes en tus frases guardadas');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
-          wrap = onbPhaseShell('Escucha cómo suena');
+          wrap = onbPhaseShell('Escucha cÃ³mo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbVerseCard(wrap, _onbVerses[1], { tap: false });
           onbShowPlayer(wrap, ONB_PLAY_SECOND, null, () => onbShowAdelante(wrap, () => onbFase(8)));
@@ -316,7 +316,7 @@
       }
 
       // Card verso con textarea appunto in stile standard .verse-note (vuota).
-      // starClicked=true → mostra la stella già salvata (preferito già aggiunto).
+      // starClicked=true â†’ mostra la stella giÃ  salvata (preferito giÃ  aggiunto).
       function onbNoteCard(wrap, index, starClicked) {
         const lyr = _onbSong.lyrics[index];
         if (!lyr) return;
@@ -337,7 +337,7 @@
           star.type = 'button';
           star.className = 'btn btn-sm btn-outline-warning ms-2';
           star.style.cssText = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
-          star.textContent = '⭐';
+          star.textContent = 'â­';
           star.disabled = true;
           row.appendChild(star);
         }
@@ -345,7 +345,7 @@
         const note = document.createElement('div');
         note.className = 'verse-note';
         const ta = document.createElement('textarea');
-        ta.placeholder = 'Añade nota';
+        ta.placeholder = 'AÃ±ade nota';
         ta.setAttribute('onblur', 'saveNotaFromVerse(this, ' + index + ')');
         ta.setAttribute('onclick', 'event.stopPropagation()');
         note.appendChild(ta);
@@ -419,8 +419,8 @@
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
         card.innerHTML =
-          '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-          '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+          '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducciÃ³n</span></div>' +
+          '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'TraducciÃ³n no disponible') + '</span></div>' +
           '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary onb-enabling" disabled>Piensa...</button></div>';
         wrap.appendChild(card);
         const btn = card.querySelector('#onbExBtn');
@@ -434,10 +434,10 @@
             btn.textContent = 'Mostrar';
             btn.onclick = () => {
               card.innerHTML =
-                '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-                '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+                '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducciÃ³n</span></div>' +
+                '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'TraducciÃ³n no disponible') + '</span></div>' +
                 '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
-                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante →</button></div>';
+                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante â†’</button></div>';
               const newBtn = card.querySelector('#onbExBtn');
               if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearTimeout(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
             };
@@ -458,7 +458,7 @@
           '<div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>' +
           '<div class="exercise-text"><span class="exercise-verse-text">' + (textWithBlanks || escapeHtml(frase)) + '</span></div>' +
           (_onbExTrad ? '<div class="exercise-translation">' + escapeHtml(_onbExTrad) + '</div>' : '') +
-          '<div class="exercise-actions"><button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente →</button></div>';
+          '<div class="exercise-actions"><button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente â†’</button></div>';
         wrap.appendChild(card);
         const inp = card.querySelector('.study-input');
         if (inp) {
@@ -501,9 +501,9 @@
       // ==================== ENTRY POINT ====================
       async function avviaOnboarding() {
         if (onbIsDone()) return;
-        // Nascondi subito il loader di app (evita race sul _loadToken → spinner infinito).
+        // Nascondi subito il loader di app (evita race sul _loadToken â†’ spinner infinito).
         if (typeof hideAppLoader === 'function') hideAppLoader();
-        const s = getCurrentSong();
+3232323232323232991111101151163211532613210310111667117114114101110116831111101034041321241243211511111010311591489359
       // ===== PIANO 2026-09-11: OVERRIDE FUNZIONI (function hoisting: queste definizioni vincono) =====
       // PIANO-1: landing unica (fuse le 2 schermate, testo sintetico, bottone -> onbFase(1)).
       function onbLanding1() {
@@ -514,9 +514,9 @@
         sec.className = 'onb-landing onb-enter';
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano<br>con Musica</div>' +
-          '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub">Nuestras canciones siguen un recorrido didáctico eficaz: escucha, lee y practica.</p>' +
-          '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
+          '<h1 class="onb-splash-title">MÃºsica creada para que aprendas</h1>' +
+          '<p class="onb-splash-sub">Nuestras canciones siguen un recorrido didÃ¡ctico eficaz: escucha, lee y practica.</p>' +
+          '<button type="button" class="btn btn-primary onb-splash-btn">Â¡Empezamos!</button></div>';
         root.appendChild(sec);
         sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
         const btnSplash = sec.querySelector('.onb-splash-btn'); if (btnSplash) btnSplash.addEventListener('click', () => onbFase(1), { once: true }); // PIANO-1: fix selettore splash
@@ -565,7 +565,7 @@
         const fill = document.getElementById('onbStepsFill');
         if (fill) fill.style.width = pct + '%';
       }
-      } // PIANO-2k-chiusura-onbUpdateTopbar
+32
       // PIANO-2k-bis: la graffa di chiusura a riga 568 chiude onbPhaseShell; gli helper topbar restano definiti sopra (hoisting).
       
       // PIANO-3: bottoni timer con animazione fluida 3s disabled->enabled, nessun countdown numerico.
@@ -612,7 +612,7 @@
         const msg = document.createElement('div');
         msg.className = 'onb-success-banner onb-inline onb-fade-in';
         msg.innerHTML =
-          '<div class="onb-success-msg">&#11088; ¡Guardada en favoritos!</div>' +
+          '<div class="onb-success-msg">&#11088; Â¡Guardada en favoritos!</div>' +
           '<div class="onb-success-hint">&#128161; Podras escribir apuntes en tus frases guardadas.</div>';
         wrap.appendChild(msg);
         const row = document.createElement('div');
