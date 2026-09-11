@@ -1384,6 +1384,7 @@ body.onboarding-active .verse { position: relative; }
 /* ==================== ONBOARDING v2 (landing + funnel a fasi) ==================== */
 #onboardingSection { display: none; }
 body.onboarding-active #onboardingSection {
+  display: block;
   position: fixed;
   inset: 0;
   z-index: 1500;
