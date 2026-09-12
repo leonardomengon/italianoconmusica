@@ -210,7 +210,7 @@
         const slot = document.createElement('div');
         slot.className = 'onb-adelante-row onb-cta-slot';
         slot.innerHTML = '<button type="button" class="btn btn-primary onb-adelante" tabindex="-1">Adelante</button>';
-        wrap.appendChild(slot);
+        r.appendChild(slot);
 
         return wrap;
       }
@@ -224,8 +224,9 @@
         b.addEventListener('click', fn);
         fresh.appendChild(b);
         // SLOT CTA: sostituisce il segnaposto invisibile (stessa posizione, zero salti)
-        const slot = wrap.querySelector('.onb-cta-slot');
-        if (slot) { wrap.replaceChild(fresh, slot); } else { wrap.appendChild(fresh); }
+        const host = onbRoot() || wrap;
+        const slot = host.querySelector('.onb-cta-slot');
+        if (slot) { host.replaceChild(fresh, slot); } else { host.appendChild(fresh); }
       return fresh;
       }
       // Bottone Adelante visibile subito ma disabilitato (in grigio). Si abilita con
@@ -243,8 +244,9 @@
         b.style.animationDuration = dur + 'ms';
         fresh.appendChild(b);
         // SLOT CTA: sostituisce il placeholder (visibile subito, disabilitato: come prima)
-        const slot = wrap.querySelector('.onb-cta-slot');
-        if (slot) { wrap.replaceChild(fresh, slot); } else { wrap.appendChild(fresh); }
+        const host = onbRoot() || wrap;
+        const slot = host.querySelector('.onb-cta-slot');
+        if (slot) { host.replaceChild(fresh, slot); } else { host.appendChild(fresh); }
         setTimeout(() => {
           b.classList.remove('onb-enabling');
           b.disabled = false;

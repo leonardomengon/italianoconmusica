@@ -1349,26 +1349,32 @@ body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-wi
 /* Topbar persistente: sempre in cima (sticky), incollata al bordo: il contenuto
    sotto la gestisce con le regole di layout dedicate (header vicino alla barra,
    corpo centrato nello spazio residuo). */
-body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: 0; }
-/* ONB layout: titolo app (come home) + barra + istruzioni in cima, poi contenuto
-   spazio residuo, CTA ancorata in basso (in flusso). Due strutture da coprire:
-   a) funnel normale: topbar + wrapper .onb-funnel (contiene header + body);
-   b) esercizio: topbar + header + .exercise-card come figli diretti del section. */
-/* (rimosso: .onb-funnel e' la sezione stessa; il display flex viene dalla regola base di #onboardingSection) */
-/* (rimosso: .onb-funnel e' la sezione stessa, non un figlio; vale la regola diretta sotto) */
-/* Body = fascia centrale: riempie lo spazio residuo. Il contenuto (versi,
-   player) e la CTA hanno ENTRAMBI margine-top auto: lo spazio libero viene
-   equidistribuito -> contenuto centrato nello spazio sopra la CTA ancorata
-   in fondo. (justify-content:center qui non funziona: i margini auto hanno
-   precedenza e incollerebbero il contenuto in alto.) */
-body.onboarding-active #onboardingSection > .onb-phase-body {
-  display: flex; flex-direction: column; justify-content: flex-start;
-  flex: 1 1 auto; min-height: 0; margin: 0; padding-top: 20px;
-  padding-bottom: 8px; /* poco spazio vuoto in fondo (si somma al padding della sezione) */
+/* (assorbito nel layout assoluto) */
+﻿/* ONB layout proporzionale: centri fissi in vh (es. 520px: 45/165/330/455) */
+body.onboarding-active #onboardingSection {
+  --onb-y-bar: 8.65vh;
+  --onb-y-instr: 31.73vh;
+  --onb-y-verse: 63.46vh;
+  --onb-y-cta: 87.5vh;
 }
-body.onboarding-active #onboardingSection > .onb-phase-body > :first-child { margin-top: auto; }
-body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 24px; margin-bottom: 0; }
-body.onboarding-active #onboardingSection > .exercise-card { margin: auto 0; }
+body.onboarding-active #onboardingSection > .onb-topbar {
+  position: absolute; top: 0; left: 0; right: 0; margin: 0 !important;
+  height: calc(var(--onb-y-bar) + 4px); padding: 0; background: none;
+}
+.onb-app-brand { position: absolute; top: 1vh; left: 0; right: 0; text-align: center; padding: 0; }
+.onb-steps-bar { position: absolute; bottom: 0; left: 16px; right: 16px; margin: 0; }
+body.onboarding-active #onboardingSection > .onb-phase-header {
+  position: absolute; top: var(--onb-y-instr); left: 50%; transform: translate(-50%, -50%);
+  margin: 0; width: calc(100% - 32px); max-width: 640px; text-align: center;
+}
+body.onboarding-active #onboardingSection > .onb-phase-body {
+  position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
+  margin: 0; padding: 0; width: calc(100% - 32px); max-width: 560px;
+}
+body.onboarding-active #onboardingSection > .exercise-card {
+  position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
+  margin: 0; width: calc(100% - 32px); max-width: 640px;
+}
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
 body.onboarding-active { overflow: hidden; }
@@ -1465,9 +1471,9 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 /* bottone Adelante: ancorato IN BASSO alla fascia centrale (in flusso, margine
    auto equidistribuito col contenuto): niente fixed, niente spazio morto.
    Su schermi bassi i margini auto collassano a 0 in sicurezza. */
-body.onboarding-active .onb-phase-body > .onb-adelante-row {
-  position: relative; inset: auto; z-index: 20; /* sopra la traduzione espansa (z 6) */
-  margin: auto 0 24px; /* CTA sollevata di 24px dal fondo */
+body.onboarding-active #onboardingSection > .onb-adelante-row {
+  position: absolute; top: var(--onb-y-cta); left: 50%; transform: translate(-50%, -50%); z-index: 20;
+  margin: 0;
 }
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) both; }
@@ -1479,9 +1485,9 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
 /* Titolo app nel funnel: STESSO stile della home (.brand-duo: Outfit 900, 32px, viola). */
-.onb-app-brand { padding: 2px 0 10px; }
+/* (posizione nel blocco layout assoluto) */
 /* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
-.onb-steps-bar { width: 100%; height: 8px; margin-top: 20px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
+/* (posizione nel blocco layout assoluto) */
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
@@ -1490,7 +1496,7 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 .onb-splash-sub { margin: 0 0 28px; font-size: 16px; font-weight: 500; color: #8A7FA3; line-height: 1.6; text-align: left; }
 .onb-splash-btn { min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
 .onb-instruction { font-size: 21px; line-height: 1.35; background: #fff; border: 2px solid #EDE5F5; border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 14px rgba(61,43,82,.06); }
-.onb-funnel { padding-bottom: 8px; }
+.onb-funnel { padding-bottom: 0; }
 /* SLOT CTA riservato: segnaposto invisibile sostituito dal bottone reale */
 .onb-cta-slot { visibility: hidden; pointer-events: none; }
 @keyframes onb-star-pulse-kf { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(155,93,229,.45);} 50% { transform: scale(1.07); box-shadow: 0 0 0 6px rgba(155,93,229,0);} }
