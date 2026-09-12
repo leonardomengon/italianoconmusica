@@ -1425,6 +1425,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-player .progress { height: 6px; }
 .onb-player .progress-bar { background: var(--primary, #9B5DE5); }
 .onb-controls { display: flex; justify-content: center; }
+.onb-player .onb-play-btn { background: var(--secondary, #7C3AED) !important; color: #fff !important; border: 0 !important; border-bottom: 4px solid var(--secondary-dark, #5B21B6) !important; }
 
 /* bottone Adelante: centrato in basso (fixed), NON si sposta quando le
    traduzioni si espandono né con lo scroll. */
@@ -1442,9 +1443,9 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
-.onb-splash-title { margin: 22px 0 10px; font-size: clamp(24px, 6.4vw, 38px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; }
+.onb-splash-title { margin: 22px 0 10px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
 /* Terzo copy grande quanto il titolo (hierarchia data dal peso/colore). */
-.onb-splash-sub { margin: 0 0 28px; font-size: clamp(24px, 6.4vw, 38px); font-weight: 600; color: #8A7FA3; line-height: 1.5; }
+.onb-splash-sub { margin: 0 0 28px; font-size: 16px; font-weight: 500; color: #8A7FA3; line-height: 1.6; text-align: left; }
 .onb-splash-btn { min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
 .onb-instruction { font-size: 21px; line-height: 1.35; background: #fff; border: 2px solid #EDE5F5; border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 14px rgba(61,43,82,.06); }
 .onb-funnel { padding-bottom: 8px; }
@@ -1452,7 +1453,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-star-attention { animation: onb-star-pulse-kf 1.5s ease-in-out infinite; border-color: var(--primary, #9B5DE5) !important; }
 /* Riutilizzata anche sul bottone play (unica CTA pulsante della fase, ferma al primo play). */
 .onb-success-banner.onb-inline { max-width: 100%; margin: 2px 0 0; border-radius: 12px; padding: 10px 14px; }
-.onb-steps-fill { height: 100%; background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED)); border-radius: 999px; transition: width .8s cubic-bezier(.25,.8,.35,1); }
+.onb-steps-fill { height: 100%; background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED)); border-radius: 999px; transition: width 1.2s cubic-bezier(.25,.8,.35,1); }
 
 /* --- Animazione abilitazione bottone (3s, nessun countdown numerico) --- */
 .onb-enabling {
@@ -1477,6 +1478,10 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 }
 .onb-success-msg { font-weight: 800; color: #2E7D32; font-size: 14px; display: flex; align-items: center; gap: 6px; }
 .onb-success-hint { font-size: 12px; color: #558B2F; margin-top: 4px; font-style: italic; font-weight: 500; }
+/* Feedback salvataggio: toast fixed, non sposta istruzioni/versi. */
+.onb-success-banner.onb-toast { position: fixed; left: 0; right: 0; margin: 0 auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: min(92vw, 480px); max-width: 92vw; z-index: 60; }
+.onb-success-banner.onb-toast .onb-success-msg { justify-content: center; }
+.onb-success-banner.onb-toast .onb-success-hint { text-align: center; }
 
 /* --- Animazione riempimento stella preferito --- */
 @keyframes starFill {
@@ -1495,6 +1500,9 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
     padding: 28px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   }
   .onb-splash { padding: 12px 4px; }
+  /* NEW fallback CSS (il JS affina il fit esatto): brand quasi a piena larghezza. */
+  .onb-splash .onb-brand { font-size: 9vw; }
+  .onb-splash-title { font-size: 7.2vw; }
   .onb-splash-btn { width: 100%; max-width: 260px; }
   .onb-phase-header { font-size: 17px; padding: 12px 14px; }
   .onb-adelante-row .btn { min-width: 200px; }

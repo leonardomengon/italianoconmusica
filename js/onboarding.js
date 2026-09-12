@@ -40,6 +40,7 @@
       let _onbExTrad = '';
       let _onbExTimer = null;
       let _onbPlayerOnDone = null;
+      let _onbPlaying = false; // NEW: stato play/pausa del player onboarding
 
       function onbIsDone() {
         try { return localStorage.getItem(ONB_COMPLETED_KEY) === ONB_COMPLETED_VALUE; } catch (e) { return false; }
@@ -94,8 +95,13 @@
         if (ic) ic.textContent = name;
       }
       function onbTogglePlay() {
-        if (_onbAudio && !_onbAudio.paused && _onbAudio.currentTime > 0) return;
         const el = ensureOnbAudio();
+        if (_onbPlaying) { // click durante la riproduzione: pausa
+          try { el.pause(); } catch (e) {}
+          _onbPlaying = false;
+          onbSetPlayIcon('play_arrow');
+          return;
+        }
         const range = _onbPlayerRange || [0, 10];
         const start = range[0], end = range[1];
         const bar = document.querySelector('#onboardingSection .onb-progress-bar');
@@ -108,10 +114,12 @@
           }
         };
         el.addEventListener('timeupdate', tick);
+        _onbPlaying = true;
         playVerseInterval(el, start, end, () => {
           el.removeEventListener('timeupdate', tick);
           if (bar) bar.style.width = '100%';
           onbSetPlayIcon('play_arrow');
+          _onbPlaying = false;
           if (typeof _onbPlayerOnDone === 'function') _onbPlayerOnDone();
         });
       }
@@ -183,7 +191,7 @@
         const total = ONB_ACTIVE_PHASES.length;
         const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
         const fill = document.getElementById('onbStepsFill');
-        if (fill) fill.style.width = pct + '%';
+        if (fill) requestAnimationFrame(() => { requestAnimationFrame(() => { fill.style.width = pct + '%'; }); }); // NEW: doppio rAF, transition garantita
       }
       function onbPhaseShell(title) {
         onbClear();
@@ -405,7 +413,7 @@
         const existing = wrap.querySelector('.onb-success-banner');
         if (existing) existing.remove();
         const banner = document.createElement('div');
-        banner.className = 'onb-success-banner onb-enter';
+        banner.className = 'onb-success-banner onb-toast onb-enter';
         let html = '<div class="onb-success-msg">' + escapeHtml(message) + '</div>';
         if (hint) html += '<div class="onb-success-hint">' + escapeHtml(hint) + '</div>';
         banner.innerHTML = html;
@@ -471,7 +479,7 @@
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
         while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
-        onbRenderStepsHeader('Completa la frase');
+        onbRenderStepsHeader('Completa tu primer ejercicio');
         const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
@@ -538,10 +546,43 @@
           '<p class="onb-splash-sub">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
+        onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
         sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
         const btnSplash = sec.querySelector('.onb-splash-btn'); if (btnSplash) btnSplash.addEventListener('click', () => onbFase(1), { once: true }); // PIANO-1: fix selettore splash
         const btn = sec.querySelector('.onb-landing-btn');
         if (btn) btn.addEventListener('click', () => onbFase(1), { once: true });
+      }
+      // NEW: adatta il tipo dello splash: brand quasi a piena larghezza (mobile),
+      // sottotitolo su una riga all 80% della dimensione del brand (si riduce solo
+      // se la riga non entra: nowrap prioritario).
+      function onbFitSplashType(sec) {
+        const brand = sec.querySelector('.onb-splash .onb-brand');
+        const sub = sec.querySelector('.onb-splash-title');
+        const box = sec.querySelector('.onb-splash');
+        if (!brand || !box || !box.clientWidth) return;
+        const probe = document.createElement('span');
+        probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;';
+        document.body.appendChild(probe);
+        const target = Math.floor(box.clientWidth * 0.94);
+        const bs = getComputedStyle(brand);
+        probe.style.fontFamily = bs.fontFamily; probe.style.fontWeight = bs.fontWeight; probe.style.letterSpacing = bs.letterSpacing;
+        probe.textContent = brand.textContent; probe.style.fontSize = '100px';
+        const w = probe.scrollWidth;
+        if (!w) { document.body.removeChild(probe); return; }
+        let px = Math.floor(100 * target / w);
+        const cap = (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ? 999 : 72;
+        if (px > cap) px = cap;
+        brand.style.fontSize = px + 'px';
+        if (sub) {
+          const ss = getComputedStyle(sub);
+          probe.style.fontFamily = ss.fontFamily; probe.style.fontWeight = ss.fontWeight; probe.style.letterSpacing = ss.letterSpacing;
+          probe.textContent = sub.textContent;
+          let spx = Math.floor(px * 0.8);
+          probe.style.fontSize = spx + 'px';
+          if (probe.scrollWidth > target) spx = Math.floor(spx * target / probe.scrollWidth);
+          sub.style.fontSize = spx + 'px';
+        }
+        document.body.removeChild(probe);
       }
       // PIANO-2: barra completamento fasi in cima (step da ONB_ACTIVE_PHASES, solo funnel).
       function onbPhaseShell(n, titleHtml) {
