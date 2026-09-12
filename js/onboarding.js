@@ -147,23 +147,38 @@
       // Renderizza: barra di avanzamento + header (spiegazione fase) + wrapper contenuto.
       // La barra + header sono in onbRenderStepsHeader() per riutilizzarli anche nelle
       // sotto-viste della Fase 8 (esercizi review/complete).
+      // Barra di progresso PERSISTENTE: creata una sola volta (onbEnsureTopbar) e
+      // mai ricreata tra le fasi (onbClear la preserva). La progressione è fluida
+      // grazie alla transition width su .onb-steps-fill. Nessuna etichetta numerica:
+      // la barra è solo grafica.
       function onbRenderStepsHeader(title) {
+        onbUpdateTopbar();
         const r = onbRoot();
-        const idx = ONB_ACTIVE_PHASES.indexOf(_onbPhase);
-        const total = ONB_ACTIVE_PHASES.length;
-        const pct = ((idx + 1) / total) * 100;
-        const bar = document.createElement('div');
-        bar.className = 'onb-steps-bar onb-enter';
-        bar.innerHTML = '<div class="onb-steps-fill" style="width:' + pct + '%"></div>';
-        r.appendChild(bar);
-        const label = document.createElement('div');
-        label.className = 'onb-steps-label onb-enter';
-        label.textContent = 'Fase ' + (idx + 1) + ' de ' + total;
-        r.appendChild(label);
         const header = document.createElement('div');
         header.className = 'onb-phase-header onb-enter';
         header.textContent = title;
         r.appendChild(header);
+      }
+      function onbEnsureTopbar() {
+        const root = onbRoot();
+        if (!root) return null;
+        let tb = document.getElementById('onbTopbar');
+        if (tb) return tb;
+        tb = document.createElement('div');
+        tb.id = 'onbTopbar';
+        tb.className = 'onb-topbar';
+        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        root.appendChild(tb);
+        return tb;
+      }
+      function onbUpdateTopbar() {
+        const tb = onbEnsureTopbar();
+        if (!tb) return;
+        const idx = ONB_ACTIVE_PHASES.indexOf(_onbPhase);
+        const total = ONB_ACTIVE_PHASES.length;
+        const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
+        const fill = document.getElementById('onbStepsFill');
+        if (fill) fill.style.width = pct + '%';
       }
       function onbPhaseShell(title) {
         onbClear();
@@ -474,7 +489,6 @@
               if (nextBtn) nextBtn.classList.remove('exercise-next-hidden');
             }
           });
-          inp.focus();
         }
       }
 
@@ -513,9 +527,9 @@
         const sec = document.createElement('div');
         sec.className = 'onb-landing onb-enter';
         sec.innerHTML =
-          '<div class="onb-splash"><div class="onb-brand">Italiano<br>con Musica</div>' +
+          '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub">Nuestras canciones siguen un recorrido didáctico eficaz: escucha, lee y practica.</p>' +
+          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)

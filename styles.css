@@ -1329,11 +1329,12 @@ body.onboarding-active #onboardingSection > :last-child { margin-bottom: auto; }
 /* Colonna contenuto: la max-width 560 non sta più sul section (che è l'overlay),
    quindi va applicata ai figli diretti renderizzati dal funnel. */
 body.onboarding-active #onboardingSection > .onb-steps-bar,
-body.onboarding-active #onboardingSection > .onb-steps-label,
 body.onboarding-active #onboardingSection > .onb-phase-header,
 body.onboarding-active #onboardingSection > .onb-phase-body,
 body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-width: 560px; }
-body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; }
+/* Topbar persistente: sempre in cima (sticky), mai spinta al centro dal
+   centering-safe; il margine-bottom automatico centra il contenuto sotto. */
+body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: auto; }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
 body.onboarding-active { overflow: hidden; }
@@ -1371,15 +1372,25 @@ body.onboarding-active #showSongsBtn { display: none !important; }
 
 /* --- funnel --- */
 .onb-funnel { width: 100%; max-width: 560px; }
+/* Istruzioni di fase: ben visibili, accento viola, entrata in dissolvenza
+   leggermente ritardata (dopo le parti interattive). */
 .onb-phase-header {
-  /* Istruzioni ben visibili: grandi, nero/grassetto */
   text-align: center;
-  font-size: 17px; font-weight: 900;
-  color: var(--text-main, #3D2B52);
+  font-size: 18px; font-weight: 900;
+  color: var(--primary-dark, #7C3AED);
+  background: #F6EEFF;
+  border: 2px solid #E4D3FA;
+  border-left: 6px solid var(--primary, #9B5DE5);
+  border-radius: 16px;
+  padding: 14px 16px;
   line-height: 1.4;
   margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(124,58,237,.10);
+  animation: onb-enter-kf .55s ease .45s both;
 }
 .onb-phase-body { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* Fasi con due versi: entrambe le box dei versi hanno la stessa altezza. */
+body.onboarding-active .onb-phase-body:has(> .verse + .verse) > .verse { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
 
 /* I versi usano lo STESSO markup/classi delle canzoni (.verse/.translation/⭐) */
 .onb-static { cursor: default !important; }
@@ -1395,8 +1406,9 @@ body.onboarding-active #showSongsBtn { display: none !important; }
 .onb-player .progress-bar { background: var(--primary, #9B5DE5); }
 .onb-controls { display: flex; justify-content: center; }
 
-/* bottone Adelante sotto i versi */
-.onb-adelante-row { width: 100%; display: flex; justify-content: flex-end; position: sticky; bottom: 12px; padding-bottom: 4px; }
+/* bottone Adelante: ancorato in basso a destra (fixed), NON si sposta quando
+   le traduzioni si espandono né con lo scroll. */
+.onb-adelante-row { width: auto; display: flex; justify-content: flex-end; position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20; }
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf .5s ease both; }
 @keyframes onb-enable-kf { 0% { opacity: .35; filter: grayscale(1) brightness(.92); transform: scale(.96); } 100% { opacity: 1; filter: none; transform: scale(1); } }
@@ -1405,10 +1417,11 @@ body.onboarding-active #showSongsBtn { display: none !important; }
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: sticky; top: 0; z-index: 5; width: 100%; padding: 6px 0 10px; background: linear-gradient(var(--surface-dim, #FDF8FF) 80%, transparent); }
 .onb-steps-bar { width: 100%; height: 10px; background: #EDE5F5; border-radius: 999px; overflow: hidden; margin-bottom: 0; }
-.onb-splash { text-align: center; max-width: 520px; padding: 24px 8px; }
-.onb-splash .onb-brand { font-size: 40px; }
-.onb-splash-title { margin: 22px 0 10px; font-size: 30px; line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; }
-.onb-splash-sub { margin: 0 0 28px; font-size: 14px; font-weight: 600; color: #8A7FA3; line-height: 1.5; }
+.onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
+/* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
+.onb-splash .onb-brand { font-size: clamp(28px, 7.5vw, 56px); white-space: nowrap; }
+.onb-splash-title { margin: 22px 0 10px; font-size: clamp(22px, 5.2vw, 32px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; }
+.onb-splash-sub { margin: 0 0 28px; font-size: clamp(15px, 3.8vw, 22px); font-weight: 600; color: #8A7FA3; line-height: 1.5; }
 .onb-splash-btn { min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
 .onb-instruction { font-size: 21px; line-height: 1.35; background: #fff; border: 2px solid #EDE5F5; border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 14px rgba(61,43,82,.06); }
 .onb-funnel { padding-bottom: 8px; }
@@ -1416,7 +1429,6 @@ body.onboarding-active #showSongsBtn { display: none !important; }
 .onb-star-attention { animation: onb-star-pulse-kf 1.2s ease-in-out infinite; border-color: var(--primary, #9B5DE5) !important; }
 .onb-success-banner.onb-inline { max-width: 100%; margin: 2px 0 0; border-radius: 12px; padding: 10px 14px; }
 .onb-steps-fill { height: 100%; background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED)); border-radius: 999px; transition: width .5s ease; }
-.onb-steps-label { font-size: 12px; font-weight: 700; color: var(--text-muted, #7B6F8C); text-align: center; margin-bottom: 14px; }
 
 /* --- Animazione abilitazione bottone (3s, nessun countdown numerico) --- */
 .onb-enabling {
@@ -1459,30 +1471,20 @@ body.onboarding-active #showSongsBtn { display: none !important; }
     padding: 28px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   }
   .onb-splash { padding: 12px 4px; }
-  .onb-splash .onb-brand { font-size: 30px; }
-  .onb-splash-title { font-size: clamp(23px, 6.5vw, 27px); margin: 18px 0 8px; }
-  .onb-splash-sub { margin: 0 0 22px; }
   .onb-splash-btn { width: 100%; max-width: 260px; }
-  .onb-instruction { font-size: 16.5px; padding: 11px 13px; }
-  .onb-phase-header { font-size: 16px; margin-bottom: 14px; }
-  .onb-adelante-row { justify-content: center; }
+  .onb-phase-header { font-size: 17px; padding: 12px 14px; }
   .onb-adelante-row .btn { min-width: 200px; }
 }
 /* Desktop: colonna più larga e tipografia più grande (niente colonnina stretta). */
 @media (min-width: 769px) {
   body.onboarding-active #onboardingSection { padding: 72px 40px; }
   body.onboarding-active #onboardingSection > .onb-steps-bar,
-  body.onboarding-active #onboardingSection > .onb-steps-label,
   body.onboarding-active #onboardingSection > .onb-phase-header,
   body.onboarding-active #onboardingSection > .onb-phase-body,
   body.onboarding-active #onboardingSection > .exercise-card { max-width: 640px; }
   body.onboarding-active #onboardingSection > .onb-landing { max-width: 560px; }
   .onb-landing-card { padding: 48px 40px; }
-  .onb-splash { max-width: 560px; }
-  .onb-splash .onb-brand { font-size: 52px; }
-  .onb-splash-title { font-size: 36px; }
-  .onb-splash-sub { font-size: 16px; }
   .onb-splash-btn { min-width: 260px; }
-  .onb-instruction { font-size: 22px; }
-  .onb-phase-header { font-size: 20px; }
+  .onb-phase-header { font-size: 23px; padding: 16px 20px; }
+  .onb-adelante-row { right: 24px; bottom: 24px; }
 }
