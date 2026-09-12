@@ -88,8 +88,6 @@
         const cta = root.querySelector(':scope > .onb-adelante-row');
         const instr = root.querySelector(':scope > .onb-phase-header');
         const vh = window.innerHeight || 520;
-        const verseVar = (getComputedStyle(root).getPropertyValue('--onb-y-verse') || '63.46vh').trim();
-        const defaultTop = onbCssLenPx(verseVar, vh);
         const GAP = 16;
         const lower = cta ? cta.getBoundingClientRect().top - GAP : vh - 60;
         let upper = vh * 0.055;
@@ -105,9 +103,13 @@
         }
         const H = Math.min(contentH, band);
         const half = H / 2;
-        let top = defaultTop;
-        const maxTop = lower - half;   // top tale che il bordo inferiore resti sopra il bottone
-        const minTop = upper + half;   // top tale che non salga sopra le istruzioni
+        const maxTop = lower - half;   // il bordo inferiore resta sopra il bottone
+        const minTop = upper + half;   // il bordo superiore non sale sopra le istruzioni
+        // Layout proporzionale "desktop" senza vuoti eccessivi né fuoriuscite:
+        // se i versi entrano nella fascia (istruzioni → bottone) vengono CENTRATI
+        // al suo interno: spazio sopra e sotto bilanciato, nessuno spazio morto.
+        // Se sono più alti della fascia si allineano in alto e scorrono dentro.
+        let top = (H >= band) ? minTop : (upper + (band - H) / 2 + half);
         if (top > maxTop) top = maxTop;
         if (top < minTop) top = minTop;
         if (top < 4) top = 4;

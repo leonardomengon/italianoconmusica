@@ -1468,12 +1468,22 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-controls { display: flex; justify-content: center; }
 .onb-player .onb-play-btn { background: var(--secondary, #7C3AED) !important; color: #fff !important; border: 0 !important; border-bottom: 4px solid var(--secondary-dark, #5B21B6) !important; }
 
-/* bottone Adelante: ancorato IN BASSO alla fascia centrale (in flusso, margine
-   auto equidistribuito col contenuto): niente fixed, niente spazio morto.
-   Su schermi bassi i margini auto collassano a 0 in sicurezza. */
+/* bottone Adelante: ancorato IN BASSO, sopra la safe-area, sempre a schermo.
+   Mantiene la proporzione vh del desktop (bottom 12.5vh ≈ centro 87.5vh) ma
+   non può uscire dal bordo inferiore né, essendo centrato con margine auto e
+   max-width, da quello destro. */
 body.onboarding-active #onboardingSection > .onb-adelante-row {
-  position: absolute; top: var(--onb-y-cta); left: 50%; transform: translate(-50%, -50%); z-index: 20;
+  position: absolute;
+  bottom: calc(12.5vh + env(safe-area-inset-bottom, 0px));
+  left: 0; right: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 20;
   margin: 0;
+}
+body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
+  max-width: calc(100% - 32px);
+  margin: 0 auto;
 }
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) both; }
