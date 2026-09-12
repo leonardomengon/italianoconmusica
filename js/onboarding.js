@@ -206,42 +206,52 @@
       // PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
       // PIANO-5: modale finale breve in index.html (#onbEndMsg).
         r.appendChild(wrap);
+        // SLOT CTA: segnaposto invisibile, sostituito al momento giusto (layout stabile)
+        const slot = document.createElement('div');
+        slot.className = 'onb-adelante-row onb-cta-slot';
+        slot.innerHTML = '<button type="button" class="btn btn-primary onb-adelante" tabindex="-1">Adelante</button>';
+        wrap.appendChild(slot);
+
         return wrap;
       }
       function onbAddAdelante(wrap, fn, opts) {
-        const row = document.createElement('div');
-        row.className = 'onb-adelante-row' + (opts && opts.fade ? ' onb-fade-in' : '');
+        const fresh = document.createElement('div');
+        fresh.className = 'onb-adelante-row' + (opts && opts.fade ? ' onb-fade-in' : '');
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante';
         b.textContent = 'Adelante';
         b.addEventListener('click', fn);
-        row.appendChild(b);
-        wrap.appendChild(row);
-      return row;
+        fresh.appendChild(b);
+        // SLOT CTA: sostituisce il segnaposto invisibile (stessa posizione, zero salti)
+        const slot = wrap.querySelector('.onb-cta-slot');
+        if (slot) { wrap.replaceChild(fresh, slot); } else { wrap.appendChild(fresh); }
+      return fresh;
       }
       // Bottone Adelante visibile subito ma disabilitato (in grigio). Si abilita con
       // un'animazione fluida di `delayMs` (default 3s) che porta da disabled→enabled.
       // Nessun countdown numerico: la transizione visiva comunica il tempo di attesa.
       function onbAddAdelanteEnabling(wrap, fn, delayMs) {
         const dur = delayMs != null ? delayMs : 3000;
-        const row = document.createElement('div');
-        row.className = 'onb-adelante-row';
+        const fresh = document.createElement('div');
+        fresh.className = 'onb-adelante-row';
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante onb-enabling';
         b.textContent = 'Adelante';
         b.disabled = true;
         b.style.animationDuration = dur + 'ms';
-        row.appendChild(b);
-        wrap.appendChild(row);
+        fresh.appendChild(b);
+        // SLOT CTA: sostituisce il placeholder (visibile subito, disabilitato: come prima)
+        const slot = wrap.querySelector('.onb-cta-slot');
+        if (slot) { wrap.replaceChild(fresh, slot); } else { wrap.appendChild(fresh); }
         setTimeout(() => {
           b.classList.remove('onb-enabling');
           b.disabled = false;
           b.style.animation = '';
           b.onclick = fn;
         }, dur);
-        return row;
+        return fresh;
       }
 
       // Card verso con lo STESSO layout delle canzoni (.verse / .translation / ⭐).
