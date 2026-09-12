@@ -155,7 +155,7 @@
         onbUpdateTopbar();
         const r = onbRoot();
         const header = document.createElement('div');
-        header.className = 'onb-phase-header onb-enter';
+        header.className = 'onb-phase-header'; // istruzione immediata, senza dissolvenza
         header.textContent = title;
         r.appendChild(header);
       }
@@ -201,7 +201,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante';
-        b.textContent = 'Adelante →';
+        b.textContent = 'Adelante';
         b.addEventListener('click', fn);
         row.appendChild(b);
         wrap.appendChild(row);
@@ -217,7 +217,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-primary onb-adelante onb-enabling';
-        b.textContent = 'Adelante →';
+        b.textContent = 'Adelante';
         b.disabled = true;
         b.style.animationDuration = dur + 'ms';
         row.appendChild(b);
@@ -405,8 +405,9 @@
         if (hint) html += '<div class="onb-success-hint">' + escapeHtml(hint) + '</div>';
         banner.innerHTML = html;
         const verse = wrap.querySelector('.verse');
-        if (verse && verse.nextSibling) {
-          wrap.insertBefore(banner, verse.nextSibling);
+        if (verse) {
+          // Il feedback va SEMPRE sotto il verso (mai sopra).
+          verse.insertAdjacentElement('afterend', banner);
         } else {
           wrap.insertBefore(banner, wrap.firstChild);
         }
@@ -429,7 +430,7 @@
       function onbRenderExReview() {
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
-        wrap.innerHTML = '';
+        while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
         onbRenderStepsHeader('Completa tu primer ejercicio');
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
@@ -452,7 +453,7 @@
                 '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
                 '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
                 '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
-                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante →</button></div>';
+                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante</button></div>';
               const newBtn = card.querySelector('#onbExBtn');
               if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearTimeout(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
             };
@@ -464,7 +465,7 @@
         const frase = _onbExFrase;
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
-        wrap.innerHTML = '';
+        while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
         onbRenderStepsHeader('Completa la frase');
         const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
         const card = document.createElement('div');
