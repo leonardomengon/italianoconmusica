@@ -1350,7 +1350,7 @@ body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-wi
    sotto la gestisce con le regole di layout dedicate (header vicino alla barra,
    corpo centrato nello spazio residuo). */
 /* (assorbito nel layout assoluto) */
-﻿/* ONB layout proporzionale: centri fissi in vh (es. 520px: 45/165/330/455) */
+/* ONB layout proporzionale: centri fissi in vh (es. 520px: 45/165/330/455) */
 body.onboarding-active #onboardingSection {
   --onb-y-bar: 8.65vh;
   --onb-y-instr: 31.73vh;
