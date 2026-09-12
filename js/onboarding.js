@@ -180,7 +180,7 @@
         tb = document.createElement('div');
         tb.id = 'onbTopbar';
         tb.className = 'onb-topbar';
-        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        tb.innerHTML = '<div class="onb-step-label" id="onbStepLabel"></div><div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
         root.appendChild(tb);
         return tb;
       }
@@ -191,7 +191,9 @@
         const total = ONB_ACTIVE_PHASES.length;
         const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
         const fill = document.getElementById('onbStepsFill');
-        if (fill) requestAnimationFrame(() => { requestAnimationFrame(() => { fill.style.width = pct + '%'; }); }); // NEW: doppio rAF, transition garantita
+        if (fill) fill.style.width = pct + '%';
+        const lbl = document.getElementById('onbStepLabel');
+        if (lbl) lbl.textContent = idx >= 0 ? ('Paso ' + (idx + 1) + ' de ' + total) : '';
       }
       function onbPhaseShell(title) {
         onbClear();
@@ -563,7 +565,7 @@
         const probe = document.createElement('span');
         probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;';
         document.body.appendChild(probe);
-        const target = Math.floor(box.clientWidth * 0.94);
+        const target = Math.floor(box.clientWidth * 0.88); // ONB: 94->88, respiro simmetrico (fix disallineamento ottico)
         const bs = getComputedStyle(brand);
         probe.style.fontFamily = bs.fontFamily; probe.style.fontWeight = bs.fontWeight; probe.style.letterSpacing = bs.letterSpacing;
         probe.textContent = brand.textContent; probe.style.fontSize = '100px';

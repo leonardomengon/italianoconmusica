@@ -1394,6 +1394,7 @@ body.onboarding-active .onb-phase-body > .onb-enter:nth-child(3):not(.onb-succes
   font-family: var(--font-display, 'Outfit', 'Segoe UI', sans-serif);
   font-size: 32px; line-height: 1; font-weight: 900;
   color: var(--primary, #9B5DE5); letter-spacing: -1px;
+  margin-right: -1px; /* ONB: compensa il letter-spacing finale (centro ottico) */
 }
 .onb-tagline { margin: 18px 0 26px; font-size: 17px; font-weight: 600; color: var(--text-muted, #7B6F8C); }
 .onb-landing-copy { margin: 16px 0 26px; font-size: 15px; line-height: 1.55; font-weight: 600; color: var(--text-muted, #7B6F8C); } /* PIANO-1: copy landing unica sintetico */
@@ -1465,7 +1466,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
-.onb-splash-title { margin: 22px 0 10px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
+.onb-splash-title { margin: 22px -0.5px 10px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
 /* Terzo copy grande quanto il titolo (hierarchia data dal peso/colore). */
 .onb-splash-sub { margin: 0 0 28px; font-size: 16px; font-weight: 500; color: #8A7FA3; line-height: 1.6; text-align: left; }
 .onb-splash-btn { min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
