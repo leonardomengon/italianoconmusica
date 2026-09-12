@@ -60,6 +60,70 @@
         if (p) p.style.display = 'none';
       }
 
+      // ---- Fit proporzionale: tiene l'area versi sopra il bottone Adelante ----
+      // Il CSS posiziona i centri a 45/165/330/455 (in vh) sul riferimento 520px.
+      // Quando il contenuto dei versi è più alto dello spazio tra istruzioni e
+      // bottone, il corpo viene spostato verso l'alto (o limitato con scroll
+      // interno) così non copre mai il bottone "Adelante".
+      let _onbFitTimer = null;
+      let _onbFitObserver = null;
+      let _onbFitInitDone = false;
+      function onbCssLenPx(v, vh) {
+        const m = String(v).trim().match(/^([\d.]+)(px|vh|%)?$/i);
+        if (!m) return 0;
+        const num = parseFloat(m[1]);
+        if (!m[2] || m[2].toLowerCase() === 'px') return num;
+        return num * vh / 100;
+      }
+      function onbScheduleFit() {
+        if (_onbFitTimer) return;
+        _onbFitTimer = setTimeout(() => { _onbFitTimer = null; onbFitPhase(); }, 40);
+      }
+      function onbFitPhase() {
+        const root = onbRoot();
+        if (!root) return;
+        const body = root.querySelector(':scope > .onb-phase-body');
+        if (!body) return;
+        if (getComputedStyle(body).position !== 'absolute') return; // solo layout proporzionale vh
+        const cta = root.querySelector(':scope > .onb-adelante-row');
+        const instr = root.querySelector(':scope > .onb-phase-header');
+        const vh = window.innerHeight || 520;
+        const verseVar = (getComputedStyle(root).getPropertyValue('--onb-y-verse') || '63.46vh').trim();
+        const defaultTop = onbCssLenPx(verseVar, vh);
+        const GAP = 16;
+        const lower = cta ? cta.getBoundingClientRect().top - GAP : vh - 60;
+        let upper = vh * 0.055;
+        if (instr && instr.getBoundingClientRect().height > 0) upper = instr.getBoundingClientRect().bottom + 12;
+        const band = Math.max(0, lower - upper);
+        const contentH = body.scrollHeight;
+        if (contentH > band) {
+          body.style.maxHeight = Math.max(40, Math.floor(band)) + 'px';
+          body.style.overflowY = 'auto';
+        } else {
+          body.style.maxHeight = '';
+          body.style.overflowY = '';
+        }
+        const H = Math.min(contentH, band);
+        const half = H / 2;
+        let top = defaultTop;
+        const maxTop = lower - half;   // top tale che il bordo inferiore resti sopra il bottone
+        const minTop = upper + half;   // top tale che non salga sopra le istruzioni
+        if (top > maxTop) top = maxTop;
+        if (top < minTop) top = minTop;
+        if (top < 4) top = 4;
+        body.style.top = Math.round(top * 10) / 10 + 'px';
+      }
+      function onbInitFit() {
+        const root = onbRoot();
+        if (!root || _onbFitInitDone) return;
+        _onbFitInitDone = true;
+        try {
+          _onbFitObserver = new MutationObserver(() => onbScheduleFit());
+          _onbFitObserver.observe(root, { childList: true, subtree: true, characterData: true });
+        } catch (e) {}
+        window.addEventListener('resize', onbScheduleFit);
+      }
+
       // ---- audio + player dedicato (pinato in basso, solo play) ----
       function ensureOnbAudio() {
         if (!_onbAudio) {
@@ -180,7 +244,7 @@
         tb = document.createElement('div');
         tb.id = 'onbTopbar';
         tb.className = 'onb-topbar';
-        tb.innerHTML = '<div class="brand-duo onb-app-brand">Italiano con Musica</div><div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
         root.appendChild(tb);
         return tb;
       }
@@ -601,20 +665,24 @@
         onbClear();
         _onbPhase = n;
         const root = onbRoot();
-        const idx = ONB_ACTIVE_PHASES.indexOf(n);
-        const total = ONB_ACTIVE_PHASES.length;
-        const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
-        const stepNum = idx >= 0 ? (idx + 1) : n;
-        const wrap = document.createElement('div');
-        wrap.className = 'onb-funnel onb-enter';
-        wrap.innerHTML =
-          '' +
-          '' +
-          '<div class="onb-phase-header onb-instruction">' + titleHtml + '</div>' +
-          '<div class="onb-phase-body"></div>';
-        root.appendChild(wrap);
-        return wrap.querySelector('.onb-phase-body'); // PIANO-2j-topbar-persistente-sotto
-      } // PIANO-2k-chiusura-onbPhaseShell
+        if (!root) return null;
+        // Come la Fase 8: header/body come FIGLI DIRETTI del section, così si
+        // applicano i selettori CSS `#onboardingSection > .onb-phase-*` che
+        // posizionano gli elementi in modo assoluto e proporzionale (vh).
+        root.className = 'onb-funnel';
+        onbEnsureTopbar();
+        onbUpdateTopbar(n);
+        const header = document.createElement('div');
+        header.className = 'onb-phase-header onb-instruction'; // istruzione immediata, senza dissolvenza
+        header.innerHTML = titleHtml || '';
+        root.appendChild(header);
+        const body = document.createElement('div');
+        body.className = 'onb-phase-body'; // niente onb-enter: la sua animazione transform romperebbe il translate(-50%,-50%)
+        root.appendChild(body);
+        onbScheduleFit();
+        return body;
+      }
+      // PIANO-2k-chiusura-onbPhaseShell (ora figli diretti per il layout vh)
       function onbEnsureTopbar() {
         onbUpdateTopbar(_onbPhase);
         const root = onbRoot();
@@ -624,7 +692,7 @@
         tb = document.createElement('div');
         tb.id = 'onbTopbar';
         tb.className = 'onb-topbar';
-        tb.innerHTML = '<div class="onb-step-label" id="onbStepLabel"></div><div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
         root.appendChild(tb);
         return tb;
       }
@@ -637,8 +705,7 @@
         const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
         const fill = document.getElementById('onbStepsFill');
         if (fill) fill.style.width = pct + '%';
-        const lbl = document.getElementById('onbStepLabel');
-        if (lbl) lbl.textContent = idx >= 0 ? ('Paso ' + (idx + 1) + ' de ' + total) : '';
+        // Niente etichetta numerica: la sola barra comunica il progresso.
       }
   
   
@@ -736,6 +803,7 @@
         currentSongId = String(s.id);
         currentSongBackup = s;
         document.body.classList.add('onboarding-active');
+        onbInitFit();
         hidePrimaryViews();
       // PIANO-DONE: override sotto (riga ~640+) attivi: landing unica, shell con barra,
       // bottoni 3s, fav con banner+hint, review esercizio 3s. Verificati visivamente.

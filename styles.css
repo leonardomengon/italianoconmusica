@@ -1361,8 +1361,7 @@ body.onboarding-active #onboardingSection > .onb-topbar {
   position: absolute; top: 0; left: 0; right: 0; margin: 0 !important;
   height: calc(var(--onb-y-bar) + 4px); padding: 0; background: none;
 }
-.onb-app-brand { position: absolute; top: 1vh; left: 0; right: 0; text-align: center; padding: 0; }
-.onb-steps-bar { position: absolute; bottom: 0; left: 16px; right: 16px; margin: 0; }
+.onb-steps-bar { position: absolute; bottom: 0; left: 16px; right: 16px; margin: 0; height: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; }
 body.onboarding-active #onboardingSection > .onb-phase-header {
   position: absolute; top: var(--onb-y-instr); left: 50%; transform: translate(-50%, -50%);
   margin: 0; width: calc(100% - 32px); max-width: 640px; text-align: center;
@@ -1370,6 +1369,7 @@ body.onboarding-active #onboardingSection > .onb-phase-header {
 body.onboarding-active #onboardingSection > .onb-phase-body {
   position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
   margin: 0; padding: 0; width: calc(100% - 32px); max-width: 560px;
+  transition: top .3s var(--onb-ease, cubic-bezier(.2,.7,.3,1));
 }
 body.onboarding-active #onboardingSection > .exercise-card {
   position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
@@ -1484,10 +1484,7 @@ body.onboarding-active #onboardingSection > .onb-adelante-row {
 
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
-/* Titolo app nel funnel: STESSO stile della home (.brand-duo: Outfit 900, 32px, viola). */
-/* (posizione nel blocco layout assoluto) */
-/* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
-/* (posizione nel blocco layout assoluto) */
+/* Barra di avanzamento in cima, senza titolo app (rimosso): la sola barra comunica il progresso. */
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
