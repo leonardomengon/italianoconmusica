@@ -1350,18 +1350,26 @@ body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-wi
    sotto la gestisce con le regole di layout dedicate (header vicino alla barra,
    corpo centrato nello spazio residuo). */
 body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: 0; }
-/* ONB layout: l'istruzione (header) sta subito sotto la barra di progresso;
-   la sezione interagibile (body/card) è centrata verticalmente nello spazio
-   residuo. Due strutture da coprire:
+/* ONB layout "tre fasce": istruzione sotto la barra, contenuto centrato nello
+   spazio residuo, CTA ancorata in basso (in flusso). Due strutture da coprire:
    a) funnel normale: topbar + wrapper .onb-funnel (contiene header + body);
    b) esercizio: topbar + header + .exercise-card come figli diretti del section. */
 body.onboarding-active #onboardingSection > .onb-funnel {
   display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
 }
 body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
-body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body { margin: auto 0; }
+/* Body = fascia centrale: riempie lo spazio residuo. Il contenuto (versi,
+   player) e la CTA hanno ENTRAMBI margine-top auto: lo spazio libero viene
+   equidistribuito -> contenuto centrato nello spazio sopra la CTA ancorata
+   in fondo. (justify-content:center qui non funziona: i margini auto hanno
+   precedenza e incollerebbero il contenuto in alto.) */
+body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body {
+  display: flex; flex-direction: column; justify-content: flex-start;
+  flex: 1 1 auto; min-height: 0; margin: 0;
+  padding-bottom: 4vh; /* leggero offset: centro visivo sopra il baricentro esatto */
+}
+body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body > :first-child { margin-top: auto; }
 body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
-body.onboarding-active #onboardingSection > .onb-phase-body,
 body.onboarding-active #onboardingSection > .exercise-card { margin: auto 0; }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
@@ -1456,9 +1464,13 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-controls { display: flex; justify-content: center; }
 .onb-player .onb-play-btn { background: var(--secondary, #7C3AED) !important; color: #fff !important; border: 0 !important; border-bottom: 4px solid var(--secondary-dark, #5B21B6) !important; }
 
-/* bottone Adelante: centrato in basso (fixed), NON si sposta quando le
-   traduzioni si espandono né con lo scroll. */
-.onb-adelante-row { width: auto; left: 0; right: 0; display: flex; justify-content: center; position: fixed; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20; }
+/* bottone Adelante: ancorato IN BASSO alla fascia centrale (in flusso, margine
+   auto equidistribuito col contenuto): niente fixed, niente spazio morto.
+   Su schermi bassi i margini auto collassano a 0 in sicurezza. */
+body.onboarding-active .onb-phase-body > .onb-adelante-row {
+  position: relative; inset: auto; z-index: 20; /* sopra la traduzione espansa (z 6) */
+  margin: auto 0 0; /* spinge la CTA in fondo alla fascia centrale */
+}
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) both; }
 /* CTA dopo il feedback: la porta successiva compare ~250ms dopo il risultato. */
@@ -1548,5 +1560,4 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
   .onb-landing-card { padding: 48px 40px; }
   .onb-splash-btn { min-width: 260px; }
   .onb-phase-header { font-size: 23px; padding: 16px 20px; }
-  .onb-adelante-row { bottom: 24px; }
 }
