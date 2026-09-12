@@ -1367,7 +1367,7 @@ body.onboarding-active #onboardingSection > .onb-phase-body {
   padding-bottom: 8px; /* poco spazio vuoto in fondo (si somma al padding della sezione) */
 }
 body.onboarding-active #onboardingSection > .onb-phase-body > :first-child { margin-top: auto; }
-body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 16px; margin-bottom: 0; }
+body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 24px; margin-bottom: 0; }
 body.onboarding-active #onboardingSection > .exercise-card { margin: auto 0; }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
@@ -1467,7 +1467,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
    Su schermi bassi i margini auto collassano a 0 in sicurezza. */
 body.onboarding-active .onb-phase-body > .onb-adelante-row {
   position: relative; inset: auto; z-index: 20; /* sopra la traduzione espansa (z 6) */
-  margin: auto 0 0; /* spinge la CTA in fondo alla fascia centrale */
+  margin: auto 0 24px; /* CTA sollevata di 24px dal fondo */
 }
 @keyframes onb-fade-in-kf { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
 .onb-fade-in { animation: onb-fade-in-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) both; }
@@ -1477,11 +1477,11 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 .onb-enable { animation: onb-enable-kf .6s ease both; }
 
 /* --- Barra di avanzamento onboarding --- */
-.onb-topbar { position: static; width: 100%; padding: 10px 0 0; background: none; }
+.onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
 /* Titolo app nel funnel: STESSO stile della home (.brand-duo: Outfit 900, 32px, viola). */
-.onb-app-brand { padding: 2px 0 12px; }
+.onb-app-brand { padding: 2px 0 10px; }
 /* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
-.onb-steps-bar { width: 100%; height: 8px; margin-top: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
+.onb-steps-bar { width: 100%; height: 8px; margin-top: 20px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
@@ -1539,7 +1539,7 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 /* Mobile: meno padding, tipografia più compatta, bottoni più facili da toccare. */
 @media (max-width: 768px) {
   body.onboarding-active #onboardingSection {
-    padding: 28px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+    padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   }
   .onb-splash { padding: 12px 4px; }
   /* NEW fallback CSS (il JS affina il fit esatto): brand quasi a piena larghezza. */
@@ -1551,7 +1551,7 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 }
 /* Desktop: colonna più larga e tipografia più grande (niente colonnina stretta). */
 @media (min-width: 769px) {
-  body.onboarding-active #onboardingSection { padding: 32px 40px 24px; }
+  body.onboarding-active #onboardingSection { padding: 14px 40px 24px; }
   body.onboarding-active #onboardingSection > .onb-steps-bar,
   body.onboarding-active #onboardingSection > .onb-phase-header,
   body.onboarding-active #onboardingSection > .onb-phase-body,
