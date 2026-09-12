@@ -1431,7 +1431,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 .onb-steps-bar { width: 100%; height: 10px; background: #EDE5F5; border-radius: 999px; overflow: hidden; margin-bottom: 0; }
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
-.onb-splash .onb-brand { font-size: clamp(28px, 7.5vw, 56px); white-space: nowrap; }
+.onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
 .onb-splash-title { margin: 22px 0 10px; font-size: clamp(24px, 6.4vw, 38px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; }
 /* Terzo copy grande quanto il titolo (hierarchia data dal peso/colore). */
 .onb-splash-sub { margin: 0 0 28px; font-size: clamp(24px, 6.4vw, 38px); font-weight: 600; color: #8A7FA3; line-height: 1.5; }
