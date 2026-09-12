@@ -180,7 +180,7 @@
         tb = document.createElement('div');
         tb.id = 'onbTopbar';
         tb.className = 'onb-topbar';
-        tb.innerHTML = '<div class="onb-step-label" id="onbStepLabel"></div><div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
         root.appendChild(tb);
         return tb;
       }
@@ -192,8 +192,6 @@
         const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
         const fill = document.getElementById('onbStepsFill');
         if (fill) fill.style.width = pct + '%';
-        const lbl = document.getElementById('onbStepLabel');
-        if (lbl) lbl.textContent = idx >= 0 ? ('Paso ' + (idx + 1) + ' de ' + total) : '';
       }
       function onbPhaseShell(title) {
         onbClear();

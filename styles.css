@@ -1346,9 +1346,23 @@ body.onboarding-active #onboardingSection > .onb-steps-bar,
 body.onboarding-active #onboardingSection > .onb-phase-header,
 body.onboarding-active #onboardingSection > .onb-phase-body,
 body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-width: 560px; }
-/* Topbar persistente: sempre in cima (sticky), mai spinta al centro dal
-   centering-safe; il margine-bottom automatico centra il contenuto sotto. */
-body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: auto; }
+/* Topbar persistente: sempre in cima (sticky), incollata al bordo: il contenuto
+   sotto la gestisce con le regole di layout dedicate (header vicino alla barra,
+   corpo centrato nello spazio residuo). */
+body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: 0; }
+/* ONB layout: l'istruzione (header) sta subito sotto la barra di progresso;
+   la sezione interagibile (body/card) è centrata verticalmente nello spazio
+   residuo. Due strutture da coprire:
+   a) funnel normale: topbar + wrapper .onb-funnel (contiene header + body);
+   b) esercizio: topbar + header + .exercise-card come figli diretti del section. */
+body.onboarding-active #onboardingSection > .onb-funnel {
+  display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
+}
+body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
+body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body { margin: auto 0; }
+body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
+body.onboarding-active #onboardingSection > .onb-phase-body,
+body.onboarding-active #onboardingSection > .exercise-card { margin: auto 0; }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
 body.onboarding-active { overflow: hidden; }
@@ -1454,14 +1468,7 @@ body.onboarding-active .verse > .translation { position: absolute; top: 100%; le
 
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: sticky; top: 0; z-index: 5; width: 100%; padding: 6px 0 10px; background: linear-gradient(var(--surface-dim, #FDF8FF) 80%, transparent); }
-/* Micro-label orientamento: "Paso X de Y", discreta ma leggibile (gerarchia bassa). */
-.onb-step-label {
-  max-width: 560px; margin: 0 auto 4px;
-  font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; text-align: right;
-  color: var(--text-muted, #7B6F8C);
-  font-family: var(--font-display, 'Outfit', sans-serif);
-}
+/* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
 .onb-steps-bar { width: 100%; height: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
