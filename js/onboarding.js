@@ -180,7 +180,7 @@
         tb = document.createElement('div');
         tb.id = 'onbTopbar';
         tb.className = 'onb-topbar';
-        tb.innerHTML = '<div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
+        tb.innerHTML = '<div class="brand-duo onb-app-brand">Italiano con Musica</div><div class="onb-steps-bar"><div class="onb-steps-fill" id="onbStepsFill" style="width:0%"></div></div>';
         root.appendChild(tb);
         return tb;
       }

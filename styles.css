@@ -1350,7 +1350,7 @@ body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-wi
    sotto la gestisce con le regole di layout dedicate (header vicino alla barra,
    corpo centrato nello spazio residuo). */
 body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margin-top: 0 !important; margin-bottom: 0; }
-/* ONB layout "tre fasce": istruzione sotto la barra, contenuto centrato nello
+/* ONB layout: titolo app (come home) + barra + istruzioni in cima, poi contenuto
    spazio residuo, CTA ancorata in basso (in flusso). Due strutture da coprire:
    a) funnel normale: topbar + wrapper .onb-funnel (contiene header + body);
    b) esercizio: topbar + header + .exercise-card come figli diretti del section. */
@@ -1366,7 +1366,7 @@ body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { ma
 body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body {
   display: flex; flex-direction: column; justify-content: flex-start;
   flex: 1 1 auto; min-height: 0; margin: 0;
-  padding-bottom: 4vh; /* leggero offset: centro visivo sopra il baricentro esatto */
+  padding-bottom: 8px; /* poco spazio vuoto in fondo (si somma al padding della sezione) */
 }
 body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body > :first-child { margin-top: auto; }
 body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
@@ -1479,7 +1479,9 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 .onb-enable { animation: onb-enable-kf .6s ease both; }
 
 /* --- Barra di avanzamento onboarding --- */
-.onb-topbar { position: sticky; top: 0; z-index: 5; width: 100%; padding: 6px 0 10px; background: linear-gradient(var(--surface-dim, #FDF8FF) 80%, transparent); }
+.onb-topbar { position: sticky; top: 0; z-index: 5; width: 100%; padding: 10px 0 12px; background: linear-gradient(var(--surface-dim, #FDF8FF) 80%, transparent); }
+/* Titolo app nel funnel: STESSO stile della home (.brand-duo: Outfit 900, 32px, viola). */
+.onb-app-brand { padding: 2px 0 14px; }
 /* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
 .onb-steps-bar { width: 100%; height: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
@@ -1521,7 +1523,7 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 .onb-success-msg { font-weight: 700; color: var(--onb-success-text); font-size: 14px; display: flex; align-items: center; gap: 6px; }
 .onb-success-hint { font-size: 12px; color: var(--onb-success-hint); margin-top: 4px; font-style: italic; font-weight: 500; }
 /* Feedback salvataggio: toast fixed, non sposta istruzioni/versi. */
-.onb-success-banner.onb-toast { position: fixed; left: 0; right: 0; margin: 0 auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: min(92vw, 480px); max-width: 92vw; z-index: 60; }
+.onb-success-banner.onb-toast { position: fixed; left: 0; right: 0; margin: 0 auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); width: min(92vw, 480px); max-width: 92vw; z-index: 60; }
 .onb-success-banner.onb-toast .onb-success-msg { justify-content: center; }
 .onb-success-banner.onb-toast .onb-success-hint { text-align: center; }
 
@@ -1551,7 +1553,7 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 }
 /* Desktop: colonna più larga e tipografia più grande (niente colonnina stretta). */
 @media (min-width: 769px) {
-  body.onboarding-active #onboardingSection { padding: 72px 40px; }
+  body.onboarding-active #onboardingSection { padding: 32px 40px 24px; }
   body.onboarding-active #onboardingSection > .onb-steps-bar,
   body.onboarding-active #onboardingSection > .onb-phase-header,
   body.onboarding-active #onboardingSection > .onb-phase-body,
