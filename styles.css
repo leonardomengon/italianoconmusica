@@ -1341,7 +1341,17 @@ body.onboarding-active { overflow: hidden; }
 body.onboarding-active #mainHeader,
 body.onboarding-active .bottom-nav,
 body.onboarding-active #loadingMessage,
-body.onboarding-active #showSongsBtn { display: none !important; }
+body.onboarding-active #showSongsBtn,
+body.onboarding-active #fixedPlayer,
+body.onboarding-active #toastContainer,
+body.onboarding-active #appLoader,
+body.onboarding-active #editModal,
+body.onboarding-active #completionModal,
+body.onboarding-active #altOverlay { display: none !important; }
+/* Difesa aggiuntiva: qualunque altro modale/overlay (z-index > 1500) non deve
+   comparire sopra l'onboarding, tranne la modale finale (#onbEndModal). */
+body.onboarding-active .progress-modal:not(#onbEndModal),
+body.onboarding-active .alt-overlay { display: none !important; }
 @keyframes onb-enter-kf {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
