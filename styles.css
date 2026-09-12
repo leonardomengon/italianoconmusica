@@ -1357,7 +1357,7 @@ body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; margi
 body.onboarding-active #onboardingSection > .onb-funnel {
   display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
 }
-body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
+body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { margin-top: 16px; margin-bottom: 0; }
 /* Body = fascia centrale: riempie lo spazio residuo. Il contenuto (versi,
    player) e la CTA hanno ENTRAMBI margine-top auto: lo spazio libero viene
    equidistribuito -> contenuto centrato nello spazio sopra la CTA ancorata
@@ -1365,11 +1365,11 @@ body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-header { ma
    precedenza e incollerebbero il contenuto in alto.) */
 body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body {
   display: flex; flex-direction: column; justify-content: flex-start;
-  flex: 1 1 auto; min-height: 0; margin: 0;
+  flex: 1 1 auto; min-height: 0; margin: 0; padding-top: 20px;
   padding-bottom: 8px; /* poco spazio vuoto in fondo (si somma al padding della sezione) */
 }
 body.onboarding-active #onboardingSection > .onb-funnel > .onb-phase-body > :first-child { margin-top: auto; }
-body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 12px; margin-bottom: 0; }
+body.onboarding-active #onboardingSection > .onb-phase-header { margin-top: 16px; margin-bottom: 0; }
 body.onboarding-active #onboardingSection > .exercise-card { margin: auto 0; }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né
    interattiva (difesa anche contro race che ri-mostrano home/navbar). */
@@ -1479,11 +1479,11 @@ body.onboarding-active .onb-phase-body > .onb-adelante-row {
 .onb-enable { animation: onb-enable-kf .6s ease both; }
 
 /* --- Barra di avanzamento onboarding --- */
-.onb-topbar { position: sticky; top: 0; z-index: 5; width: 100%; padding: 10px 0 12px; background: linear-gradient(var(--surface-dim, #FDF8FF) 80%, transparent); }
+.onb-topbar { position: static; width: 100%; padding: 10px 0 0; background: none; }
 /* Titolo app nel funnel: STESSO stile della home (.brand-duo: Outfit 900, 32px, viola). */
-.onb-app-brand { padding: 2px 0 14px; }
+.onb-app-brand { padding: 2px 0 12px; }
 /* Micro-label orientamento rimossa: la sola barra comunica il progresso. */
-.onb-steps-bar { width: 100%; height: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
+.onb-steps-bar { width: 100%; height: 8px; margin-top: 8px; background: var(--onb-step-track, #EDE5F5); border-radius: 999px; overflow: hidden; margin-bottom: 0; }
 .onb-splash { text-align: center; max-width: 560px; padding: 24px 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
