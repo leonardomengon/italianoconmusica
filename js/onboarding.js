@@ -84,7 +84,10 @@
           '</div>';
         container.appendChild(p);
         _onbPlayerBtn = p.querySelector('.onb-play-btn');
-        if (_onbPlayerBtn) _onbPlayerBtn.addEventListener('click', onbTogglePlay);
+        if (_onbPlayerBtn) {
+          _onbPlayerBtn.classList.add('onb-star-attention'); // pulse sottile fino al primo play
+          _onbPlayerBtn.addEventListener('click', onbTogglePlay);
+        }
       }
       function onbSetPlayIcon(name) {
         const ic = document.querySelector('#onboardingSection .onb-play-icon');
@@ -97,6 +100,8 @@
         const start = range[0], end = range[1];
         const bar = document.querySelector('#onboardingSection .onb-progress-bar');
         onbSetPlayIcon('pause');
+        const pulseBtn = document.querySelector('#onboardingSection .onb-play-btn.onb-star-attention'); // ferma il pulse al primo play
+        if (pulseBtn) pulseBtn.classList.remove('onb-star-attention');
         const tick = () => {
           if (bar && isFinite(el.duration)) {
             bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start) / (end - start)) * 100)) + '%';
