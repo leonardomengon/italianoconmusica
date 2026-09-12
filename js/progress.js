@@ -278,7 +278,10 @@
       console.error('Errore caricamento home:', e);
     }
 
-    if (token !== _loadToken) return;
+    // Difesa race: se showHomeView è ancora in corso (avviata prima del funnel,
+    // es. da boot.js) la sua continuation non deve ri-mostrare home/navbar
+    // mentre l'onboarding è attivo.
+    if (token !== _loadToken || _onboardingActive) return;
     document.getElementById('loadingMessage').style.display = "none";
     document.getElementById('progressionHome').classList.remove('d-none');
     showBottomNav();

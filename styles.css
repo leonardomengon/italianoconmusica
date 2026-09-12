@@ -1306,15 +1306,41 @@ body.onboarding-active #onboardingSection {
   position: fixed;
   inset: 0;
   z-index: 1500;
+  /* L'overlay deve SEMPRE coprire l'intera viewport: neutralizza i max-width
+     di .onb-landing/.onb-funnel (che altrimenti, combinati con inset:0, restringono
+     l'overlay a 520/560px ancorato a sinistra lasciando visibili home e navbar). */
+  width: 100%;
+  max-width: none;
   background: var(--surface-dim, #FDF8FF);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Centering "safe": niente justify-content:center (con contenuto più alto
+     della viewport taglierebbe la cima, non raggiungibile con lo scroll).
+     I margini automatici su primo/ultimo figlio centrano quando c'è spazio
+     e collassano a 0 quando il contenuto sfora. */
+  justify-content: flex-start;
   padding: 48px 16px;
   min-height: 100%;
 }
+body.onboarding-active #onboardingSection > :first-child { margin-top: auto; }
+body.onboarding-active #onboardingSection > :last-child { margin-bottom: auto; }
+/* Colonna contenuto: la max-width 560 non sta più sul section (che è l'overlay),
+   quindi va applicata ai figli diretti renderizzati dal funnel. */
+body.onboarding-active #onboardingSection > .onb-steps-bar,
+body.onboarding-active #onboardingSection > .onb-steps-label,
+body.onboarding-active #onboardingSection > .onb-phase-header,
+body.onboarding-active #onboardingSection > .onb-phase-body,
+body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-width: 560px; }
+body.onboarding-active #onboardingSection > .onb-topbar { max-width: none; }
+/* Durante l'onboarding nessun'altra schermata deve restare visibile né
+   interattiva (difesa anche contro race che ri-mostrano home/navbar). */
+body.onboarding-active { overflow: hidden; }
+body.onboarding-active #mainHeader,
+body.onboarding-active .bottom-nav,
+body.onboarding-active #loadingMessage,
+body.onboarding-active #showSongsBtn { display: none !important; }
 @keyframes onb-enter-kf {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -1425,3 +1451,38 @@ body.onboarding-active #onboardingSection {
   100% { transform: scale(1) rotate(0deg); }
 }
 .star-filled { animation: starFill .5s ease; }
+
+/* ==================== ONBOARDING: adattamento mobile / desktop ==================== */
+/* Mobile: meno padding, tipografia più compatta, bottoni più facili da toccare. */
+@media (max-width: 768px) {
+  body.onboarding-active #onboardingSection {
+    padding: 28px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  }
+  .onb-splash { padding: 12px 4px; }
+  .onb-splash .onb-brand { font-size: 30px; }
+  .onb-splash-title { font-size: clamp(23px, 6.5vw, 27px); margin: 18px 0 8px; }
+  .onb-splash-sub { margin: 0 0 22px; }
+  .onb-splash-btn { width: 100%; max-width: 260px; }
+  .onb-instruction { font-size: 16.5px; padding: 11px 13px; }
+  .onb-phase-header { font-size: 16px; margin-bottom: 14px; }
+  .onb-adelante-row { justify-content: center; }
+  .onb-adelante-row .btn { min-width: 200px; }
+}
+/* Desktop: colonna più larga e tipografia più grande (niente colonnina stretta). */
+@media (min-width: 769px) {
+  body.onboarding-active #onboardingSection { padding: 72px 40px; }
+  body.onboarding-active #onboardingSection > .onb-steps-bar,
+  body.onboarding-active #onboardingSection > .onb-steps-label,
+  body.onboarding-active #onboardingSection > .onb-phase-header,
+  body.onboarding-active #onboardingSection > .onb-phase-body,
+  body.onboarding-active #onboardingSection > .exercise-card { max-width: 640px; }
+  body.onboarding-active #onboardingSection > .onb-landing { max-width: 560px; }
+  .onb-landing-card { padding: 48px 40px; }
+  .onb-splash { max-width: 560px; }
+  .onb-splash .onb-brand { font-size: 52px; }
+  .onb-splash-title { font-size: 36px; }
+  .onb-splash-sub { font-size: 16px; }
+  .onb-splash-btn { min-width: 260px; }
+  .onb-instruction { font-size: 22px; }
+  .onb-phase-header { font-size: 20px; }
+}

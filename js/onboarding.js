@@ -645,6 +645,9 @@
       // ===== FINE OVERRIDE PIANO =====
         if (!s) return;
         _onboardingActive = true;
+        // Invalida le viste pendenti (es. showHomeView avviata da boot.js prima
+        // del funnel): la loro continuation uscirà via check sul token.
+        _loadToken++;
         _onbSong = s;
         try { if (!s.lyrics || !s.lyrics.length) s.lyrics = await fetchLyrics(s.id); } catch (e) { s.lyrics = s.lyrics || []; }
         if (!s.lyrics || !s.lyrics.length) { _onboardingActive = false; return; }
