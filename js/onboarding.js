@@ -105,11 +105,10 @@
         const half = H / 2;
         const maxTop = lower - half;   // il bordo inferiore resta sopra il bottone
         const minTop = upper + half;   // il bordo superiore non sale sopra le istruzioni
-        // Layout proporzionale "desktop" senza vuoti eccessivi né fuoriuscite:
-        // se i versi entrano nella fascia (istruzioni → bottone) vengono CENTRATI
-        // al suo interno: spazio sopra e sotto bilanciato, nessuno spazio morto.
-        // Se sono più alti della fascia si allineano in alto e scorrono dentro.
-        let top = (H >= band) ? minTop : (upper + (band - H) / 2 + half);
+        // Meno spazio tra istruzione e versi: allineiamo i versi subito sotto
+        // l'istruzione (top edge = instr.bottom + 12). Il bottone resta
+        // ancorato in basso, quindi non esce mai dallo schermo.
+        let top = minTop;
         if (top > maxTop) top = maxTop;
         if (top < minTop) top = minTop;
         if (top < 4) top = 4;
