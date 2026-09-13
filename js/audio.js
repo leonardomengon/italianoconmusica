@@ -29,18 +29,29 @@
       // l'ascolto: la riproduzione mirata non equivale a "ascolto completo").
       function playVerseInterval(audioEl, startSec, endSec, onEnd) {
         if (!audioEl) return;
-        const tick = () => {
+        let done = false;
+        let fallback = null;
+        function finish() {
+          if (done) return; done = true;
+          audioEl.removeEventListener('timeupdate', tick);
+          if (fallback) { clearTimeout(fallback); fallback = null; }
+          if (typeof onEnd === 'function') onEnd();
+        }
+        function tick() {
           if (isFinite(audioEl.duration) && audioEl.currentTime >= endSec) {
             audioEl.pause();
-            audioEl.removeEventListener('timeupdate', tick);
-            if (typeof onEnd === 'function') onEnd();
+            finish();
           }
-        };
+        }
         audioEl.addEventListener('timeupdate', tick);
-        const start = () => {
+        // Fallback: se il segmento non si conclude (stream non caricato / bloccato),
+        // termina comunque così il bottone Adelante compare sempre.
+        const span = Math.max(1, (endSec || 0) - (startSec || 0));
+        fallback = setTimeout(finish, (span + 15) * 1000);
+        function start() {
           try { audioEl.currentTime = startSec; } catch (e) {}
           audioEl.play().catch(() => {});
-        };
+        }
         if (audioEl.readyState >= 1) start();
         else audioEl.addEventListener('loadedmetadata', start, { once: true });
       }
