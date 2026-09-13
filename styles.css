@@ -1602,14 +1602,10 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
   .onb-splash-btn { min-width: 260px; }
   .onb-phase-header { font-size: 23px; padding: 16px 20px; }
 }
-/* OVERRIDE 2026-09-13 (3): landing alta + testi a sinistra pesanti + banner con check.
-   Il DOM reale e .onb-splash > .onb-brand + .onb-splash-title + .onb-splash-sub + .onb-splash-btn.
-   Il centramento verticale viene da margin:auto sul section -> neutralizzato. */
-body.onboarding-active #onboardingSection > .onb-landing{ margin-top:0 !important; margin-bottom:0 !important; padding-top:6px; }
-#onboardingSection .onb-splash{ align-items:stretch !important; text-align:left !important; justify-content:flex-start !important; padding-top:8px; }
-#onboardingSection .onb-brand{ text-align:left !important; }
-#onboardingSection .onb-splash-title{ text-align:left !important; font-weight:800 !important; }
-#onboardingSection .onb-splash-sub{ text-align:left !important; font-weight:700 !important; font-size:17px !important; }
-#onboardingSection .onb-splash-btn{ align-self:center !important; margin-top:28px !important; }
+/* OVERRIDE 2026-09-13 (4): solo hint ingrandito. Landing ripristinata all'originale. */
 #onboardingSection .onb-fase-hint{ font-size:17px !important; }
-#onboardingSection .onb-success-hint{ font-size:16px !important; }
+/* Feedback fase 5: check come carattere di testo (stesso font di "Guardada en favoritos").
+   Hint stessa grandezza/font del messaggio ma peso leggermente minore. */
+#onboardingSection .onb-fb-check{ font:inherit; font-weight:inherit; color:inherit; }
+#onboardingSection .onb-success-banner .onb-success-msg{ font-size:15px; font-weight:700; }
+#onboardingSection .onb-success-banner .onb-success-hint{ font-size:15px; font-style:normal; font-weight:600; }

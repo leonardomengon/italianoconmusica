@@ -516,6 +516,7 @@
         banner.className = 'onb-success-banner onb-inline onb-fade-in';
         const iconBox = (ic, sm) => {
           if (!ic) return '';
+          if (ic === '✓' || ic === '✔') return '<span class="onb-fb-check">' + escapeHtml(ic) + '</span> ';
           if (typeof ic === 'string' && ic.indexOf('M:') === 0) { // icona Material (come la navbar)
             const name = ic.slice(2);
             return '<span class="material-symbols-outlined onb-fb-icon' + (sm ? ' onb-fb-icon-sm' : '') + '">' + name + '</span>';
@@ -649,12 +650,11 @@
         const root = onbRoot();
         const sec = document.createElement('div');
         sec.className = 'onb-landing onb-enter';
-        sec.style.cssText = 'margin-top:0 !important;margin-bottom:0 !important;padding-top:6px !important;';
         sec.innerHTML =
-          '<div class="onb-splash" style="align-items:stretch !important;text-align:left !important;justify-content:flex-start !important;padding-top:8px !important;"><div class="onb-brand" style="text-align:left !important;">Italiano con Musica</div>' +
-          '<h1 class="onb-splash-title" style="text-align:left !important;font-weight:800 !important;">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub" style="text-align:left !important;font-weight:700 !important;font-size:17px !important;">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
-          '<button type="button" class="btn btn-primary onb-splash-btn" style="align-self:center !important;margin-top:28px !important;">¡Empezamos!</button></div>';
+          '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
+          '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
+          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
+          '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
         sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
