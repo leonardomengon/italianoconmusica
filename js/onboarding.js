@@ -41,6 +41,7 @@
       let _onbExTimer = null;
       let _onbPlayerOnDone = null;
       let _onbPlaying = false; // NEW: stato play/pausa del player onboarding
+      let _onbPlayFrom = null; // posizione (sec) da cui riprendere dopo la pausa
 
       function onbIsDone() {
         try { return localStorage.getItem(ONB_COMPLETED_KEY) === ONB_COMPLETED_VALUE; } catch (e) { return false; }
@@ -165,6 +166,7 @@
       function onbShowPlayer(container, range, unused, onDone) {
         _onbPlayerRange = range || [0, 10];
         _onbPlayerOnDone = onDone;
+        _onbPlayFrom = null; // nuovo segmento: riparte dall'inizio
         const p = document.createElement('div');
         p.className = 'onb-player onb-enter';
         p.innerHTML =
@@ -176,7 +178,7 @@
         container.appendChild(p);
         _onbPlayerBtn = p.querySelector('.onb-play-btn');
         if (_onbPlayerBtn) {
-          _onbPlayerBtn.classList.add('onb-star-attention'); // pulse sottile fino al primo play
+          _onbPlayerBtn.classList.add('onb-play-attention'); // pulse viola fino al primo play
           _onbPlayerBtn.addEventListener('click', onbTogglePlay);
         }
       }
@@ -186,18 +188,22 @@
       }
       function onbTogglePlay() {
         const el = ensureOnbAudio();
-        if (_onbPlaying) { // click durante la riproduzione: pausa
+        if (!el) return;
+        const range = _onbPlayerRange || [0, 10];
+        const start0 = range[0], end = range[1];
+        if (_onbPlaying) { // click durante la riproduzione: PAUSA (ricorda la posizione)
           try { el.pause(); } catch (e) {}
+          if (isFinite(el.currentTime) && el.currentTime > start0 && el.currentTime < end) _onbPlayFrom = el.currentTime;
           _onbPlaying = false;
           onbSetPlayIcon('play_arrow');
           return;
         }
-        const range = _onbPlayerRange || [0, 10];
-        const start = range[0], end = range[1];
+        // PLAY: riparte da dove si era messo in pausa (o dall'inizio del segmento)
+        const start = (typeof _onbPlayFrom === 'number' && _onbPlayFrom > start0) ? Math.min(_onbPlayFrom, end - 0.05) : start0;
         const bar = document.querySelector('#onboardingSection .onb-progress-bar');
         onbSetPlayIcon('pause');
-        const pulseBtn = document.querySelector('#onboardingSection .onb-play-btn.onb-star-attention'); // ferma il pulse al primo play
-        if (pulseBtn) pulseBtn.classList.remove('onb-star-attention');
+        const pulseBtn = document.querySelector('#onboardingSection .onb-play-btn.onb-play-attention'); // ferma il pulse al primo play
+        if (pulseBtn) pulseBtn.classList.remove('onb-play-attention');
         const tick = () => {
           if (bar && isFinite(el.duration)) {
             bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start) / (end - start)) * 100)) + '%';
@@ -210,6 +216,7 @@
           if (bar) bar.style.width = '100%';
           onbSetPlayIcon('play_arrow');
           _onbPlaying = false;
+          _onbPlayFrom = null;
           if (typeof _onbPlayerOnDone === 'function') _onbPlayerOnDone();
         });
       }
@@ -397,10 +404,10 @@
           wrap = onbPhaseShell('Intenta entender y toca para ver la traducción');
           onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(5)) });
         } else if (n === 5) {
-          wrap = onbPhaseShell('Esta frase parece complicada, guárdala en tus favoritos para estudiarla con más frecuencia');
+          wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessBanner(wrap, '⭐ Guardada en favoritos', '💡 Podrás escribir apuntes en tus frases guardadas');
+            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir apuntes en tus frases guardadas', '⭐', '🎵');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
@@ -485,13 +492,14 @@
       }
 
       // Banner di successo persistente (sostituisce il toast) con eventuale hint.
-      function onbShowSuccessBanner(wrap, message, hint) {
+      function onbShowSuccessBanner(wrap, message, hint, icon, hintIcon) {
         const existing = wrap.querySelector('.onb-success-banner');
         if (existing) existing.remove();
         const banner = document.createElement('div');
         banner.className = 'onb-success-banner onb-inline onb-fade-in';
-        let html = '<div class="onb-success-msg">' + escapeHtml(message) + '</div>';
-        if (hint) html += '<div class="onb-success-hint">' + escapeHtml(hint) + '</div>';
+        const iconBox = (ic, sm) => ic ? '<span class="onb-fb-icon' + (sm ? ' onb-fb-icon-sm' : '') + '">' + escapeHtml(ic) + '</span>' : '';
+        let html = '<div class="onb-success-msg">' + iconBox(icon, false) + escapeHtml(message) + '</div>';
+        if (hint) html += '<div class="onb-success-hint">' + iconBox(hintIcon, true) + escapeHtml(hint) + '</div>';
         banner.innerHTML = html;
         const verse = wrap.querySelector('.verse');
         if (verse) {
