@@ -27,9 +27,9 @@
       
       // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
       // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
-      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–20 s
+      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–19 s
       const ONB_PLAY_FIRST = [10, 15];
-      const ONB_PLAY_SECOND = [0, 19.5];
+      const ONB_PLAY_SECOND = [0, 19];
 
       let _onbPhase = 0;
       let _onbSong = null;
@@ -237,11 +237,11 @@
       // mai ricreata tra le fasi (onbClear la preserva). La progressione è fluida
       // grazie alla transition width su .onb-steps-fill. Nessuna etichetta numerica:
       // la barra è solo grafica.
-      function onbRenderStepsHeader(title) {
+      function onbRenderStepsHeader(title, cls) {
         onbUpdateTopbar();
         const r = onbRoot();
         const header = document.createElement('div');
-        header.className = 'onb-phase-header'; // istruzione immediata, senza dissolvenza
+        header.className = 'onb-phase-header' + (cls ? ' ' + cls : ''); // istruzione immediata, senza dissolvenza
         header.innerHTML = title; // innerHTML: alcuni titoli (es. Fase 5) contengono markup
         r.appendChild(header);
       }
@@ -542,7 +542,7 @@
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
         while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
-        onbRenderStepsHeader('Completa tu primer ejercicio');
+        onbRenderStepsHeader('Completa tu primer ejercicio', 'onb-phase-header-ex');
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
         card.innerHTML =
@@ -576,7 +576,7 @@
         const wrap = onbRoot();
         wrap.className = 'onb-funnel';
         while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
-        onbRenderStepsHeader('Completa tu primer ejercicio');
+        onbRenderStepsHeader('Completa tu primer ejercicio', 'onb-phase-header-ex');
         const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';

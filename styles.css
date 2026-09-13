@@ -1353,7 +1353,7 @@ body.onboarding-active #onboardingSection > .exercise-card { width: 100%; max-wi
 /* ONB layout proporzionale: centri fissi in vh (es. 520px: 45/165/330/455) */
 body.onboarding-active #onboardingSection {
   --onb-y-bar: 8.65vh;
-  --onb-y-instr: 31.73vh;
+  --onb-y-instr: 28.5vh;
   --onb-y-verse: 63.46vh;
   --onb-y-cta: 87.5vh;
 }
@@ -1407,6 +1407,10 @@ body.onboarding-active #onboardingSection > .exercise-card { padding: 24px 20px;
 body.onboarding-active .exercise-card .exercise-header { margin-bottom: 20px; }
 body.onboarding-active .exercise-card .exercise-text { padding: 20px 16px; line-height: 1.7; }
 body.onboarding-active .exercise-card .exercise-actions { gap: 14px; padding: 12px 8px; }
+/* Istruzioni esercizi (fase 8): ancora più in alto del resto (+ margini verso/traduzione come esercizi classici) */
+body.onboarding-active #onboardingSection > .onb-phase-header.onb-phase-header-ex { top: 22vh; }
+body.onboarding-active .exercise-card .exercise-text { margin-bottom: 18px; }
+body.onboarding-active .exercise-card .exercise-translation { margin: 0 0 18px; padding: 16px 20px; }
 /* Stagger: 2° e 3° elemento entrato seguono il primo (ordine di lettura).
    Il banner di feedback è escluso: il richiamo del risultato non deve aspettare. */
 body.onboarding-active .onb-phase-body > .onb-enter:nth-child(2):not(.onb-success-banner) { animation-delay: .34s; }
