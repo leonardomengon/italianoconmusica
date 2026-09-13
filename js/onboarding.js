@@ -27,9 +27,9 @@
       
       // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
       // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
-      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–19 s
+      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–19.25 s
       const ONB_PLAY_FIRST = [10, 15];
-      const ONB_PLAY_SECOND = [0, 19];
+      const ONB_PLAY_SECOND = [0, 19.25];
 
       let _onbPhase = 0;
       let _onbSong = null;
@@ -413,7 +413,7 @@
           wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas', '⭐');
+            onbShowSuccessPlain(wrap, '✓ Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
@@ -497,7 +497,18 @@
         return added;
       }
 
-      // Banner di successo persistente (sostituisce il toast) con eventuale hint.
+      // Feedback plain: check verde testuale senza box (fase 5).
+      function onbShowSuccessPlain(wrap, msg, hint) {
+        const old = wrap.querySelector('.onb-success-banner');
+        if (old) old.remove();
+        const box = document.createElement('div');
+        box.className = 'onb-success-plain onb-fade-in';
+        box.innerHTML = '<div class="onb-plain-msg">' + escapeHtml(msg) + '</div>' + (hint ? '<div class="onb-plain-hint">' + escapeHtml(hint) + '</div>' : '');
+        const verse = wrap.querySelector('.verse');
+        if (verse) verse.insertAdjacentElement('afterend', box);
+        else wrap.insertBefore(box, wrap.firstChild);
+      }
+      // Legacy: banner con box (non piu usato, tenuto per compatibilita).
       function onbShowSuccessBanner(wrap, message, hint, icon, hintIcon) {
         const existing = wrap.querySelector('.onb-success-banner');
         if (existing) existing.remove();
