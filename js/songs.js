@@ -408,6 +408,9 @@
 
       function toggleTranslation(index) {
         if (_exerciseMode) return;
+        // In onboarding (layout assoluto vh) NON scrollare verso/contenitore:
+        // lo scrollIntoView sposterebbe il verso dalla posizione originale.
+        const isOnboarding = !!(document.body && document.body.classList.contains('onboarding-active'));
         const translationEl = document.getElementById(`translation-${index}`);
         const verseEl = document.querySelector(`.verse[data-index="${index}"]`);
         const altLinkEl = document.getElementById(`alt-link-${index}`);
@@ -427,8 +430,8 @@
           translationEl.style.display = "none";
           if (verseEl) verseEl.classList.remove("active");
           if (altLinkEl) altLinkEl.classList.add("d-none");
-          // Scrolla il verso chiuso solo se necessario (minimo movimento)
-          setTimeout(() => {
+          // Scrolla il verso chiuso solo se necessario (minimo movimento; NON in onboarding)
+          if (!isOnboarding) setTimeout(() => {
             verseEl.scrollIntoView({
               behavior: "smooth",
               block: "nearest"
@@ -441,8 +444,8 @@
           if (verseEl) verseEl.classList.add("active");
           if (altLinkEl) altLinkEl.classList.remove("d-none");
           // Scrolla il verso cliccato solo se necessario (minimo movimento),
-          // dopo che la traduzione si è espansa
-          setTimeout(() => {
+          // dopo che la traduzione si è espansa (NON in onboarding)
+          if (!isOnboarding) setTimeout(() => {
             verseEl.scrollIntoView({
               behavior: "smooth",
               block: "nearest"

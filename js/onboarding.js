@@ -490,7 +490,7 @@
         const existing = wrap.querySelector('.onb-success-banner');
         if (existing) existing.remove();
         const banner = document.createElement('div');
-        banner.className = 'onb-success-banner onb-toast onb-enter';
+        banner.className = 'onb-success-banner onb-inline onb-fade-in';
         let html = '<div class="onb-success-msg">' + escapeHtml(message) + '</div>';
         if (hint) html += '<div class="onb-success-hint">' + escapeHtml(hint) + '</div>';
         banner.innerHTML = html;
