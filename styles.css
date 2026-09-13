@@ -1367,12 +1367,11 @@ body.onboarding-active #onboardingSection > .onb-phase-header {
   margin: 0; width: calc(100% - 32px); max-width: 640px; text-align: center;
 }
 body.onboarding-active #onboardingSection > .onb-phase-body {
-  position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
+  position: absolute; left: 50%; transform: translateX(-50%);
   margin: 0; padding: 0; width: calc(100% - 32px); max-width: 560px;
-  transition: top .3s var(--onb-ease, cubic-bezier(.2,.7,.3,1));
 }
 body.onboarding-active #onboardingSection > .exercise-card {
-  position: absolute; top: var(--onb-y-verse); left: 50%; transform: translate(-50%, -50%);
+  position: absolute; left: 50%; transform: translateX(-50%);
   margin: 0; width: calc(100% - 32px); max-width: 640px;
 }
 /* Durante l'onboarding nessun'altra schermata deve restare visibile né

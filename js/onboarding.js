@@ -132,16 +132,10 @@
           body.style.maxHeight = '';
           body.style.overflowY = '';
         }
-        const H = Math.min(contentH, band);
-        const half = H / 2;
-        const maxTop = lower - half;   // il bordo inferiore resta sopra il bottone
-        const minTop = upper + half;   // il bordo superiore non sale sopra le istruzioni
-        // Meno spazio tra istruzione e versi: allineiamo i versi subito sotto
-        // l'istruzione (top edge = instr.bottom + 12). Il bottone resta
-        // ancorato in basso, quindi non esce mai dallo schermo.
-        let top = minTop;
-        if (top > maxTop) top = maxTop;
-        if (top < minTop) top = minTop;
+        // Verso ancorato in CIMA (top = instr.bottom + 12), INDIPENDENTE dall'altezza
+        // del contenuto: aggiunte sotto il verso (traduzione / banner feedback) NON lo
+        // spostano. (L'altezza è già limitata a `band` qui sopra → bottom sopra il bottone.)
+        let top = upper;
         if (top < 4) top = 4;
         body.style.top = Math.round(top * 10) / 10 + 'px';
       }
