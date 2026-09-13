@@ -29,7 +29,7 @@
       // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
       // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–20 s
       const ONB_PLAY_FIRST = [10, 15];
-      const ONB_PLAY_SECOND = [0, 20];
+      const ONB_PLAY_SECOND = [0, 19.5];
 
       let _onbPhase = 0;
       let _onbSong = null;
@@ -412,7 +412,7 @@
           wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir apuntes en tus frases guardadas', '⭐', 'M:description');
+            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas', '⭐');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
