@@ -206,7 +206,9 @@
         if (pulseBtn) pulseBtn.classList.remove('onb-play-attention');
         const tick = () => {
           if (bar && isFinite(el.duration)) {
-            bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start) / (end - start)) * 100)) + '%';
+            // Conteggio dall'inizio del segmento (start0): dopo la pausa la barra
+            // riparte dallo stato di pausa (non da 0).
+            bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start0) / (end - start0)) * 100)) + '%';
           }
         };
         el.addEventListener('timeupdate', tick);
@@ -240,7 +242,7 @@
         const r = onbRoot();
         const header = document.createElement('div');
         header.className = 'onb-phase-header'; // istruzione immediata, senza dissolvenza
-        header.textContent = title;
+        header.innerHTML = title; // innerHTML: alcuni titoli (es. Fase 5) contengono markup
         r.appendChild(header);
       }
       function onbEnsureTopbar() {
@@ -262,7 +264,10 @@
         const total = ONB_ACTIVE_PHASES.length;
         const pct = idx >= 0 ? Math.round(((idx + 1) / total) * 100) : 0;
         const fill = document.getElementById('onbStepsFill');
-        if (fill) fill.style.width = pct + '%';
+        if (fill) {
+          void fill.offsetWidth; // forza il paint dello stato precedente → transition width fluida anche al primo step
+          fill.style.width = pct + '%';
+        }
       }
       function onbPhaseShell(title) {
         onbClear();
@@ -407,7 +412,7 @@
           wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir apuntes en tus frases guardadas', '⭐', '🎵');
+            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir apuntes en tus frases guardadas', '⭐', 'M:description');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
@@ -497,7 +502,14 @@
         if (existing) existing.remove();
         const banner = document.createElement('div');
         banner.className = 'onb-success-banner onb-inline onb-fade-in';
-        const iconBox = (ic, sm) => ic ? '<span class="onb-fb-icon' + (sm ? ' onb-fb-icon-sm' : '') + '">' + escapeHtml(ic) + '</span>' : '';
+        const iconBox = (ic, sm) => {
+          if (!ic) return '';
+          if (typeof ic === 'string' && ic.indexOf('M:') === 0) { // icona Material (come la navbar)
+            const name = ic.slice(2);
+            return '<span class="material-symbols-outlined onb-fb-icon' + (sm ? ' onb-fb-icon-sm' : '') + '">' + name + '</span>';
+          }
+          return '<span class="onb-fb-icon' + (sm ? ' onb-fb-icon-sm' : '') + '">' + escapeHtml(ic) + '</span>';
+        };
         let html = '<div class="onb-success-msg">' + iconBox(icon, false) + escapeHtml(message) + '</div>';
         if (hint) html += '<div class="onb-success-hint">' + iconBox(hintIcon, true) + escapeHtml(hint) + '</div>';
         banner.innerHTML = html;
