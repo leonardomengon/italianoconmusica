@@ -1602,13 +1602,14 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
   .onb-splash-btn { min-width: 260px; }
   .onb-phase-header { font-size: 23px; padding: 16px 20px; }
 }
-/* OVERRIDE 2026-09-13: landing alta, descrizione sinistra pesante, CTA bassa, hint grande, successo plain */
-#onboardingSection .onb-landing{ justify-content:flex-start; padding-top:10px; gap:18px; }
-#onboardingSection .onb-splash{ justify-content:flex-start; padding-top:8px; }
-#onboardingSection .onb-landing-title{ text-align:left; align-self:stretch; font-weight:800; font-size:19px; }
-#onboardingSection .onb-landing-sub{ text-align:left; align-self:stretch; font-size:17px; }
-#onboardingSection .onb-landing-cta{ margin-top:28px; }
-#onboardingSection .onb-fase-hint{ font-size:17px; }
-#onboardingSection .onb-success-plain{ background:none; border:none; padding:8px 2px; }
-#onboardingSection .onb-plain-msg{ color:var(--onb-success-text); font-weight:800; font-size:17px; }
-#onboardingSection .onb-plain-hint{ color:var(--onb-success-hint); font-weight:800; font-size:17px; }
+/* OVERRIDE 2026-09-13 (3): landing alta + testi a sinistra pesanti + banner con check.
+   Il DOM reale e .onb-splash > .onb-brand + .onb-splash-title + .onb-splash-sub + .onb-splash-btn.
+   Il centramento verticale viene da margin:auto sul section -> neutralizzato. */
+body.onboarding-active #onboardingSection > .onb-landing{ margin-top:0 !important; margin-bottom:0 !important; padding-top:6px; }
+#onboardingSection .onb-splash{ align-items:stretch !important; text-align:left !important; justify-content:flex-start !important; padding-top:8px; }
+#onboardingSection .onb-brand{ text-align:left !important; }
+#onboardingSection .onb-splash-title{ text-align:left !important; font-weight:800 !important; }
+#onboardingSection .onb-splash-sub{ text-align:left !important; font-weight:700 !important; font-size:17px !important; }
+#onboardingSection .onb-splash-btn{ align-self:center !important; margin-top:28px !important; }
+#onboardingSection .onb-fase-hint{ font-size:17px !important; }
+#onboardingSection .onb-success-hint{ font-size:16px !important; }

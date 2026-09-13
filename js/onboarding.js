@@ -413,7 +413,7 @@
           wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
             onbFav(starBtn, idx);
-            onbShowSuccessPlain(wrap, '✓ Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas');
+            onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas', '✓');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
         } else if (n === 7) {
@@ -497,7 +497,7 @@
         return added;
       }
 
-      // Feedback plain: check verde testuale senza box (fase 5).
+      // Feedback banner classico con box verde (fase 5). Icona = check testuale.
       function onbShowSuccessPlain(wrap, msg, hint) {
         const old = wrap.querySelector('.onb-success-banner');
         if (old) old.remove();
@@ -508,7 +508,7 @@
         if (verse) verse.insertAdjacentElement('afterend', box);
         else wrap.insertBefore(box, wrap.firstChild);
       }
-      // Legacy: banner con box (non piu usato, tenuto per compatibilita).
+      // Banner verde classico (box + icona + hint). Usato in fase 5 con icona check.
       function onbShowSuccessBanner(wrap, message, hint, icon, hintIcon) {
         const existing = wrap.querySelector('.onb-success-banner');
         if (existing) existing.remove();
@@ -649,11 +649,12 @@
         const root = onbRoot();
         const sec = document.createElement('div');
         sec.className = 'onb-landing onb-enter';
+        sec.style.cssText = 'margin-top:0 !important;margin-bottom:0 !important;padding-top:6px !important;';
         sec.innerHTML =
-          '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
-          '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
-          '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
+          '<div class="onb-splash" style="align-items:stretch !important;text-align:left !important;justify-content:flex-start !important;padding-top:8px !important;"><div class="onb-brand" style="text-align:left !important;">Italiano con Musica</div>' +
+          '<h1 class="onb-splash-title" style="text-align:left !important;font-weight:800 !important;">Música creada para que aprendas</h1>' +
+          '<p class="onb-splash-sub" style="text-align:left !important;font-weight:700 !important;font-size:17px !important;">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
+          '<button type="button" class="btn btn-primary onb-splash-btn" style="align-self:center !important;margin-top:28px !important;">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
         sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
