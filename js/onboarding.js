@@ -288,6 +288,7 @@
         slot.innerHTML = '<button type="button" class="btn btn-primary onb-adelante" tabindex="-1">Adelante</button>';
         r.appendChild(slot);
 
+        onbFitPhase(); // posizione corretta PRIMA del primo paint (niente twitch/jump)
         return wrap;
       }
       function onbAddAdelante(wrap, fn, opts) {
@@ -549,6 +550,7 @@
           '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
           '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary onb-enabling" disabled>Piensa...</button></div>';
         wrap.appendChild(card);
+        onbFitPhase(); // imposta top prima del paint → niente twitch
         const btn = card.querySelector('#onbExBtn');
         // Animazione fluida 3s (nessun countdown numerico): al termine il bottone si abilita.
         onbPhaseTimeout(3000, () => {
@@ -584,6 +586,7 @@
           (_onbExTrad ? '<div class="exercise-translation">' + escapeHtml(_onbExTrad) + '</div>' : '') +
           '<div class="exercise-actions"><button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente →</button></div>';
         wrap.appendChild(card);
+        onbFitPhase(); // imposta top prima del paint → niente twitch
         const inp = card.querySelector('.study-input');
         if (inp) {
           inp.addEventListener('input', () => {
