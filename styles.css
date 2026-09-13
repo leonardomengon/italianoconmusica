@@ -1397,6 +1397,10 @@ body.onboarding-active .alt-overlay { display: none !important; }
   100% { opacity: 1; transform: translateY(0); }
 }
 .onb-enter { animation: onb-enter-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) .2s both; }
+/* Esercizi ONBOARDING: la card è centrata con translate(-50%,-50%); l'animazione
+   .onb-enter (translateY) la disallineerebbe durante l'ingresso → solo dissolvenza. */
+body.onboarding-active .exercise-card.onb-enter { animation: onb-fade-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)); }
+@keyframes onb-fade-kf { 0% { opacity: 0; } 100% { opacity: 1; } }
 /* Stagger: 2° e 3° elemento entrato seguono il primo (ordine di lettura).
    Il banner di feedback è escluso: il richiamo del risultato non deve aspettare. */
 body.onboarding-active .onb-phase-body > .onb-enter:nth-child(2):not(.onb-success-banner) { animation-delay: .34s; }

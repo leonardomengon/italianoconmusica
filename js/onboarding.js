@@ -82,7 +82,7 @@
       function onbFitPhase() {
         const root = onbRoot();
         if (!root) return;
-        const body = root.querySelector(':scope > .onb-phase-body');
+        const body = root.querySelector(':scope > .onb-phase-body, :scope > .exercise-card');
         if (!body) return;
         if (getComputedStyle(body).position !== 'absolute') return; // solo layout proporzionale vh
         const cta = root.querySelector(':scope > .onb-adelante-row');
