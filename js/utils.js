@@ -41,14 +41,24 @@
       }
 
       // ==================== RIVELAZIONE PROGRESSIVA ====================
-      // Rivelazione della soluzione "parola per parola": ogni parola entra con un
-      // piccolo delay. Nessun blocco: il tocco dell'utente è il momento di impegno.
+      // Rivelazione della soluzione "parola per parola", volutamente LENTA e
+      // calma: ogni parola entra con un proprio ritardo. Nessun blocco: il tocco
+      // dell'utente è il momento di impegno, l'animazione dà "peso" alla soluzione.
+      // I tempi (durata/stagger/cap) sono centralizzati qui per essere tarati facilmente.
+      const REVEAL_WORD_DUR_MS = 800;   // DEVE combaciare con --reveal-word-dur nel CSS (.8s)
+      const REVEAL_STAGGER_MS = 220;    // passo tra una parola e la successiva
+      const REVEAL_MAX_TOTAL_MS = 2000; // cap: le frasi lunghe non superano ~2s
       function revealWordsHtml(text) {
         const safe = escapeHtml(text || '');
         const words = safe.split(/\s+/).filter(Boolean);
         if (!words.length) return '';
+        // Stagger effettivo: quello nominale, ridotto (mai sotto 40ms) per non
+        // sfondare il cap totale quando la frase ha molte parole.
+        const gap = words.length <= 1 ? 0
+          : Math.max(40, Math.min(REVEAL_STAGGER_MS,
+              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_WORD_DUR_MS) / (words.length - 1))));
         return words
-          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (i * 70) + 'ms">' + w + '</span>')
+          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (i * gap) + 'ms">' + w + '</span>')
           .join(' ');
       }
 
