@@ -41,24 +41,26 @@
       }
 
       // ==================== RIVELAZIONE PROGRESSIVA ====================
-      // Rivelazione della soluzione "parola per parola", volutamente LENTA e
-      // calma: ogni parola entra con un proprio ritardo. Nessun blocco: il tocco
-      // dell'utente è il momento di impegno, l'animazione dà "peso" alla soluzione.
+      // Rivelazione della soluzione "parola per parola", molto lenta e calma:
+      // ogni parola entra dopo una pausa iniziale e con un ampio intervallo.
+      // Nessun blocco: il tocco dell'utente è il momento di impegno,
+      // l'animazione dà "peso" alla soluzione.
       // I tempi (durata/stagger/cap) sono centralizzati qui per essere tarati facilmente.
-      const REVEAL_WORD_DUR_MS = 800;   // DEVE combaciare con --reveal-word-dur nel CSS (.8s)
-      const REVEAL_STAGGER_MS = 220;    // passo tra una parola e la successiva
-      const REVEAL_MAX_TOTAL_MS = 2000; // cap: le frasi lunghe non superano ~2s
+      const REVEAL_WORD_DUR_MS = 1100;   // DEVE combaciare con --reveal-word-dur nel CSS (1.1s)
+      const REVEAL_STAGGER_MS = 340;     // passo tra una parola e la successiva
+      const REVEAL_INITIAL_DELAY_MS = 200; // pausa prima della prima parola
+      const REVEAL_MAX_TOTAL_MS = 3000;  // cap: le frasi lunghe non superano ~3s
       function revealWordsHtml(text) {
         const safe = escapeHtml(text || '');
         const words = safe.split(/\s+/).filter(Boolean);
         if (!words.length) return '';
-        // Stagger effettivo: quello nominale, ridotto (mai sotto 40ms) per non
-        // sfondare il cap totale quando la frase ha molte parole.
+        // Stagger effettivo: quello nominale, ridotto (mai sotto 40ms) affinché
+        // pausa iniziale + ultimo delay + durata non sfondino il cap totale.
         const gap = words.length <= 1 ? 0
           : Math.max(40, Math.min(REVEAL_STAGGER_MS,
-              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_WORD_DUR_MS) / (words.length - 1))));
+              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_INITIAL_DELAY_MS - REVEAL_WORD_DUR_MS) / (words.length - 1))));
         return words
-          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (i * gap) + 'ms">' + w + '</span>')
+          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (REVEAL_INITIAL_DELAY_MS + i * gap) + 'ms">' + w + '</span>')
           .join(' ');
       }
 
