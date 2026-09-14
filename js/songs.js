@@ -156,7 +156,7 @@
           const songCard = document.createElement("div");
           songCard.className = "col-md-6 col-lg-4 song-card";
           songCard.innerHTML = `
-            <div class="card h-100" onclick="openSong(${song.id})">
+            <div class="card h-100" onclick="router.navigate('#/canzone/${song.id}')">
               <div class="card-body d-flex flex-column justify-content-between">
                 <div>
                   <div class="d-flex justify-content-between align-items-start mb-3">

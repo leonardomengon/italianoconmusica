@@ -213,19 +213,19 @@
 
   <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav" aria-label="Navegación inferior">
-    <button id="bottomNavHome" class="bottom-nav-item active" type="button" onclick="showHomeView()">
+    <button id="bottomNavHome" class="bottom-nav-item active" type="button" onclick="window.router ? router.navigate('#/') : showHomeView()">
       <span class="material-symbols-outlined">home</span>
       <span>Inicio</span>
     </button>
-       <button id="bottomNavAppunti" class="bottom-nav-item" type="button" onclick="openNotebookView()">
+       <button id="bottomNavAppunti" class="bottom-nav-item" type="button" onclick="window.router ? router.navigate('#/notas') : openNotebookView()">
       <span class="material-symbols-outlined">description</span>
       <span>Notas</span>
     </button>
-     <button id="bottomNavLibrary" class="bottom-nav-item" type="button" onclick="showLibreria()">
+     <button id="bottomNavLibrary" class="bottom-nav-item" type="button" onclick="window.router ? router.navigate('#/biblioteca') : showLibreria()">
       <span class="material-symbols-outlined">library_music</span>
       <span>Biblioteca</span>
     </button>
-     <button id="bottomNavSettings" class="bottom-nav-item" type="button" onclick="openSettingsView()">
+     <button id="bottomNavSettings" class="bottom-nav-item" type="button" onclick="window.router ? router.navigate('#/ajustes') : openSettingsView()">
       <span class="material-symbols-outlined">settings</span>
       <span>Ajustes</span>
     </button>
@@ -244,6 +244,7 @@
   <script src="js/analytics.js"></script>
   <script src="js/backup.js"></script>
   <script src="js/onboarding.js"></script>
+  <script src="js/router.js"></script>
   <script src="js/boot.js"></script>
 </body>
 </html>

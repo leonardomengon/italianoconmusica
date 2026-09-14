@@ -219,9 +219,9 @@
     const m=missionState(current);
     const sfidaUnlocked = isSfidaUnlocked(m);
     const sfidaBtnHtml = sfidaUnlocked
-      ? `<button class="btn btn-challenge" onclick="openSongStudyMode()">Ejercicio</button>`
+      ? `<button class="btn btn-challenge" onclick="router.navigate('#/canzone/${current.id}/esercizi')">Ejercicio</button>`
       : '';
-    box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="openCurrentSong()">CANCIÓN</button></div></div><div class="course-missions-divider"></div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
+    box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="router.navigate('#/canzone/${current.id}')">CANCIÓN</button></div></div><div class="course-missions-divider"></div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
     const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
     const ripassoBox = document.getElementById('ripassoHome');
     if (appuntiCount >= 10) {
@@ -477,15 +477,25 @@
 
   async function openCurrentSong() { const s=getCurrentSong(); if (s) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=false; await openSong(s.id); } }
   async function openSongStudyMode() {
-    const s=getCurrentSong();
+    const s = getCurrentSong();
     if (!s) return;
+    await openSongInStudyMode(s.id);
+  }
+  // Apre una canzone specifica in modalità esercizi (usata dal router:
+  // rotta #/canzone/:id/esercizi e deep-link). Se non c'è ancora la coda,
+  // la genera dalla canzone corrente.
+  async function openSongInStudyMode(songId) {
     _exerciseMode = true;
     _exerciseQueue = [];
     _exerciseIndex = 0;
     _reviewMode = false;
     _ripassoMode = false;
-    await openSong(s.id);
-    // Apri la sezione nascosta degli esercizi con lo stesso layout del ripasso.
+    await openSong(songId);
+    renderStudiedExercisesView();
+  }
+  // Mostra la sezione esercizi nascosta (#esercizi) con lo stesso layout
+  // del ripasso. È un render interno (nessuna navigazione di rotta).
+  function renderStudiedExercisesView() {
     if (!_exerciseMode) return;
     hidePrimaryViews();
     document.body.classList.remove('view-song');
@@ -493,7 +503,7 @@
     updateNavigation('home');
     updateBottomNav('home');
     window.scrollTo(0, 0);
-    if (_exerciseQueue.length === 0) generaCodaEsercizi(currentSongBackup);
+    if (_exerciseQueue.length === 0 && currentSongBackup) generaCodaEsercizi(currentSongBackup);
     renderCurrentExercise();
   }
   async function openCompletedSong(id) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=true; await openSong(id); }

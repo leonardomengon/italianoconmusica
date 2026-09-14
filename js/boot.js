@@ -109,6 +109,12 @@
         // Onboarding di primo avvio: se non ancora completato, avvia il funnel
         // (avviaOnboarding è un no-op se 'onboardingCompleted' è già impostato).
         if (typeof avviaOnboarding === 'function') { await avviaOnboarding(); }
+        // Deep-link: se l'URL contiene una rotta specifica (es. #/canzone/123,
+        // #/notas, #/biblioteca, ...) eseguirla dopo catalogo e onboarding.
+        // La home (#/) è già mostrata dal flusso di avvio normale.
+        if (window.router && typeof router.handleDeepLink === 'function') {
+          try { router.handleDeepLink(); } catch (e) { console.error('[boot] deep-link:', e); }
+        }
         // Backup automatico + metrica di utilizzo: fire-and-forget, non blocca l'avvio.
         if (typeof sincronizzaBackup === 'function') { sincronizzaBackup(); }
       })();
