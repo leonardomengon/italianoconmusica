@@ -153,7 +153,7 @@
               <div class="exercise-card text-center p-4">
                 <div class="celebration-icon">🍾</div>
                 <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
-                <p class="text-muted">Has completado el lote de 20 ejercicios (10 piensa, 10 completa).</p>
+                <p class="text-muted">${(() => { const tot = (typeof ESERCIZI_PER_SFIDA === 'number') ? ESERCIZI_PER_SFIDA : (_exerciseQueue.length || 0); const pensa = Math.ceil(tot / 2); const completa = Math.floor(tot / 2); return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
                 <div class="exercise-actions">
                   <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>
                   <button class="btn btn-outline-secondary" onclick="chiudiEsercizi()">← Inicio</button>

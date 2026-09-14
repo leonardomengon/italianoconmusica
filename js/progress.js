@@ -1,15 +1,28 @@
   // ==================== PROGRESSION MVP ====================
   const PROGRESS_KEY = 'lyricalProgress';
-  // Requisiti missioni DINAMICI in base al progresso:
-  // - senza canzoni completate → 1/1/1
-  // - dalla prima canzone completata in poi → 3/10/3
-  function REQUIRED_NOTES() { return hasCompletedAnySong() ? 3 : 1; }
-  function REQUIRED_LISTENS() { return hasCompletedAnySong() ? 10 : 1; }
-  function REQUIRED_SFIDE() { return hasCompletedAnySong() ? 3 : 1; }
-  function hasCompletedAnySong() {
-    const p = getProgress();
-    return (p.completedSongIds || []).length > 0;
+  // Requisiti missioni GRADUALI (scala a gradini, non più binaria 1→10):
+  // livello = quante canzoni sono già state completate (0, 1, 2+):
+  //   - 0 completate → note 1 / ascolti 1 / sfide 1
+  //   - 1 completata → note 2 / ascolti 3 / sfide 2
+  //   - 2+ completate → note 3 / ascolti 5 / sfide 3
+  const LISTENS_LADDER = [1, 3, 5];
+  const NOTES_LADDER   = [1, 2, 3];
+  const SFIDE_LADDER   = [1, 2, 3];
+  function _level() { return Math.min(Math.max((getProgress().completedSongIds || []).length, 0), LISTENS_LADDER.length - 1); }
+  function REQUIRED_LISTENS() { return LISTENS_LADDER[_level()]; }
+  function REQUIRED_NOTES()   { return NOTES_LADDER[_level()]; }
+  function REQUIRED_SFIDE()   { return SFIDE_LADDER[_level()]; }
+  // Varianti per-canzone: derivano il livello dalla posizione della canzone
+  // nel percorso (indice in `songs`), così il requisito resta stabile per la
+  // singola canzone anche mentre si completano le altre (coerente con
+  // REQUIRED_*() perché alla canzone di indice i si arriva dopo i completate).
+  function _songLevel(song) {
+    const i = songs.findIndex(s => String(s) && String(s.id) === String(song && song.id));
+    return i < 0 ? 0 : Math.min(i, LISTENS_LADDER.length - 1);
   }
+  function REQUIRED_LISTENS_FOR(song) { return LISTENS_LADDER[_songLevel(song)]; }
+  function REQUIRED_NOTES_FOR(song)   { return NOTES_LADDER[_songLevel(song)]; }
+  function REQUIRED_SFIDE_FOR(song)   { return SFIDE_LADDER[_songLevel(song)]; }
   const ESERCIZI_PER_SFIDA = 14;
   let _reviewMode = false;
   let _completionLock = false;
@@ -364,10 +377,11 @@
   function buildCompleteSongEntry(song) {
     const verseKeys = uniqueMainVerseKeys((song && song.lyrics) || []);
     const openedVerseKeys = verseKeys.slice();
-    // Servono REQUIRED_NOTES frasi salvate valide; se non ce ne sono
-    // abbastanza, aggiungi segnaposto per raggiungere il requisito.
-    const savedNoteKeys = verseKeys.slice(0, REQUIRED_NOTES());
-    while (savedNoteKeys.length < REQUIRED_NOTES()) {
+    // Valori MASSIMI del ladder: la voce deve risultare "completata" in
+    // qualunque scenario demo (parziale/totale), a prescindere dal livello.
+    const maxNotes = NOTES_LADDER[NOTES_LADDER.length - 1];
+    const savedNoteKeys = verseKeys.slice(0, maxNotes);
+    while (savedNoteKeys.length < maxNotes) {
       savedNoteKeys.push('__test_note_' + Math.random().toString(36).slice(2, 8));
     }
     return {
@@ -375,8 +389,8 @@
       completedAt: Date.now(),
       openedVerseKeys,
       savedNoteKeys,
-      listenedCount: REQUIRED_LISTENS(),
-      completedSfideCount: REQUIRED_SFIDE()
+      listenedCount: LISTENS_LADDER[LISTENS_LADDER.length - 1],
+      completedSfideCount: SFIDE_LADDER[SFIDE_LADDER.length - 1]
     };
   }
 
@@ -505,7 +519,7 @@
     const song = currentSongBackup;
     const before = missionState(song);
     const p=getProgress(), sp=p.songs[String(song.id)] || ensureSongProgress(song.id), key=normalizeProgressKey(text); if(!key) return;
-    if(!(sp.savedNoteKeys||[]).includes(key) && sp.savedNoteKeys.length<REQUIRED_NOTES()) sp.savedNoteKeys.push(key);
+    if(!(sp.savedNoteKeys||[]).includes(key) && sp.savedNoteKeys.length<REQUIRED_NOTES_FOR(song)) sp.savedNoteKeys.push(key);
     saveProgress(p); checkSongCompletion(song);
     trackMissionCompletion(song);
     renderFixedPlayerMissions();
@@ -516,7 +530,7 @@
     const current=getCurrentSong(); if(!current || String(current.id)!==String(songId)) return;
     const song = currentSongBackup || current;
     const before = missionState(song);
-    const p=getProgress(), sp=p.songs[String(songId)] || ensureSongProgress(songId); sp.listenedCount=Math.min((sp.listenedCount||0)+1,REQUIRED_LISTENS()); saveProgress(p);
+    const p=getProgress(), sp=p.songs[String(songId)] || ensureSongProgress(songId); sp.listenedCount=Math.min((sp.listenedCount||0)+1,REQUIRED_LISTENS_FOR(song)); saveProgress(p);
     checkSongCompletion(song);
     trackMissionCompletion(song);
     renderFixedPlayerMissions();
@@ -526,7 +540,7 @@
     if (_onboardingActive || _ripassoMode || _reviewMode || !currentSongBackup) return;
     if (_sfidaCountedSession) return;
     _sfidaCountedSession = true;
-    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE()); saveProgress(p);
+    const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE_FOR(currentSongBackup)); saveProgress(p);
     checkSongCompletion(currentSongBackup);
     trackMissionCompletion(currentSongBackup);
     renderFixedPlayerMissions();
