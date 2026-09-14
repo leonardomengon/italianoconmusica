@@ -303,7 +303,8 @@
     .appunto-testo .toggle-hint { font-size: 11px; color: #9A8FB5; font-weight: 900; transition: transform .2s, color .2s; }
     .verse.active .toggle-hint,
     .alt-phrase-item.active .toggle-hint,
-    .appunto-item.expanded .toggle-hint { transform: rotate(180deg); color: var(--secondary); }
+    .appunto-item.expanded .toggle-hint,
+    .exercise-text.revealing .toggle-hint { transform: rotate(180deg); color: var(--secondary); }
     .translation,
     .alt-phrase-translation,
     .appunto-traduzione {
@@ -419,6 +420,10 @@
     .exercise-next-hidden {
       display: none !important;
     }
+    /* ESERCIZI review: frase cliccabile come un verso (freccia di espansione, niente bottone "Mostrar") */
+    .exercise-text-clickable { cursor: pointer; }
+    .exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
+    .exercise-text-clickable:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
     /* ESERCIZI: piccolo margine laterale per la herocard degli esercizi */
     #eserciziLyrics .exercise-card {
       margin-left: 10px;
@@ -829,6 +834,10 @@
 .exercise-text { padding: 22px; line-height: 1.7; }
 .exercise-translation { padding: 16px 20px; }
 .exercise-actions { gap: 14px; }
+/* ESERCIZI review: frase cliccabile come un verso (freccia di espansione + reveal parola-per-parola) */
+.exercise-text-clickable { cursor: pointer; transition: background .2s, border-color .2s; }
+.exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
+.exercise-text-clickable:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
 #eserciziLyrics .exercise-card { margin-left: 16px; margin-right: 16px; }
 #eserciziLyrics .exercise-text { gap: 14px; }
 #eserciziLyrics .exercise-fav-btn { margin-top: 4px; }

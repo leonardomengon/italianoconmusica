@@ -125,8 +125,6 @@
         if (!wrap) return;
 
         const phase = _exercisePhase;
-        const proceedBtnId = 'exerciseProceedBtn';
-        const proceedHandler = 'advanceExercisePhase()';
         const nextHandler = 'nextExercise()';
         const hintHandler = 'useHint(this)';
         const hintTitle = isRipasso ? 'Revela la primera palabra que falta' : 'Revelar una letra';
@@ -181,16 +179,19 @@ if (exercise.mode === 'review') {
               <div class="exercise-card">
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
-                  <div class="exercise-text">
-                    <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
+                  <div class="exercise-text exercise-text-clickable" role="button" tabindex="0" aria-expanded="false"
+                    title="Haz clic para mostrar la traducción"
+                    onclick="toggleExerciseReveal(this)"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
+                      <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
+                      <span class="toggle-hint" title="Haz clic para mostrar la traducción">▼</span>
+                    </div>
                     ${starBtnInReview}
                   </div>
                   <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                   </div>
-                  <div class="exercise-actions">
-                    <button id="${proceedBtnId}" class="btn btn-primary" onclick="${proceedHandler}">Mostrar</button>
-                  </div>
+                  <div class="exercise-actions"></div>
                 </div>
               </div>
             `;
@@ -202,8 +203,11 @@ if (exercise.mode === 'review') {
               <div class="exercise-card">
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
-                  <div class="exercise-text">
-                    <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
+                  <div class="exercise-text revealing" role="button" tabindex="0" aria-expanded="true">
+                    <div class="d-flex align-items-center gap-2 flex-grow-1">
+                      <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
+                      <span class="toggle-hint">▼</span>
+                    </div>
                     ${starBtnInReview}
                   </div>
                   <div class="exercise-translation">${revealWordsHtml(exercise.text || '')}</div>
@@ -211,12 +215,20 @@ if (exercise.mode === 'review') {
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                   </div>
                   <div class="exercise-actions">
-                    <button class="btn btn-primary" onclick="${proceedHandler}">Continuar</button>
+                    <button id="exerciseContinueBtn" class="btn btn-primary exercise-next-hidden" onclick="advanceExercisePhase()">Continuar</button>
                   </div>
                 </div>
               </div>
             `;
+            // Bottone nascosto finché il reveal non è concluso: timeout allineato
+            // a revealTotalMs, cancellato se si cambia esercizio prima della fine.
+            const totalMs = revealTotalMs(exercise.text || '');
             if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+            _exerciseTimer = setTimeout(() => {
+              _exerciseTimer = null;
+              const btn = document.getElementById('exerciseContinueBtn');
+              if (btn) btn.classList.remove('exercise-next-hidden');
+            }, totalMs + 120);
             return;
           }
         }
@@ -258,6 +270,29 @@ if (exercise.mode === 'review') {
           if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
           nextExercise();
         }
+      }
+      // Reveal della traduzione al click sulla frase (come nei versi): niente
+      // bottone "Mostrar". Cambia solo lo stato "revealed" (freccia ruotata);
+      // la fase passa a 'revealed' e il re-render mostra la traduzione con il
+      // reveal attivo, poi "Continuar" appare a reveal concluso. Doppio click
+      // ignorato, navigazione resa sicura (fase/indice).
+      function toggleExerciseReveal(el) {
+        if (!el || _exercisePhase !== 'translation') return;
+        const ex = (_exerciseQueue && _exerciseQueue[_exerciseIndex]) || null;
+        if (!ex) return;
+        // Re-render immediato allo stato 'revealed': la freccia è già ruotata,
+        // "Continuar" parte nascosto e viene mostrato a reveal concluso.
+        // No-op se si cambia esercizio prima della fine (fase/indice).
+        _exercisePhase = 'revealed';
+        renderCurrentExercise();
+        const totalMs = revealTotalMs(ex.text || '');
+        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        _exerciseTimer = setTimeout(() => {
+          _exerciseTimer = null;
+          if (_exercisePhase !== 'revealed') return;
+          const btn = document.getElementById('exerciseContinueBtn');
+          if (btn) btn.classList.remove('exercise-next-hidden');
+        }, totalMs + 150);
       }
 
       // Sostituisce nextExercise() + nextRipassoExercise().

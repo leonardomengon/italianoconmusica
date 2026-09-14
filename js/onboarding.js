@@ -499,9 +499,10 @@
       }
 
       // ==================== FASE 8: ESERCIZI (struttura classica: review + complete) ====================
-      // Due sotto-fasi locali: 'review' (pensa traduzione, animazione 3s) e
-      // 'complete' (completa la frase, una parola). Look identico agli esercizi
-      // classici (.exercise-card / .exercise-header / .exercise-text / actions).
+      // Due sotto-fasi locali: 'review' (pensa traduzione, click sulla frase con
+      // freccia di espansione e reveal parola-per-parola) e 'complete' (completa
+      // la frase, una parola). Look identico agli esercizi classici
+      // (.exercise-card / .exercise-header / .exercise-text / actions).
       let _onbExPhase = 'review';
       function onbEsercizio() {
         _onbPhase = 8;
@@ -521,22 +522,63 @@
         card.className = 'exercise-card onb-enter';
         card.innerHTML =
           '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-          '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Mostrar</button></div>';
+          '<div class="exercise-text exercise-text-clickable" role="button" tabindex="0" title="Haz clic para mostrar la traducción">' +
+            '<div class="d-flex align-items-center gap-2 flex-grow-1">' +
+              '<span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span>' +
+              '<span class="toggle-hint" title="Haz clic para mostrar/ocultar la traducción">▼</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="exercise-actions"></div>';
         wrap.appendChild(card);
         onbFitPhase(); // imposta top prima del paint → niente twitch
-        const btn = card.querySelector('#onbExBtn');
-        // Bottone subito attivo (nessun timer): al click la traduzione si rivela
-        // con un'animazione parola-per-parola che dà "peso" alla soluzione.
-        if (btn) btn.onclick = () => {
-          card.innerHTML =
-            '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-            '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-            '<div class="exercise-translation">' + revealWordsHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
-            '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante</button></div>';
-          const newBtn = card.querySelector('#onbExBtn');
-          if (newBtn) newBtn.onclick = () => onbRenderExComplete();
+        // Click sulla frase (come nei versi): niente bottone "Mostrar", il reveal
+        // parte subito e "Adelante" appare solo a reveal concluso.
+        const phrase = card.querySelector('.exercise-text-clickable');
+        if (phrase) {
+          phrase.onclick = () => toggleOnbExReveal(card);
+          phrase.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOnbExReveal(card); } };
+        }
+      }
+      // Reveal in-place + "Adelante" solo a reveal concluso (specchio di toggleExerciseReveal).
+      function toggleOnbExReveal(cardEl) {
+        if (!cardEl || cardEl.dataset.revealStarted === '1') return;
+        cardEl.dataset.revealStarted = '1';
+        const phraseEl = cardEl.querySelector('.exercise-text-clickable');
+        if (phraseEl) phraseEl.classList.add('revealed');
+        const solText = _onbExFrase || '';
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const total = reduced ? 0 : revealTotalMs(solText);
+        let transEl = cardEl.querySelector('.exercise-translation');
+        if (!transEl) {
+          transEl = document.createElement('div');
+          transEl.className = 'exercise-translation';
+          if (phraseEl) phraseEl.insertAdjacentElement('afterend', transEl);
+          else cardEl.appendChild(transEl);
+        }
+        transEl.innerHTML = (!solText.trim() || reduced) ? escapeHtml(solText) : revealWordsHtml(solText);
+        const showNext = () => {
+          const actions = cardEl.querySelector('.exercise-actions');
+          if (!actions || actions.querySelector('#onbExBtn') || !cardEl.isConnected) return;
+          if (_onbPhase !== 8 || _onbExPhase !== 'review') return;
+          const b = document.createElement('button');
+          b.id = 'onbExBtn';
+          b.type = 'button';
+          b.className = 'btn btn-primary';
+          b.textContent = 'Adelante';
+          b.onclick = () => onbRenderExComplete();
+          actions.appendChild(b);
         };
+        if (total <= 0 || !solText.trim()) { showNext(); return; }
+        let finished = false;
+        const finishOnce = () => { if (finished) return; finished = true; showNext(); };
+        try {
+          const last = transEl.querySelector('.reveal-word:last-child');
+          if (last) {
+            const onEnd = function() { try { last.removeEventListener('animationend', onEnd); } catch (e2) {} finishOnce(); };
+            last.addEventListener('animationend', onEnd);
+          }
+        } catch (e) {}
+        setTimeout(finishOnce, total + 150);
       }
       function onbRenderExComplete() {
         const frase = _onbExFrase;

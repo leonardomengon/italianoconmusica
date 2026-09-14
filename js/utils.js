@@ -59,9 +59,25 @@
         const gap = words.length <= 1 ? 0
           : Math.max(40, Math.min(REVEAL_STAGGER_MS,
               Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_INITIAL_DELAY_MS - REVEAL_WORD_DUR_MS) / (words.length - 1))));
+        const usedGap = Number.isFinite(gap) ? gap : 0;
         return words
-          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (REVEAL_INITIAL_DELAY_MS + i * gap) + 'ms">' + w + '</span>')
+          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (REVEAL_INITIAL_DELAY_MS + i * usedGap) + 'ms">' + w + '</span>')
           .join(' ');
+      }
+      // Durata totale (ms) del reveal prodotto da revealWordsHtml: serve per
+      // mostrare il bottone "avanti" solo a reveal concluso. Se l'utente
+      // preferisce il movimento ridotto, il reveal è istantaneo → durata 0.
+      function revealTotalMs(text) {
+        try {
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+        } catch (e) {}
+        const safe = String(text || '').split(/\s+/).filter(Boolean);
+        if (!safe.length) return 0;
+        const gap = safe.length <= 1 ? 0
+          : Math.max(40, Math.min(REVEAL_STAGGER_MS,
+              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_INITIAL_DELAY_MS - REVEAL_WORD_DUR_MS) / (safe.length - 1))));
+        const usedGap = Number.isFinite(gap) ? gap : 0;
+        return REVEAL_INITIAL_DELAY_MS + usedGap * (safe.length - 1) + REVEAL_WORD_DUR_MS;
       }
 
       // ==================== MIGRAZIONE DATI ====================
