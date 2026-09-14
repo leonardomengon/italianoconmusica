@@ -199,9 +199,12 @@
       border: 1px solid color-mix(in srgb, var(--primary) 32%, #fff);
       border-radius: 999px;
       padding: 3px 11px;
+      /* Font più leggero e "di testo" (body font, non display) per distinguere
+         le tagword dal titolo della canzone, che usa Outfit a peso 800. */
+      font-family: var(--font-body, 'Manrope', sans-serif);
       font-size: 11px;
       line-height: 1.5;
-      font-weight: 800;
+      font-weight: 600;
       letter-spacing: .3px;
       white-space: nowrap;
     }
@@ -764,13 +767,13 @@
     .brand-duo, .bottom-nav-item,
     #songTitle, .card-title, .current-song-title, .section-heading h2,
     .path-summary h1, .missions-count, .eyebrow, .overall-count,
-    .song-lang-pill, .start-pill, .song-tag-pill, .current-song-badge, .progress-modal-box h2,
+    .song-lang-pill, .start-pill, .current-song-badge, .progress-modal-box h2,
     .btn, .pagination-container button {
       font-family: var(--font-display) !important;
     }
     /* Pesi controllati sugli elementi piccoli (evita tratti finissimi) */
     .bottom-nav-item,
-    .song-lang-pill, .start-pill, .song-tag-pill, .current-song-badge, .eyebrow, .badge,
+    .song-lang-pill, .start-pill, .current-song-badge, .eyebrow, .badge,
     .btn { font-weight: 800 !important; }
 @media (max-width:768px) {
   .path-summary, .section-heading { align-items:flex-start; flex-direction:column; }
