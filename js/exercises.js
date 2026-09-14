@@ -183,10 +183,11 @@ if (exercise.mode === 'review') {
                     title="Haz clic para mostrar la traducción"
                     onclick="toggleExerciseReveal(this)"
                     onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
-                      <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
-                      <span class="toggle-hint" title="Haz clic para mostrar la traducción">▼</span>
-                    </div>
-                    ${starBtnInReview}
+                      <div class="d-flex align-items-center gap-2 flex-grow-1">
+                        <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
+                        <span class="toggle-hint" title="Haz clic para mostrar la traducción">▼</span>
+                      </div>
+                      ${starBtnInReview}
                   </div>
                   <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>

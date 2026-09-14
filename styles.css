@@ -424,6 +424,18 @@
     .exercise-text-clickable { cursor: pointer; }
     .exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
     .exercise-text-clickable:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
+    /* Freccia di espansione: piccola, sottile, coerente con i versi della canzone */
+    .exercise-text-clickable .toggle-hint,
+    .exercise-text.revealing .toggle-hint {
+      font-size: 11px;
+      color: #9A8FB5;
+      font-weight: 900;
+      flex-shrink: 0;
+      line-height: 1;
+      transform: none;
+    }
+    .exercise-text-clickable.revealing .toggle-hint,
+    .exercise-text.revealing .toggle-hint { transform: rotate(180deg); color: var(--secondary); }
     /* ESERCIZI: piccolo margine laterale per la herocard degli esercizi */
     #eserciziLyrics .exercise-card {
       margin-left: 10px;
