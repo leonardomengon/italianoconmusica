@@ -1609,24 +1609,3 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
 #onboardingSection .onb-fb-check{ font:inherit; font-weight:inherit; color:inherit; }
 #onboardingSection .onb-success-banner .onb-success-msg{ font-size:15px; font-weight:700; }
 #onboardingSection .onb-success-banner .onb-success-hint{ font-size:15px; font-style:normal; font-weight:600; }
-/* OVERRIDE 2026-09-14: splash landing distribuzione verticale (alto/centro/basso).
-   Solo CSS, nessun cambio a onboarding.js. */
-body.onboarding-active #onboardingSection > .onb-landing .onb-splash {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: flex-start;
-  min-height: 70vh;
-  padding-top: 12px; padding-bottom: 8px;
-}
-/* Title (.onb-brand) + subtitle (.onb-splash-title) piu in alto */
-body.onboarding-active #onboardingSection > .onb-landing .onb-splash .onb-brand { transform: translateY(-18px); }
-body.onboarding-active #onboardingSection > .onb-landing .onb-splash-title { transform: translateY(-18px); margin-bottom: 0; }
-/* Testo descrittivo altezza centrale */
-body.onboarding-active #onboardingSection > .onb-landing .onb-splash-sub { margin: auto 0; max-width: 44ch; }
-/* Bottone piu in basso */
-body.onboarding-active #onboardingSection > .onb-landing .onb-splash-btn { margin-top: 40px; transform: translateY(18px); }
-@media (max-width: 768px) {
-  body.onboarding-active #onboardingSection > .onb-landing .onb-splash { min-height: 72vh; }
-  body.onboarding-active #onboardingSection > .onb-landing .onb-splash .onb-brand { transform: translateY(-12px); }
-  body.onboarding-active #onboardingSection > .onb-landing .onb-splash-title { transform: translateY(-12px); }
-  body.onboarding-active #onboardingSection > .onb-landing .onb-splash-btn { margin-top: 32px; transform: translateY(12px); }
-}
