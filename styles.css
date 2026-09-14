@@ -1541,12 +1541,22 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
   filter: grayscale(1) brightness(0.92);
   transform: scale(0.96);
   pointer-events: none;
-  animation: onb-enable-flow 3s ease-in-out forwards;
+  animation: onb-enable-flow 3s ease-out forwards;
 }
 @keyframes onb-enable-flow {
   0% { opacity: 0.35; filter: grayscale(1) brightness(0.92); transform: scale(0.96); }
-  50% { opacity: 0.5; filter: grayscale(0.5) brightness(0.94); transform: scale(0.975); }
+  65% { opacity: 0.4; filter: grayscale(1) brightness(0.92); transform: scale(0.965); }
   100% { opacity: 1; filter: none; transform: scale(1); }
+}
+/* Segnale di sblocco: singolo pop + glow (una tantum, rimossa su animationend). */
+.onb-just-enabled { animation: onb-pop .38s ease; }
+@keyframes onb-pop {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(155,93,229,.55); }
+  45% { transform: scale(1.07); box-shadow: 0 0 0 8px rgba(155,93,229,0); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onb-just-enabled { animation: none; }
 }
 
 /* --- Banner di successo salvataggio preferito (Endowed Progress) --- */

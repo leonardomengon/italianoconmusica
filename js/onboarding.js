@@ -328,6 +328,8 @@
           b.classList.remove('onb-enabling');
           b.disabled = false;
           b.style.animation = '';
+          b.classList.add('onb-just-enabled');
+          b.addEventListener('animationend', () => b.classList.remove('onb-just-enabled'), { once: true });
           b.onclick = fn;
         });
         return fresh;
