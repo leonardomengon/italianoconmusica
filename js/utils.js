@@ -12,6 +12,34 @@
         const div = document.createElement("div"); div.textContent = text; return div.innerHTML;
       }
 
+      // ==================== TAG DIDATTICI (P0.5) ====================
+      // Ogni canzone espone le proprie etichette grammaticali/lessicali
+      // (es. "futuro semplice", "indicazioni stradali") tramite il campo "tag"
+      // del catalogo, che è un array di stringhe. Finché il catalogo non è
+      // aggiornato con i tag reali, si applicano questi placeholder.
+      const DEFAULT_SONG_TAGS = ["verbos esenciales", "presente"];
+      // Accetta indifferentemente un array di tag o un oggetto canzone.
+      function getSongTags(songOrTags) {
+        const raw = Array.isArray(songOrTags)
+          ? songOrTags
+          : (songOrTags && Array.isArray(songOrTags.tag) ? songOrTags.tag : null);
+        const tags = (raw || []).filter(t => t !== null && t !== undefined && String(t).trim() !== '');
+        return tags.length ? tags : DEFAULT_SONG_TAGS;
+      }
+      // Solo le pillole (span), senza contenitore.
+      function songTagPillItemsHtml(songOrTags) {
+        return getSongTags(songOrTags)
+          .map(t => '<span class="song-tag-pill">' + escapeHtml(t) + '</span>')
+          .join('');
+      }
+      // Contenitore + pillole, con eventuale classe aggiuntiva (es. "song-tag-pills-hero").
+      function songTagPillsHtml(songOrTags, extraClass) {
+        const items = songTagPillItemsHtml(songOrTags);
+        if (!items) return '';
+        const cls = 'song-tag-pills' + (extraClass ? ' ' + extraClass : '');
+        return '<div class="' + cls + '">' + items + '</div>';
+      }
+
       // ==================== MIGRAZIONE DATI ====================
       function migraAppunti() {
         const raw = JSON.parse(localStorage.getItem('mieiAppunti') || '[]');

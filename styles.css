@@ -190,6 +190,30 @@
       text-transform: uppercase;
     }
     .song-icon { color: #D8CFE8; font-size: 26px; }
+    /* P0.5 — Tag didattici per canzone (pills sotto il titolo) */
+    .song-tag-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+    .song-tag-pill {
+      display: inline-block;
+      background: color-mix(in srgb, var(--primary) 12%, #fff);
+      color: var(--primary-dark);
+      border: 1px solid color-mix(in srgb, var(--primary) 32%, #fff);
+      border-radius: 999px;
+      padding: 3px 11px;
+      font-size: 11px;
+      line-height: 1.5;
+      font-weight: 800;
+      letter-spacing: .3px;
+      white-space: nowrap;
+    }
+    /* Nella home (canzone corrente) le pills stanno subito sotto il titolo:
+       la striscia adotta lo sfondo della card sottostante per fondersi senza
+       cuciture tra l'header viola e il corpo della card. */
+    .song-tag-pills-hero {
+      background: #F9F5FF;
+      justify-content: center;
+      margin: 0;
+      padding: 2px 16px 12px;
+    }
     .start-pill {
       background: var(--primary);
       color: #fff;
@@ -733,19 +757,20 @@
     .brand-duo, .bottom-nav-item,
     #songTitle, .card-title, .current-song-title, .section-heading h2,
     .path-summary h1, .missions-count, .eyebrow, .overall-count,
-    .song-lang-pill, .start-pill, .current-song-badge, .progress-modal-box h2,
+    .song-lang-pill, .start-pill, .song-tag-pill, .current-song-badge, .progress-modal-box h2,
     .btn, .pagination-container button {
       font-family: var(--font-display) !important;
     }
     /* Pesi controllati sugli elementi piccoli (evita tratti finissimi) */
     .bottom-nav-item,
-    .song-lang-pill, .start-pill, .current-song-badge, .eyebrow, .badge,
+    .song-lang-pill, .start-pill, .song-tag-pill, .current-song-badge, .eyebrow, .badge,
     .btn { font-weight: 800 !important; }
 @media (max-width:768px) {
   .path-summary, .section-heading { align-items:flex-start; flex-direction:column; }
   .current-song-title { font-size: clamp(21px, 6vw, 28px); margin: 0; text-align:center; background:linear-gradient(135deg, #9B5DE5, #7C3AED); padding:20px 16px; border:none; border-radius:21px 21px 0 0; min-height:auto; display:flex; align-items:center; justify-content:center; color:#fff; letter-spacing:.3px; box-shadow:inset 0 1px 0 rgba(255,255,255,.22); }
   .current-song-card { border:none; border-radius:0 0 21px 21px; padding:0 16px 16px 16px; }
   .current-song-badge { font-size: 11px; padding: 4px 10px; }
+  .song-tag-pill { font-size: 10px; padding: 3px 9px; }
   .missions-count { margin-bottom: 12px; font-size: 13px; }
   .mission-row { grid-template-columns: 30px 1fr auto; gap: 10px; padding: 8px 10px; }
   .mission-icon { width: 30px; height: 30px; font-size: 16px; border-radius: 10px; }
@@ -766,6 +791,8 @@
   body { padding-top: 62px; }
   .current-song-card { padding: 14px 14px 10px; }
   .current-song-title { margin: 0 0 0px; }
+  .song-tag-pills-hero { padding: 1px 14px 8px; }
+  .song-tag-pill { font-size: 10px; padding: 2px 8px; }
   .missions-count { margin-bottom: 9px; font-size: 12px; }
   .mission-row { gap: 8px; padding: 6px 8px; }
   .mission-icon { width: 26px; height: 26px; font-size: 14px; border-radius: 9px; }

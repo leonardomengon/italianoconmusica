@@ -118,6 +118,12 @@
           const n = normalizza(s.corso);
           if (n && s.corsoDesc) courseDescriptions[n] = s.corsoDesc;
         });
+        // P0.5: normalizza il tag didattico su ogni canzone. Il campo "tag" del
+        // catalogo è un array di etichette grammaticali/lessicali; finché non è
+        // presente (catalogo non ancora aggiornato) si applicano i placeholder.
+        (data || []).forEach(s => {
+          if (!Array.isArray(s.tag) || s.tag.length === 0) s.tag = DEFAULT_SONG_TAGS.slice();
+        });
         // === DEBUG: sorgente usata e primi elementi ===
         console.log(`[fetchSongs] SORGENTE USATA: ${source} | canzoni: ${(data||[]).length}`);
         console.log(`[fetchSongs] primo elemento (${source}):`, data && data[0]);
@@ -164,6 +170,7 @@
                     <span class="material-symbols-outlined song-icon">music_note</span>
                   </div>
                   <h5 class="card-title">${escapeHtml(song.title)}</h5>
+                  ${songTagPillsHtml(song)}
                   <p class="card-text text-muted">${escapeHtml(song.artist)}</p>
                 </div>
                 <div class="start-pill">START</div>
@@ -193,6 +200,9 @@
         document.getElementById("song").classList.remove("d-none");
         document.getElementById("fixedPlayer").classList.remove("d-none");
         document.getElementById("songTitle").textContent = song.title;
+        // P0.5: tag didattici sotto il titolo, nella pagina di dettaglio canzone.
+        const songTagsEl = document.getElementById("songTags");
+        if (songTagsEl) songTagsEl.innerHTML = songTagPillItemsHtml(song);
         document.getElementById("songArtist").textContent = song.artist
           ? `${song.artist} (${song.lang1} / ${song.lang2})`
           : `(${song.lang1} / ${song.lang2})`;

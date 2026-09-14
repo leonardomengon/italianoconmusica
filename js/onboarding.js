@@ -655,7 +655,7 @@
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones para que puedas progresar en el estudio del idioma.</p>' +
+          '<p class="onb-splash-sub">Cada canción usa frases y vocabulario que siguen un camino estructurado, de lo básico a lo más avanzado. No es una playlist: es un curso que avanza paso a paso.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
