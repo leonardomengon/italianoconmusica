@@ -189,27 +189,13 @@ if (exercise.mode === 'review') {
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                   </div>
                   <div class="exercise-actions">
-                    <button id="${proceedBtnId}" class="btn btn-primary" onclick="${proceedHandler}" disabled>5</button>
+                    <button id="${proceedBtnId}" class="btn btn-primary" onclick="${proceedHandler}">Mostrar</button>
                   </div>
                 </div>
               </div>
             `;
 
-            if (_exerciseTimer) clearInterval(_exerciseTimer);
-            let secondsLeft = 5;
-            const timerId = setInterval(() => {
-              secondsLeft--;
-              const btn = document.getElementById(proceedBtnId);
-              if (btn) {
-                btn.textContent = secondsLeft > 0 ? secondsLeft : 'Mostrar';
-                if (secondsLeft <= 0) {
-                  btn.disabled = false;
-                  clearInterval(timerId);
-                  _exerciseTimer = null;
-                }
-              }
-            }, 1000);
-            _exerciseTimer = timerId;
+            if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
             return;
           } else {
             wrap.innerHTML = `
@@ -220,7 +206,7 @@ if (exercise.mode === 'review') {
                     <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
                     ${starBtnInReview}
                   </div>
-                  <div class="exercise-translation">${escapeHtml(exercise.text || '')}</div>
+                  <div class="exercise-translation">${revealWordsHtml(exercise.text || '')}</div>
                   <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
                     <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                   </div>

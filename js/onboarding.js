@@ -1,7 +1,7 @@
 // ===== ONBOARDING v3 (PIANO 2026-09-11) =====
 // PIANO-1: landing unica (fuse le due schermate introduttive, testo sintetico).
 // PIANO-2: barra completamento fasi in cima (step da ONB_ACTIVE_PHASES).
-// PIANO-3: bottoni timer -> animazione fluida 3s disabled->enabled, nessun countdown numerico.
+// PIANO-3: rimosso il timer d'attesa sui bottoni soluzione -> reveal immediato + animazione parola-per-parola.
 // PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
 // PIANO-5: modale finale breve.
 //
@@ -9,7 +9,7 @@
 // le modifiche sono applicate con inserimenti + sostituzioni a riga singola.
 // Le funzioni vecchie restano ma il flusso attivo usa onbLanding1 -> onbFase(1..8 senza 6).
 // ===== FINE HEADER PIANO =====
-// Piano onboarding 2026-09-11: landing unica, progress bar, animazione 3s, stella+hint, modale breve.
+// Piano onboarding 2026-09-11: landing unica, progress bar, reveal immediato, stella+hint, modale breve.
 
 // ==================== ONBOARDING v2 (LANDING + FUNNEL A FASI) ====================
       // Due landing page introduttive + funnel interattivo in una SEZIONE DEDICATA
@@ -38,7 +38,6 @@
       let _onbPlayerBtn = null;
       let _onbExFrase = '';
       let _onbExTrad = '';
-      let _onbExTimer = null;
       let _onbPlayerOnDone = null;
       let _onbPlaying = false; // NEW: stato play/pausa del player onboarding
       let _onbPlayFrom = null; // posizione (sec) da cui riprendere dopo la pausa
@@ -53,23 +52,12 @@
         const r = onbRoot();
         if (r) { const tb = document.getElementById('onbTopbar'); r.innerHTML = ''; if (tb) r.appendChild(tb); }
         if (_onbAudio) { try { _onbAudio.pause(); } catch (e) {} }
-        if (_onbExTimer) { try { clearTimeout(_onbExTimer); } catch (e) {} _onbExTimer = null; }
         _onbPlayerOnDone = null; // evita callback audio "vecchie" sulla fase successiva
         onbHidePlayer();
       }
       function onbHidePlayer() {
         const p = document.getElementById('onbPlayer');
         if (p) p.style.display = 'none';
-      }
-
-      // ---- Gestore centrale dei timer di fase ----
-      // Un SOLO timer di fase pendente: ogni nuovo onbPhaseTimeout annulla il
-      // precedente e onbClear() lo azzera ad ogni cambio fase (niente timer zombie).
-      function onbPhaseTimeout(ms, fn) {
-        if (_onbExTimer) { try { clearTimeout(_onbExTimer); } catch (e) {} _onbExTimer = null; }
-        const t = setTimeout(() => { _onbExTimer = null; try { fn(); } catch (e) {} }, ms);
-        _onbExTimer = t;
-        return t;
       }
 
       // Errore d'ingresso: canzone senza versi validi o senza testo → messaggio
@@ -278,7 +266,7 @@
         wrap.className = 'onb-phase-body';
       // PIANO-1-INIZIO (implementato via insert per limite editor: vedi righe onbLanding1/onbLanding2).
       // PIANO-2: barra completamento fasi in onbPhaseShell (step derivati da ONB_ACTIVE_PHASES).
-      // PIANO-3: bottoni timer -> animazione fluida 3s disabled->enabled senza countdown numerico.
+      // PIANO-3: rimosso il timer d'attesa sui bottoni soluzione -> reveal immediato senza countdown.
       // PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
       // PIANO-5: modale finale breve in index.html (#onbEndMsg).
         r.appendChild(wrap);
@@ -305,34 +293,6 @@
         const slot = host.querySelector('.onb-cta-slot');
         if (slot) { host.replaceChild(fresh, slot); } else { host.appendChild(fresh); }
       return fresh;
-      }
-      // Bottone Adelante visibile subito ma disabilitato (in grigio). Si abilita con
-      // un'animazione fluida di `delayMs` (default 3s) che porta da disabled→enabled.
-      // Nessun countdown numerico: la transizione visiva comunica il tempo di attesa.
-      function onbAddAdelanteEnabling(wrap, fn, delayMs) {
-        const dur = delayMs != null ? delayMs : 3000;
-        const fresh = document.createElement('div');
-        fresh.className = 'onb-adelante-row';
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'btn btn-primary onb-adelante onb-enabling';
-        b.textContent = 'Adelante';
-        b.disabled = true;
-        b.style.animationDuration = dur + 'ms';
-        fresh.appendChild(b);
-        // SLOT CTA: sostituisce il placeholder (visibile subito, disabilitato: come prima)
-        const host = onbRoot() || wrap;
-        const slot = host.querySelector('.onb-cta-slot');
-        if (slot) { host.replaceChild(fresh, slot); } else { host.appendChild(fresh); }
-        onbPhaseTimeout(dur, () => {
-          b.classList.remove('onb-enabling');
-          b.disabled = false;
-          b.style.animation = '';
-          b.classList.add('onb-just-enabled');
-          b.addEventListener('animationend', () => b.classList.remove('onb-just-enabled'), { once: true });
-          b.onclick = fn;
-        });
-        return fresh;
       }
 
       // Card verso con lo STESSO layout delle canzoni (.verse / .translation / ⭐).
@@ -395,11 +355,12 @@
         _onbAdelanteShown = false;
         let wrap;
         if (n === 1) {
-          // Fase 1: verso NON interattivo. Bottone subito visibile ma in grigio,
-          // si abilita con animazione dopo 3s.
+          // Fase 1: verso NON interattivo. Il bottone è subito attivo: la
+          // riflessione è già garantita dalla struttura (la traduzione appare
+          // solo nella Fase 2), senza bloccare l'utente con un timer.
           wrap = onbPhaseShell('Intenta adivinar el significado');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbAddAdelanteEnabling(wrap, () => onbFase(2), 3000);
+          onbShowAdelante(wrap, () => onbFase(2));
         } else if (n === 2) {
           // Fase 2: toca → traduzione. Bottone appare con dissolvenza dopo il tap.
           wrap = onbPhaseShell('Toca la frase para ver la traducción');
@@ -543,7 +504,6 @@
       // classici (.exercise-card / .exercise-header / .exercise-text / actions).
       let _onbExPhase = 'review';
       function onbEsercizio() {
-        if (_onbExTimer) { try { clearTimeout(_onbExTimer); } catch (e) {} _onbExTimer = null; } // azzera timer di fase pendente (cambio fase)
         _onbPhase = 8;
         _onbExPhase = 'review';
         const appunti = getAppunti();
@@ -562,28 +522,21 @@
         card.innerHTML =
           '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
           '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary onb-enabling" disabled>Piensa...</button></div>';
+          '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Mostrar</button></div>';
         wrap.appendChild(card);
         onbFitPhase(); // imposta top prima del paint → niente twitch
         const btn = card.querySelector('#onbExBtn');
-        // Animazione fluida 3s (nessun countdown numerico): al termine il bottone si abilita.
-        onbPhaseTimeout(3000, () => {
-          if (btn) {
-            btn.classList.remove('onb-enabling');
-            btn.disabled = false;
-            btn.textContent = 'Mostrar';
-            btn.onclick = () => {
-              card.innerHTML =
-                '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
-                '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
-                '<div class="exercise-translation">' + escapeHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
-                '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante</button></div>';
-              const newBtn = card.querySelector('#onbExBtn');
-              if (newBtn) newBtn.onclick = () => { if (_onbExTimer) { clearTimeout(_onbExTimer); _onbExTimer = null; } onbRenderExComplete(); };
-            };
-          }
-        });
-        if (btn) btn.onclick = null;
+        // Bottone subito attivo (nessun timer): al click la traduzione si rivela
+        // con un'animazione parola-per-parola che dà "peso" alla soluzione.
+        if (btn) btn.onclick = () => {
+          card.innerHTML =
+            '<div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>' +
+            '<div class="exercise-text"><span class="exercise-verse-text">' + escapeHtml(_onbExTrad || 'Traducción no disponible') + '</span></div>' +
+            '<div class="exercise-translation">' + revealWordsHtml(_onbExFrase || 'Texto no disponible') + '</div>' +
+            '<div class="exercise-actions"><button id="onbExBtn" class="btn btn-primary">Adelante</button></div>';
+          const newBtn = card.querySelector('#onbExBtn');
+          if (newBtn) newBtn.onclick = () => onbRenderExComplete();
+        };
       }
       function onbRenderExComplete() {
         const frase = _onbExFrase;
@@ -703,7 +656,7 @@
       
       // ===== FINE OVERRIDE PIANO =====
       // Le funzioni di funnel (onbPhaseShell, onbEnsureTopbar, onbUpdateTopbar,
-      // onbAddAdelanteEnabling, onbFav, onbRenderExReview) vivono UNA sola volta
+      // onbFav, onbRenderExReview) vivono UNA sola volta
       // a livello file (scope globale). Qui dentro resta SOLO la landing/splash.
         if (!s) return;
         _onboardingActive = true;

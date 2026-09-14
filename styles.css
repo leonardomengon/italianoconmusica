@@ -1539,8 +1539,6 @@ body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
 .onb-fade-in { animation: onb-fade-in-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1)) both; }
 /* CTA dopo il feedback: la porta successiva compare ~250ms dopo il risultato. */
 .onb-adelante-row.onb-fade-in { animation-delay: .25s; }
-@keyframes onb-enable-kf { 0% { opacity: .35; filter: grayscale(1) brightness(.92); transform: scale(.96); } 100% { opacity: 1; filter: none; transform: scale(1); } }
-.onb-enable { animation: onb-enable-kf .6s ease both; }
 
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
@@ -1571,28 +1569,18 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
 .onb-success-banner.onb-inline .onb-success-hint { text-align: center; }
 .onb-steps-fill { height: 100%; background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED)); border-radius: 999px; transition: width 1.2s var(--onb-ease, cubic-bezier(.2,.7,.3,1)); }
 
-/* --- Animazione abilitazione bottone (3s, nessun countdown numerico) --- */
-.onb-enabling {
-  opacity: 0.35;
-  filter: grayscale(1) brightness(0.92);
-  transform: scale(0.96);
-  pointer-events: none;
-  animation: onb-enable-flow 3s ease-out forwards;
+/* --- Rivelazione progressiva della soluzione (nessun blocco, parola per parola) --- */
+.reveal-word {
+  display: inline-block;
+  opacity: 0;
+  animation: reveal-word-kf .3s ease-out forwards;
 }
-@keyframes onb-enable-flow {
-  0% { opacity: 0.35; filter: grayscale(1) brightness(0.92); transform: scale(0.96); }
-  65% { opacity: 0.4; filter: grayscale(1) brightness(0.92); transform: scale(0.965); }
-  100% { opacity: 1; filter: none; transform: scale(1); }
-}
-/* Segnale di sblocco: singolo pop + glow (una tantum, rimossa su animationend). */
-.onb-just-enabled { animation: onb-pop .38s ease; }
-@keyframes onb-pop {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(155,93,229,.55); }
-  45% { transform: scale(1.07); box-shadow: 0 0 0 8px rgba(155,93,229,0); }
-  100% { transform: scale(1); box-shadow: none; }
+@keyframes reveal-word-kf {
+  from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+  to   { opacity: 1; transform: none; filter: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .onb-just-enabled { animation: none; }
+  .reveal-word { animation: none; opacity: 1; }
 }
 
 /* --- Banner di successo salvataggio preferito (Endowed Progress) --- */

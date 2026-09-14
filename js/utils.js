@@ -40,6 +40,18 @@
         return '<div class="' + cls + '">' + items + '</div>';
       }
 
+      // ==================== RIVELAZIONE PROGRESSIVA ====================
+      // Rivelazione della soluzione "parola per parola": ogni parola entra con un
+      // piccolo delay. Nessun blocco: il tocco dell'utente è il momento di impegno.
+      function revealWordsHtml(text) {
+        const safe = escapeHtml(text || '');
+        const words = safe.split(/\s+/).filter(Boolean);
+        if (!words.length) return '';
+        return words
+          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (i * 70) + 'ms">' + w + '</span>')
+          .join(' ');
+      }
+
       // ==================== MIGRAZIONE DATI ====================
       function migraAppunti() {
         const raw = JSON.parse(localStorage.getItem('mieiAppunti') || '[]');
