@@ -272,28 +272,92 @@ if (exercise.mode === 'review') {
           nextExercise();
         }
       }
-      // Reveal della traduzione al click sulla frase (come nei versi): niente
-      // bottone "Mostrar". Cambia solo lo stato "revealed" (freccia ruotata);
-      // la fase passa a 'revealed' e il re-render mostra la traduzione con il
-      // reveal attivo, poi "Continuar" appare a reveal concluso. Doppio click
-      // ignorato, navigazione resa sicura (fase/indice).
+      // Reveal della traduzione al click sulla frase (toggle con animazione):
+      // il primo click espande con animazione; il click successivo la restringe
+      // con animazione (mostra ⇄ nascondi). "Continuar" appare a reveal concluso.
       function toggleExerciseReveal(el) {
-        if (!el || _exercisePhase !== 'translation') return;
+        if (!el) return;
         const ex = (_exerciseQueue && _exerciseQueue[_exerciseIndex]) || null;
         if (!ex) return;
-        // Re-render immediato allo stato 'revealed': la freccia è già ruotata,
-        // "Continuar" parte nascosto e viene mostrato a reveal concluso.
-        // No-op se si cambia esercizio prima della fine (fase/indice).
+
+        const translationEl = el.parentElement.querySelector('.exercise-translation');
+        const actionsEl = el.parentElement.querySelector('.exercise-actions');
+        const btnContinue = document.getElementById('exerciseContinueBtn');
+
+        if (_exercisePhase === 'revealed') {
+          // === NASCONDI (toggle da espansa a chiusa) ===
+          if (_exerciseTimer) { clearTimeout(_exerciseTimer); _exerciseTimer = null; }
+          if (btnContinue) btnContinue.classList.add('exercise-next-hidden');
+
+          el.classList.remove('revealing');
+          el.setAttribute('aria-expanded', 'false');
+
+          if (translationEl) {
+            translationEl.style.opacity = '0';
+            translationEl.style.transform = 'translateY(-6px)';
+            translationEl.style.transition = 'opacity .3s ease, transform .3s ease';
+            setTimeout(() => {
+              if (translationEl && translationEl.parentNode) translationEl.parentNode.removeChild(translationEl);
+              if (actionsEl && !actionsEl.children.length && actionsEl.parentNode) actionsEl.parentNode.removeChild(actionsEl);
+              _exercisePhase = 'translation';
+            }, 320);
+          } else {
+            _exercisePhase = 'translation';
+          }
+          return;
+        }
+
+        // === MOSTRA (toggle da chiusa a espansa) ===
         _exercisePhase = 'revealed';
-        renderCurrentExercise();
+        el.classList.add('revealing');
+        el.setAttribute('aria-expanded', 'true');
+
+        const translationHtml = revealWordsHtml(ex.text || '');
+        if (!translationHtml.trim()) {
+          _exercisePhase = 'translation';
+          renderCurrentExercise();
+          return;
+        }
+
+        let translationNode = el.parentElement.querySelector('.exercise-translation');
+        if (!translationNode) {
+          translationNode = document.createElement('div');
+          translationNode.className = 'exercise-translation';
+          el.parentElement.appendChild(translationNode);
+        }
+        translationNode.innerHTML = translationHtml;
+        translationNode.style.opacity = '0';
+        translationNode.style.transform = 'translateY(-6px)';
+        translationNode.style.transition = 'none';
+        translationNode.offsetWidth; // reflow
+        translationNode.style.transition = 'opacity .3s ease, transform .3s ease';
+        translationNode.style.opacity = '';
+        translationNode.style.transform = '';
+
+        if (!actionsEl) {
+          const aDiv = document.createElement('div');
+          aDiv.className = 'exercise-actions';
+          el.parentElement.appendChild(aDiv);
+        }
+        if (btnContinue) {
+          btnContinue.classList.add('exercise-next-hidden');
+        } else {
+          const newBtn = document.createElement('button');
+          newBtn.id = 'exerciseContinueBtn';
+          newBtn.className = 'btn btn-primary exercise-next-hidden';
+          newBtn.textContent = 'Continuar';
+          newBtn.onclick = advanceExercisePhase;
+          el.parentElement.querySelector('.exercise-actions').appendChild(newBtn);
+        }
+
         const totalMs = revealTotalMs(ex.text || '');
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        if (_exerciseTimer) { clearTimeout(_exerciseTimer); _exerciseTimer = null; }
         _exerciseTimer = setTimeout(() => {
           _exerciseTimer = null;
           if (_exercisePhase !== 'revealed') return;
-          const btn = document.getElementById('exerciseContinueBtn');
-          if (btn) btn.classList.remove('exercise-next-hidden');
-        }, totalMs + 150);
+          const b = document.getElementById('exerciseContinueBtn');
+          if (b) b.classList.remove('exercise-next-hidden');
+        }, Math.max(320, totalMs + 150));
       }
 
       // Sostituisce nextExercise() + nextRipassoExercise().

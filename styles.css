@@ -392,6 +392,7 @@
       font-style: italic;
       color: #3D2B52;
       font-weight: 700;
+      transition: opacity .3s ease, transform .3s ease;
     }
     .verse-note,
     .exercise-note {
