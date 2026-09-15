@@ -328,7 +328,10 @@
       margin-bottom: 16px;
       /* La card è già alta per contenere traduzione + nota + bottone senza
          ridefinire la sua altezza al reveal. */
-      min-height: 268px;
+      min-height: 320px;
+      /* Spazio riservato al bottone "Continuar" che appare dopo il reveal,
+         per evitare che la card si espanda bruscamente */
+      padding-bottom: 56px;
       /* entrance gestito a livello di sezione (#esercizi.fade-in) — la card
          non ri-anima al re-render durante il reveal della frase */
     }
@@ -452,8 +455,8 @@
     #eserciziLyrics .exercise-card.is-hero {
       margin-top: 4px;
       margin-bottom: 16px;
-      padding: 32px 24px 24px;
-      min-height: 320px;
+      padding: 32px 24px 56px;
+      min-height: 380px;
       max-height: calc(85vh - 68px - 72px - 4px - 16px - env(safe-area-inset-bottom, 0px));
       box-sizing: border-box;
       overflow-y: auto;
