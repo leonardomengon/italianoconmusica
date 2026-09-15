@@ -286,8 +286,8 @@ if (exercise.mode === 'review') {
 
         if (_exercisePhase === 'revealed') {
           // === NASCONDI (toggle da espansa a chiusa) ===
+          // Il bottone rimane visibile anche quando la traduzione viene nascosta
           if (_exerciseTimer) { clearTimeout(_exerciseTimer); _exerciseTimer = null; }
-          if (btnContinue) btnContinue.classList.add('exercise-next-hidden');
 
           el.classList.remove('revealing');
           el.setAttribute('aria-expanded', 'false');
@@ -298,7 +298,6 @@ if (exercise.mode === 'review') {
             translationEl.style.transition = 'opacity .3s ease, transform .3s ease';
             setTimeout(() => {
               if (translationEl && translationEl.parentNode) translationEl.parentNode.removeChild(translationEl);
-              if (actionsEl && !actionsEl.children.length && actionsEl.parentNode) actionsEl.parentNode.removeChild(actionsEl);
               _exercisePhase = 'translation';
             }, 320);
           } else {
@@ -334,30 +333,24 @@ if (exercise.mode === 'review') {
         translationNode.style.opacity = '';
         translationNode.style.transform = '';
 
+        // Bottone "Continuar": appare insieme alla traduzione (non dopo un timeout)
+        let actionsEl = el.parentElement.querySelector('.exercise-actions');
         if (!actionsEl) {
-          const aDiv = document.createElement('div');
-          aDiv.className = 'exercise-actions';
-          el.parentElement.appendChild(aDiv);
+          actionsEl = document.createElement('div');
+          actionsEl.className = 'exercise-actions';
+          el.parentElement.appendChild(actionsEl);
         }
-        if (btnContinue) {
-          btnContinue.classList.add('exercise-next-hidden');
+        let btnContinue = document.getElementById('exerciseContinueBtn');
+        if (!btnContinue) {
+          btnContinue = document.createElement('button');
+          btnContinue.id = 'exerciseContinueBtn';
+          btnContinue.className = 'btn btn-primary';
+          btnContinue.textContent = 'Continuar';
+          btnContinue.onclick = advanceExercisePhase;
+          actionsEl.appendChild(btnContinue);
         } else {
-          const newBtn = document.createElement('button');
-          newBtn.id = 'exerciseContinueBtn';
-          newBtn.className = 'btn btn-primary exercise-next-hidden';
-          newBtn.textContent = 'Continuar';
-          newBtn.onclick = advanceExercisePhase;
-          el.parentElement.querySelector('.exercise-actions').appendChild(newBtn);
+          btnContinue.classList.remove('exercise-next-hidden');
         }
-
-        const totalMs = revealTotalMs(ex.text || '');
-        if (_exerciseTimer) { clearTimeout(_exerciseTimer); _exerciseTimer = null; }
-        _exerciseTimer = setTimeout(() => {
-          _exerciseTimer = null;
-          if (_exercisePhase !== 'revealed') return;
-          const b = document.getElementById('exerciseContinueBtn');
-          if (b) b.classList.remove('exercise-next-hidden');
-        }, Math.max(320, totalMs + 150));
       }
 
       // Sostituisce nextExercise() + nextRipassoExercise().
