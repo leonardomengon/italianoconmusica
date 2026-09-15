@@ -451,14 +451,23 @@
     /* Hero card (prima esercizio): più alta, avvicinata alla navbar */
     #eserciziLyrics .exercise-card.is-hero {
       margin-top: 4px;
-      margin-bottom: 22px;
-      padding: 44px 28px 34px;
-      min-height: 300px;
+      margin-bottom: 16px;
+      padding: 32px 24px 24px;
+      min-height: 320px;
+      height: calc(100vh - 68px - 72px - 4px - 16px - env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      overflow-y: auto;
     }
     #eserciziLyrics .exercise-card.is-hero .exercise-header {
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
-    /* ESERCIZI: stella preferiti accanto al verso (modalit� complete) */
+    #eserciziLyrics .exercise-header {
+      margin-bottom: 6px;
+    }
+    #eserciziLyrics .exercise-progress {
+      white-space: nowrap;
+    }
+    /* ESERCIZI: stella preferiti accanto al verso (modalità complete) */
     #eserciziLyrics .exercise-text {
       display: flex;
       align-items: flex-start;
@@ -863,11 +872,15 @@
 .exercise-text { padding: 22px; line-height: 1.7; }
 .exercise-translation { padding: 16px 20px; }
 .exercise-actions { gap: 14px; }
-/* ESERCIZI review: frase cliccabile come un verso (freccia di espansione + reveal parola-per-parola) */
-.exercise-text-clickable { cursor: pointer; transition: background .2s, border-color .2s; }
-.exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
-.exercise-text-clickable:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
-#eserciziLyrics .exercise-card { margin-left: 16px; margin-right: 16px; }
+
+/* Blocco specifico per #eserciziLyrics: layout coerente, senza duplicati */
+#eserciziLyrics .exercise-card { margin-left: 10px; margin-right: 10px; margin-bottom: 16px; }
+#eserciziLyrics .exercise-header { margin-bottom: 6px; }
+#eserciziLyrics .exercise-text { gap: 14px; }
+#eserciziLyrics .exercise-fav-btn { margin-top: 4px; }
+#eserciziLyrics .exercise-note { margin-top: 0; }
+.exercise-note textarea { padding: 8px 12px; min-height: 40px; }
+#eserciziLyrics .exercise-card:not(:has(.exercise-body)) > * + * { margin-top: 18px; }
 #eserciziLyrics .exercise-text { gap: 14px; }
 #eserciziLyrics .exercise-fav-btn { margin-top: 4px; }
 #eserciziLyrics .exercise-note { margin-top: 0; }
