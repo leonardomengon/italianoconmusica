@@ -176,7 +176,7 @@
 if (exercise.mode === 'review') {
           if (phase === 'translation') {
             wrap.innerHTML = `
-              <div class="exercise-card">
+              <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text exercise-text-clickable" role="button" tabindex="0" aria-expanded="false"
@@ -201,7 +201,7 @@ if (exercise.mode === 'review') {
             return;
           } else {
             wrap.innerHTML = `
-              <div class="exercise-card">
+              <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
                   <div class="exercise-text revealing" role="button" tabindex="0" aria-expanded="true">
@@ -236,7 +236,7 @@ if (exercise.mode === 'review') {
 
         const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
         wrap.innerHTML = `
-          <div class="exercise-card">
+          <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
             <div class="exercise-header"><span class="exercise-progress">Completa la frase</span><span class="exercise-counter">${num}/${tot}</span></div>
             <div class="exercise-text">
               <span class="exercise-verse-text">${textWithBlanks || '<em>Texto no disponible</em>'}</span>

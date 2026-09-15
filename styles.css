@@ -448,6 +448,16 @@
       margin-left: 10px;
       margin-right: 10px;
     }
+    /* Hero card (prima esercizio): più alta, avvicinata alla navbar */
+    #eserciziLyrics .exercise-card.is-hero {
+      margin-top: 4px;
+      margin-bottom: 22px;
+      padding: 44px 28px 34px;
+      min-height: 300px;
+    }
+    #eserciziLyrics .exercise-card.is-hero .exercise-header {
+      margin-bottom: 10px;
+    }
     /* ESERCIZI: stella preferiti accanto al verso (modalit� complete) */
     #eserciziLyrics .exercise-text {
       display: flex;
