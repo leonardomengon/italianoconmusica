@@ -194,10 +194,10 @@ if (exercise.mode === 'review') {
                     </div>
                     ${starBtnInReview}
                 </div>
-                <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
                 <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
                   <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                 </div>
+                <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
                 <div class="exercise-actions">
                   <button id="exerciseContinueBtn" class="btn btn-primary${isRevealed?'':' exercise-reveal-hidden'}" ${isRevealed?'':'disabled aria-hidden="true" '}onclick="advanceExercisePhase()">Continuar</button>
                 </div>
