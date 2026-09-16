@@ -430,6 +430,22 @@
     .exercise-next-hidden {
       display: none !important;
     }
+    /* Reveal review (traduzione + "Continuar"): SEMPRE nel DOM, mai
+       display:none. visibility+opacity li tengono nel flusso, quindi
+       .exercise-card ha già l'altezza definitiva al primo render — il
+       click non causa reflow. Classe dedicata (non .exercise-next-hidden,
+       che è display:none !important e serve altrove per lo scambio
+       hint/next in modalità "completa la frase"). */
+    .exercise-reveal-hidden {
+      visibility: hidden;
+      opacity: 0;
+    }
+    #exerciseContinueBtn {
+      transition: opacity .2s ease-out;
+    }
+    #exerciseContinueBtn:disabled {
+      cursor: default;
+    }
     /* ESERCIZI review: frase cliccabile come un verso (freccia di espansione, niente bottone "Mostrar") */
     .exercise-text-clickable { cursor: pointer; }
     .exercise-text-clickable:hover { border-color: var(--surface-border-dark); }

@@ -1,4 +1,4 @@
-      // ==================== NUOVA MODALITÀ ESERCIZI ====================
+// ==================== NUOVA MODALITÀ ESERCIZI ====================
       function generaCodaEsercizi(song) {
         if (!song || !song.lyrics) return;
         const currentSongId = String(song.id);
@@ -174,67 +174,50 @@
         const starBtnInReview = `<button class="btn btn-sm ${btnClass} exercise-fav-btn" style="padding: 2px 8px; font-size: 14px; border-radius: 6px;" onclick="event.stopPropagation(); togglePreferitoFromExercise(this, ${_exerciseIndex});">${starIcon}</button>`;
         const starBtnCompleteStyle = 'padding: 2px 8px; font-size: 14px; border-radius: 6px;';
 if (exercise.mode === 'review') {
-          if (phase === 'translation') {
-            wrap.innerHTML = `
-              <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
-                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
-                <div class="exercise-body">
-                  <div class="exercise-text exercise-text-clickable" role="button" tabindex="0" aria-expanded="false"
-                    title="Haz clic para mostrar la traducción"
-                    onclick="toggleExerciseReveal(this)"
-                    onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
-                      <div class="d-flex align-items-center gap-2 flex-grow-1">
-                        <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
-                        <span class="toggle-hint" title="Haz clic para mostrar la traducción">▼</span>
-                      </div>
-                      ${starBtnInReview}
-                  </div>
-                  <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
-                    <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
-                  </div>
-                  <div class="exercise-actions"></div>
-                </div>
-              </div>
-            `;
-
-            if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
-            return;
-          } else {
-            wrap.innerHTML = `
-              <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
-                <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
-                <div class="exercise-body">
-                  <div class="exercise-text exercise-text-clickable revealing" role="button" tabindex="0" aria-expanded="true"
-                    title="Haz clic para ocultar la traducción"
-                    onclick="toggleExerciseReveal(this)"
-                    onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
+          const isRevealed = phase === 'revealed';
+          // Markup UNICO per 'translation' e 'revealed': la frase nascosta e
+          // "Continuar" sono SEMPRE nel DOM, solo nascosti con .exercise-reveal-hidden
+          // (visibility, non display — vedi styles.css). Così la card ha già
+          // l'altezza definitiva al primo render e il click non causa reflow.
+          wrap.innerHTML = `
+            <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
+              <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
+              <div class="exercise-body">
+                <div class="exercise-text exercise-text-clickable${isRevealed?' revealing':''}" role="button" tabindex="0"
+                  aria-expanded="${isRevealed ? 'true' : 'false'}" aria-controls="exerciseReveal"
+                  title="${isRevealed ? 'Haz clic para ocultar la traducción' : 'Haz clic para mostrar la traducción'}"
+                  onclick="toggleExerciseReveal(this)"
+                  onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
                     <div class="d-flex align-items-center gap-2 flex-grow-1">
                       <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
                       <span class="toggle-hint" title="Haz clic para mostrar/ocultar la traducción">▼</span>
                     </div>
                     ${starBtnInReview}
-                  </div>
-                  <div class="exercise-translation">${revealWordsHtml(exercise.text || '')}</div>
-                  <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
-                    <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
-                  </div>
-                  <div class="exercise-actions">
-                    <button id="exerciseContinueBtn" class="btn btn-primary exercise-next-hidden" onclick="advanceExercisePhase()">Continuar</button>
-                  </div>
+                </div>
+                <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
+                <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+                  <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
+                </div>
+                <div class="exercise-actions">
+                  <button id="exerciseContinueBtn" class="btn btn-primary${isRevealed?'':' exercise-reveal-hidden'}" ${isRevealed?'':'disabled aria-hidden="true" '}onclick="advanceExercisePhase()">Continuar</button>
                 </div>
               </div>
-            `;
-            // Bottone nascosto finché il reveal non è concluso: timeout allineato
-            // a revealTotalMs, cancellato se si cambia esercizio prima della fine.
+            </div>
+          `;
+
+          if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+          // Se il render avviene già in fase 'revealed' (es. renderCurrentExercise
+          // richiamato da fuori mentre la frase è aperta), riparte il timer che
+          // sblocca "Continuar": il contenuto qui sopra è già quello rivelato.
+          if (isRevealed) {
             const totalMs = revealTotalMs(exercise.text || '');
-            if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
             _exerciseTimer = setTimeout(() => {
               _exerciseTimer = null;
               const btn = document.getElementById('exerciseContinueBtn');
-              if (btn) btn.classList.remove('exercise-next-hidden');
-            }, totalMs + 120);
-            return;
+              if (btn) { btn.disabled = false; btn.removeAttribute('aria-hidden'); btn.classList.remove('exercise-reveal-hidden'); }
+            }, totalMs + 150);
           }
+          return;
         }
 
         const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
@@ -259,55 +242,74 @@ if (exercise.mode === 'review') {
         renderEsercizio(_ripassoMode ? 'ripasso' : 'studio');
       }
 
-      // Sostituisce startExerciseFromReview() + startRipassoFromReview():
-      // fa avanzare la fase dell'esercizio corrente (studio o ripasso).
+      // "Continuar" è cliccabile solo quando l'animazione di reveal è finita
+      // (il bottone è disabled/nascosto fino a quel momento, vedi
+      // toggleExerciseReveal), quindi qui basta avanzare — non serve più
+      // controllare la fase.
       function advanceExercisePhase() {
-        if (_exercisePhase === 'translation') {
-          if (_exerciseTimer) {
-            clearInterval(_exerciseTimer);
-            _exerciseTimer = null;
-          }
-          _exercisePhase = 'revealed';
-          renderCurrentExercise();
-        } else {
-          // Il conteggio della sfida vale solo in modalità studio, non in ripasso.
-          if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
-          nextExercise();
-        }
+        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        // Il conteggio della sfida vale solo in modalità studio, non in ripasso.
+        if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
+        nextExercise();
       }
+
       // Reveal della traduzione al click sulla frase (come nei versi): niente
-      // bottone "Mostrar". Il click sulla prima frase ALTERNA mostra/nascondi:
-      // la prima volta la fase passa a 'revealed' e il re-render mostra la
-      // traduzione con il reveal attivo (poi "Continuar" appare a reveal
-      // concluso); un nuovo click sulla stessa frase la nasconde di nuovo
-      // (fase 'translation'), e il click successivo la rimostra da capo con
-      // l'animazione. Navigazione resa sicura (fase/indice).
+      // bottone "Mostrar". La frase nascosta e "Continuar" sono già nel DOM
+      // (vedi renderEsercizio): qui si agisce solo sulle loro classi/attributi,
+      // MAI un re-render — così la card non cambia altezza e la nota che
+      // l'utente sta scrivendo non viene persa. Il click ALTERNA mostra/nascondi:
+      // la prima volta rivela la traduzione con l'animazione parola-per-parola
+      // (poi "Continuar" si abilita a reveal concluso); un nuovo click la
+      // nasconde di nuovo, e il click successivo la rimostra da capo.
       function toggleExerciseReveal(el) {
         if (!el) return;
         const ex = (_exerciseQueue && _exerciseQueue[_exerciseIndex]) || null;
         if (!ex) return;
-        // Frase già espansa → nascondila e torna alla fase iniziale. Il timer
-        // del bottone "Continuar" viene annullato: il re-render lo ricrea
-        // nascosto, così il reveal successivo riparte da capo con l'animazione.
+        const wrap = document.getElementById('eserciziLyrics');
+        const reveal = wrap ? wrap.querySelector('#exerciseReveal') : null;
+        const btn = wrap ? wrap.querySelector('#exerciseContinueBtn') : null;
+        const testo = wrap ? wrap.querySelector('.exercise-text-clickable') : null;
+        if (!reveal || !btn) return;
+
+        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+
         if (_exercisePhase === 'revealed') {
-          if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+          // Nascondi di nuovo: il markup resta al suo posto (l'altezza della
+          // card non cambia). Il contenuto viene rigenerato così il prossimo
+          // reveal riparte da capo con l'animazione parola-per-parola.
           _exercisePhase = 'translation';
-          renderCurrentExercise();
+          reveal.innerHTML = revealWordsHtml(ex.text || '');
+          reveal.classList.add('exercise-reveal-hidden');
+          reveal.setAttribute('aria-hidden', 'true');
+          btn.disabled = true;
+          btn.setAttribute('aria-hidden', 'true');
+          btn.classList.add('exercise-reveal-hidden');
+          if (testo) {
+            testo.classList.remove('revealing');
+            testo.setAttribute('aria-expanded', 'false');
+            testo.setAttribute('title', 'Haz clic para mostrar la traducción');
+          }
           return;
         }
         if (_exercisePhase !== 'translation') return;
-        // Re-render immediato allo stato 'revealed': la freccia è già ruotata,
-        // "Continuar" parte nascosto e viene mostrato a reveal concluso.
-        // No-op se si cambia esercizio prima della fine (fase/indice).
+
         _exercisePhase = 'revealed';
-        renderCurrentExercise();
+        reveal.innerHTML = revealWordsHtml(ex.text || '');
+        reveal.classList.remove('exercise-reveal-hidden');
+        reveal.removeAttribute('aria-hidden');
+        if (testo) {
+          testo.classList.add('revealing');
+          testo.setAttribute('aria-expanded', 'true');
+          testo.setAttribute('title', 'Haz clic para ocultar la traducción');
+        }
+
         const totalMs = revealTotalMs(ex.text || '');
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
         _exerciseTimer = setTimeout(() => {
           _exerciseTimer = null;
           if (_exercisePhase !== 'revealed') return;
-          const btn = document.getElementById('exerciseContinueBtn');
-          if (btn) btn.classList.remove('exercise-next-hidden');
+          btn.disabled = false;
+          btn.removeAttribute('aria-hidden');
+          btn.classList.remove('exercise-reveal-hidden');
         }, totalMs + 150);
       }
 
@@ -571,4 +573,3 @@ if (exercise.mode === 'review') {
       // renderRipassoExercise, useRipassoHint, nextRipassoExercise e
       // startRipassoFromReview sono stati unificati rispettivamente in
       // renderCurrentExercise, useHint, nextExercise e advanceExercisePhase.
-
