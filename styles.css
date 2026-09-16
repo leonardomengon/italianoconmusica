@@ -467,15 +467,18 @@
       margin-left: 10px;
       margin-right: 10px;
     }
-    /* Hero card (prima esercizio): più alta, avvicinata alla navbar */
+    /* Hero card (prima esercizio): più alta, avvicinata alla navbar.
+       Niente max-height/overflow-y: con nota+traduzione+bottone sempre nel
+       DOM (per riservare l'altezza al reveal) la card può superare il tetto
+       calcolato sul viewport, e uno scroll interno avrebbe fatto comparire
+       una scrollbar verticale a destra della box. Meglio lasciarla crescere
+       e far scorrere la pagina, se serve. */
     #eserciziLyrics .exercise-card.is-hero {
       margin-top: 4px;
       margin-bottom: 16px;
       padding: 32px 24px 56px;
       min-height: 380px;
-      max-height: calc(85vh - 68px - 72px - 4px - 16px - env(safe-area-inset-bottom, 0px));
       box-sizing: border-box;
-      overflow-y: auto;
     }
     #eserciziLyrics .exercise-card.is-hero .exercise-header {
       margin-bottom: 6px;
