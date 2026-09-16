@@ -445,7 +445,10 @@ if (exercise.mode === 'review') {
         input.setAttribute("data-hint-used", "true");
         input.value = answerOriginal.substring(0, newRevealed);
         input.setAttribute("data-hint-state", newRevealed.toString());
-        input.focus();
+        // Niente input.focus(): su mobile riaprirebbe la tastiera solo per
+        // mostrare un suggerimento. Se il campo aveva già il focus (l'utente
+        // ci stava scrivendo prima di toccare "Ayuda"), lo togliamo.
+        input.blur();
         // Analytics: uso del hint (livello 1 = metà parola, 2 = soluzione completa).
         try {
           const _hintLevel = newRevealed >= answer.length ? 2 : 1;
