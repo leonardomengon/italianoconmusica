@@ -194,7 +194,7 @@ if (exercise.mode === 'review') {
                     </div>
                     ${starBtnInReview}
                 </div>
-                <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+                <div class="exercise-note${isSavedFlag?'':' exercise-note-hidden'}" id="exercise-note-${_exerciseIndex}">
                   <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                 </div>
                 <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
@@ -229,7 +229,7 @@ if (exercise.mode === 'review') {
               <button class="btn btn-sm ${btnClass} exercise-fav-btn" style="${starBtnCompleteStyle}" onclick="event.stopPropagation(); togglePreferitoFromExercise(this, ${_exerciseIndex});">${starIcon}</button>
             </div>
             ${exercise.hint ? `<div class="exercise-translation">${escapeHtml(exercise.hint)}</div>` : ''}
-            <div class="exercise-note" id="exercise-note-${_exerciseIndex}">
+            <div class="exercise-note${isSavedFlag?'':' exercise-note-hidden'}" id="exercise-note-${_exerciseIndex}">
               <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
             </div>
             <div class="exercise-actions">
@@ -350,24 +350,23 @@ if (exercise.mode === 'review') {
             linguaTrad: currentSongBackup ? (currentSongBackup.lang2 || '') : ''
         });
 
+        // La box degli appunti è SEMPRE nel DOM (renderEsercizio), subito
+        // sotto la frase originale: qui la si mostra o nasconde soltanto,
+        // MAI creata o rimossa. Ricrearla al ri-favorito la reinserirebbe
+        // in coda al markup attuale — cioè sotto la frase rivelata, non più
+        // sotto quella originale — perché la posizione dipenderebbe da dove
+        // si trova .exercise-actions in quel momento.
+        const noteEl = document.getElementById(`exercise-note-${exerciseIdx}`);
+        if (!noteEl) return;
         if (added) {
-          let noteEl = document.getElementById(`exercise-note-${exerciseIdx}`);
-          if (!noteEl) {
-              noteEl = document.createElement('div');
-              noteEl.className = 'exercise-note';
-              noteEl.id = `exercise-note-${exerciseIdx}`;
-              noteEl.innerHTML = `<textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${exerciseIdx})"></textarea>`;
-              const root = btn.closest('.exercise-card') || getActiveExerciseRoot();
-              const actionsEl = btn.closest('.exercise-card')?.querySelector('.exercise-actions');
-              if (actionsEl) {
-                  actionsEl.parentNode.insertBefore(noteEl, actionsEl);
-              } else {
-                  root.appendChild(noteEl);
-              }
-          }
+          noteEl.classList.remove('exercise-note-hidden');
         } else {
-          const noteEl = document.getElementById(`exercise-note-${exerciseIdx}`);
-          if (noteEl) noteEl.remove();
+          noteEl.classList.add('exercise-note-hidden');
+          // Lo storage dell'appunto è già stato rimosso da _togglePreferitoCore:
+          // svuotiamo anche il campo visibile, altrimenti un testo scritto lì
+          // resterebbe in vista senza più essere salvato da nessuna parte.
+          const textarea = noteEl.querySelector('textarea');
+          if (textarea) textarea.value = '';
         }
       }
 

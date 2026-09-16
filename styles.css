@@ -446,6 +446,16 @@
     #exerciseContinueBtn:disabled {
       cursor: default;
     }
+    /* Box appunti: diversa dalla traduzione sopra. Qui lo stato "nascosto"
+       (frase non tra i preferiti) è spesso permanente per quell'esercizio,
+       non un toggle temporaneo — riservarle lo spazio con visibility avrebbe
+       lasciato un vuoto fisso tra frase originale e frase rivelata. Con
+       display:none non occupa spazio, e siccome l'elemento resta comunque
+       sempre nello stesso punto del DOM (mai rimosso/ricreato, vedi
+       togglePreferitoFromExercise), mostrarla non la sposta né la duplica. */
+    .exercise-note-hidden {
+      display: none !important;
+    }
     /* ESERCIZI review: frase cliccabile come un verso (freccia di espansione, niente bottone "Mostrar") */
     .exercise-text-clickable { cursor: pointer; }
     .exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
