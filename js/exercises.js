@@ -204,10 +204,13 @@ if (exercise.mode === 'review') {
               <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
                 <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
                 <div class="exercise-body">
-                  <div class="exercise-text revealing" role="button" tabindex="0" aria-expanded="true">
+                  <div class="exercise-text exercise-text-clickable revealing" role="button" tabindex="0" aria-expanded="true"
+                    title="Haz clic para ocultar la traducción"
+                    onclick="toggleExerciseReveal(this)"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){ var t=event.target||{}; var tg=(t.tagName||'').toLowerCase(); if(tg==='input'||tg==='textarea'||tg==='button'||tg==='a'||tg==='select') return; event.preventDefault(); toggleExerciseReveal(this); }">
                     <div class="d-flex align-items-center gap-2 flex-grow-1">
                       <div class="exercise-verse-text ">${escapeHtml(exercise.hint) || '<em>Traducción no disponible</em>'}</div>
-                      <span class="toggle-hint">▼</span>
+                      <span class="toggle-hint" title="Haz clic para mostrar/ocultar la traducción">▼</span>
                     </div>
                     ${starBtnInReview}
                   </div>
@@ -273,14 +276,26 @@ if (exercise.mode === 'review') {
         }
       }
       // Reveal della traduzione al click sulla frase (come nei versi): niente
-      // bottone "Mostrar". Cambia solo lo stato "revealed" (freccia ruotata);
-      // la fase passa a 'revealed' e il re-render mostra la traduzione con il
-      // reveal attivo, poi "Continuar" appare a reveal concluso. Doppio click
-      // ignorato, navigazione resa sicura (fase/indice).
+      // bottone "Mostrar". Il click sulla prima frase ALTERNA mostra/nascondi:
+      // la prima volta la fase passa a 'revealed' e il re-render mostra la
+      // traduzione con il reveal attivo (poi "Continuar" appare a reveal
+      // concluso); un nuovo click sulla stessa frase la nasconde di nuovo
+      // (fase 'translation'), e il click successivo la rimostra da capo con
+      // l'animazione. Navigazione resa sicura (fase/indice).
       function toggleExerciseReveal(el) {
-        if (!el || _exercisePhase !== 'translation') return;
+        if (!el) return;
         const ex = (_exerciseQueue && _exerciseQueue[_exerciseIndex]) || null;
         if (!ex) return;
+        // Frase già espansa → nascondila e torna alla fase iniziale. Il timer
+        // del bottone "Continuar" viene annullato: il re-render lo ricrea
+        // nascosto, così il reveal successivo riparte da capo con l'animazione.
+        if (_exercisePhase === 'revealed') {
+          if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+          _exercisePhase = 'translation';
+          renderCurrentExercise();
+          return;
+        }
+        if (_exercisePhase !== 'translation') return;
         // Re-render immediato allo stato 'revealed': la freccia è già ruotata,
         // "Continuar" parte nascosto e viene mostrato a reveal concluso.
         // No-op se si cambia esercizio prima della fine (fase/indice).

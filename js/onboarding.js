@@ -540,11 +540,23 @@
         }
       }
       // Reveal in-place + "Adelante" solo a reveal concluso (specchio di toggleExerciseReveal).
+      // Il click sulla prima frase ALTERNA mostra/nascondi: la traduzione entrata
+      // parola per parola viene nascosta al click successivo e rimostrata (con
+      // l'animazione da capo) a quello dopo. "Adelante" segue il reveal: compare
+      // a reveal concluso e sparisce quando la traduzione viene nascosta.
       function toggleOnbExReveal(cardEl) {
-        if (!cardEl || cardEl.dataset.revealStarted === '1') return;
+        if (!cardEl) return;
+        if (cardEl.dataset.revealStarted === '1') { hideOnbExReveal(cardEl); return; }
         cardEl.dataset.revealStarted = '1';
+        // Generazione del reveal: annulla i timer del reveal precedente, così
+        // dopo un nascondi/mostra veloce il bottone non riappare in anticipo.
+        const gen = String((Number(cardEl.dataset.revealGen) || 0) + 1);
+        cardEl.dataset.revealGen = gen;
         const phraseEl = cardEl.querySelector('.exercise-text-clickable');
-        if (phraseEl) phraseEl.classList.add('revealed');
+        if (phraseEl) {
+          phraseEl.classList.add('revealed');
+          phraseEl.title = 'Haz clic para ocultar la traducción';
+        }
         const solText = _onbExFrase || '';
         const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const total = reduced ? 0 : revealTotalMs(solText);
@@ -570,7 +582,13 @@
         };
         if (total <= 0 || !solText.trim()) { showNext(); return; }
         let finished = false;
-        const finishOnce = () => { if (finished) return; finished = true; showNext(); };
+        const finishOnce = () => {
+          if (finished) return;
+          // Traduzione nascosta nel frattempo (o nuovo reveal): niente bottone.
+          if (cardEl.dataset.revealGen !== gen || cardEl.dataset.revealStarted !== '1') return;
+          finished = true;
+          showNext();
+        };
         try {
           const last = transEl.querySelector('.reveal-word:last-child');
           if (last) {
@@ -578,7 +596,27 @@
             last.addEventListener('animationend', onEnd);
           }
         } catch (e) {}
-        setTimeout(finishOnce, total + 150);
+        cardEl.dataset.revealTimer = String(setTimeout(finishOnce, total + 150));
+      }
+      // Nasconde la traduzione espansa (e il bottone "Adelante") riportando la
+      // card allo stato iniziale: il click successivo rifà il reveal animato.
+      function hideOnbExReveal(cardEl) {
+        if (!cardEl || cardEl.dataset.revealStarted !== '1') return;
+        cardEl.dataset.revealStarted = '0';
+        // Nuova generazione + timer azzerato: nessun "Adelante" fuori tempo.
+        cardEl.dataset.revealGen = String((Number(cardEl.dataset.revealGen) || 0) + 1);
+        const timer = Number(cardEl.dataset.revealTimer);
+        if (timer) clearTimeout(timer);
+        cardEl.dataset.revealTimer = '';
+        const phraseEl = cardEl.querySelector('.exercise-text-clickable');
+        if (phraseEl) {
+          phraseEl.classList.remove('revealed');
+          phraseEl.title = 'Haz clic para mostrar la traducción';
+        }
+        const transEl = cardEl.querySelector('.exercise-translation');
+        if (transEl) transEl.remove();
+        const btn = cardEl.querySelector('#onbExBtn');
+        if (btn) btn.remove();
       }
       function onbRenderExComplete() {
         const frase = _onbExFrase;
