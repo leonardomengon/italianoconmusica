@@ -420,7 +420,7 @@
         } else if (n === 5) {
           wrap = onbPhaseShell('<span class="onb-instr-base">Esta frase parece complicada, </span><span class="onb-instr-hl">guárdala en tus favoritos</span><span class="onb-instr-base"> para estudiarla con más frecuencia</span>');
           onbVerseCard(wrap, _onbVerses[1], { showStar: true, starIcon: '☆', onStar: (starBtn, idx) => {
-            onbFav(starBtn, idx);
+            if (!onbFav(starBtn, idx)) return;
             onbShowSuccessBanner(wrap, 'Guardada en favoritos', 'Podrás escribir notas en tus frases guardadas', '✓');
             onbShowAdelante(wrap, () => onbFase(7));
           }});
@@ -478,14 +478,28 @@
         wrap.appendChild(verse);
       }
 
-      // Salva la frase nei preferiti (conteggiato: recordSavedNoteForProgress).
-      // Il feedback di successo lo mostra il chiamante tramite onbShowSuccessBanner.
+      // Nell'onboarding il preferito si può solo salvare, mai rimuovere.
+      // Ritorna true soltanto al primo click riuscito, per mostrare il feedback una volta.
       function onbFav(starBtn, index) {
-        const lyr = _onbSong.lyrics[index];
-        if (!lyr) return;
-        let added = false;
+        if (!starBtn) return false;
+        const animate = () => {
+          starBtn.classList.remove('star-filled');
+          void starBtn.offsetWidth;
+          starBtn.classList.add('star-filled');
+        };
+        if (starBtn.dataset.onbFavoriteSaved === '1') {
+          animate();
+          return false;
+        }
+        const lyr = _onbSong && _onbSong.lyrics[index];
+        if (!lyr || !lyr.text1) return false;
         try {
-          added = _togglePreferitoCore(starBtn, {
+          // Stesso matching del core, senza mai invocare il ramo di rimozione.
+          const target = normalizza(lyr.text1);
+          const exists = getAppunti().some(a =>
+            normalizza(a.testo) === target || normalizza(a.traduzione) === target
+          );
+          if (!exists && !_togglePreferitoCore(starBtn, {
             testo: lyr.text1,
             traduzione: lyr.text2 || '',
             songId: _onbSong.id,
@@ -494,15 +508,14 @@
             lingua: _onbSong.lang1,
             linguaTrad: _onbSong.lang2,
             lyricIndex: index
-          });
-        } catch (e) { added = false; }
-        if (added) {
-          // Animazione riempimento stella
-          starBtn.classList.remove('star-filled');
-          void starBtn.offsetWidth;
-          starBtn.classList.add('star-filled');
-        }
-        return added;
+          })) return false;
+        } catch (e) { return false; }
+        starBtn.dataset.onbFavoriteSaved = '1';
+        starBtn.textContent = '⭐';
+        starBtn.classList.remove('btn-outline-secondary');
+        starBtn.classList.add('btn-outline-warning');
+        animate();
+        return true;
       }
 
       // Feedback banner classico con box verde (fase 5). Icona = check testuale.
