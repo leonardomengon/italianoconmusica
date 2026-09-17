@@ -1731,23 +1731,13 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
   opacity: 0;
   animation: reveal-word-kf var(--reveal-word-dur, 1.1s) cubic-bezier(.2,.7,.25,1) forwards;
 }
+/* Focus e dissolvenza condivisi da onboarding, esercizi classici e ripasso. */
 @keyframes reveal-word-kf {
-  from { opacity: 0; transform: translateY(8px); filter: blur(1px); }
-  to   { opacity: 1; transform: none; filter: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .reveal-word { animation: none; opacity: 1; }
-}
-
-/* Solo onboarding: focus e dissolvenza, nessuna entrata verticale. */
-@keyframes onb-reveal-word-focus {
   from { opacity: 0; filter: blur(1px); }
   to   { opacity: 1; filter: none; }
 }
-@media (prefers-reduced-motion: no-preference) {
-  #onboardingSection .reveal-word {
-    animation-name: onb-reveal-word-focus;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word { animation: none; opacity: 1; }
 }
 
 /* --- Banner di successo salvataggio preferito (Endowed Progress) --- */
