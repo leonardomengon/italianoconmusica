@@ -746,7 +746,8 @@
 .course-missions-basic .mission-value { font-size: 13px; }
 .course-missions-open-wrap { display: flex; justify-content: center; margin-top: 8px; }
 .course-missions-open-wrap .btn { width: 100%; max-width: 280px; padding: 10px 20px; font-size: 15px; }
-.course-missions-divider { height: 2px; background: var(--surface-border, #EDE5F5); margin: 18px 0; border-radius: 2px; }
+.course-missions-divider { border-top: 2px solid var(--surface-border, #EDE5F5); margin: 18px 0; }
+.course-missions-hint { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); font-weight: 600; text-align: center; }
 .course-missions-sfida { display: flex; flex-direction: column; gap: 10px; background: #F5F5F5; border: 3px solid #DBCCEC; border-radius: 16px; padding: 16px; box-shadow: none; opacity: 0.7; filter: grayscale(1); transition: all 0.3s ease; }
 .course-missions-sfida .mission-list { gap: 8px; }
 .course-missions-sfida .mission-row { padding: 10px 12px; grid-template-columns: 36px 1fr auto; border-radius: 14px; background: #fff; }
@@ -773,8 +774,10 @@
 .next-song-lock { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#EDE5F5; color:#8A7FA3; font-size:28px; }
 .next-song-card h3 { margin:0; font-size:20px; font-weight:900; color:var(--text-muted, #7B6F8C); }
 .next-song-card p { margin:2px 0 0; font-size:13px; }
-/* Nota sotto la card "prossima canzone": spostata fuori dalla card. */
+/* Sottotesto della prossima canzone; nota finale del percorso sotto la card. */
 .next-song-hint { margin:8px 4px 0; font-size:13px; color:#8A7FA3; font-weight:700; }
+.next-song-heading { margin-bottom: 12px; }
+.next-song-heading .next-song-hint { margin: 0; line-height: 1.5; font-weight: 600; color: var(--text-muted); }
 .song-mission-summary { background:#fff; border:2px solid var(--surface-border); border-radius:16px; padding:12px; }
 .song-mission-summary .mission-list { gap:6px; }
 .song-mission-summary .mission-row { padding:8px 10px; grid-template-columns:32px 1fr auto; border-width:1px; }

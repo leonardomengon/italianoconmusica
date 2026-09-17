@@ -221,7 +221,7 @@
     const sfidaBtnHtml = sfidaUnlocked
       ? `<button class="btn btn-challenge" onclick="router.navigate('#/canzone/${current.id}/esercizi')">Ejercicio</button>`
       : '';
-    box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}${songTagPillsHtml(current, 'song-tag-pills-hero')}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="router.navigate('#/canzone/${current.id}')">CANCIÓN</button></div></div><div class="course-missions-divider"></div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
+    box.innerHTML=`<div class="song-box-container"><h2 class="current-song-title">${escapeHtml(current.title)}${songTagPillsHtml(current, 'song-tag-pills-hero')}</h2><article class="current-song-card"><div class="course-missions-section"><div class="course-missions-basic">${missionRowsHtml(m, false, 'basic')}</div><div class="course-missions-open-wrap"><button class="btn btn-primary" onclick="router.navigate('#/canzone/${current.id}')">CANCIÓN</button></div></div><div class="course-missions-divider">${sfidaUnlocked ? '' : '<p class="course-missions-hint">Completa las otras misiones para acceder a los ejercicios.</p>'}</div><div class="course-missions-sfida ${sfidaUnlocked ? 'unlocked' : ''}"><div class="mission-list">${missionRowsHtml(m, false, 'sfida')}</div>${sfidaBtnHtml}</div></article></div>`;
     const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
     const ripassoBox = document.getElementById('ripassoHome');
     if (appuntiCount >= 10) {
@@ -230,7 +230,7 @@
       ripassoBox.innerHTML=``;
     }
     const next=getNextSong(current);
-    nextBox.innerHTML= (next ? `<div class="eyebrow mb-2">PRÓXIMA CANCIÓN</div><article class="next-song-card"><div class="next-song-lock"><span class="material-symbols-outlined">lock</span></div><div><h3>${escapeHtml(next.title)}</h3>${songTagPillsHtml(next)}</div></article><p class="next-song-hint">Completa las misiones para desbloquearla.</p>` : '<div class="next-song-card"><div class="next-song-lock">🏁</div><div><h3>Última canción del recorrido</h3></div></div><p class="next-song-hint">Completa las misiones para terminar el recorrido.</p>');
+    nextBox.innerHTML= (next ? `<div class="next-song-heading"><div class="eyebrow mb-2">PRÓXIMA CANCIÓN</div><p class="next-song-hint">Completa las misiones para desbloquearla.</p></div><article class="next-song-card"><div class="next-song-lock"><span class="material-symbols-outlined">lock</span></div><div><h3>${escapeHtml(next.title)}</h3>${songTagPillsHtml(next)}</div></article>` : '<div class="next-song-card"><div class="next-song-lock">🏁</div><div><h3>Última canción del recorrido</h3></div></div><p class="next-song-hint">Completa las misiones para terminar el recorrido.</p>');
   }
   function updateNavigation(view) {
     const header = document.getElementById('mainHeader');
