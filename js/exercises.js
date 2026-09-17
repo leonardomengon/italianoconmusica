@@ -550,14 +550,26 @@ if (exercise.mode === 'review') {
         return a;
       }
 
+      // Avvia (o riavvia) il ripasso generale dagli appunti. Ritorna false se
+      // non c'è nessuna frase salvata, così il router (rotta #/ripasso) può
+      // riallineare l'URL alla home invece di lasciare una rotta "vuota".
       function openRipasso() {
         const appunti = getAppunti().filter(a => a.testo && a.testo.trim());
         if (appunti.length === 0) {
           alert('Aún no has guardado frases en las notas.');
-          return;
+          return false;
         }
+        // Apertura da rotta (#/ripasso): invalida i render pendenti (es. una
+        // showHomeView ancora in corso) e azzera timer/stato della sessione
+        // precedente prima di generare la nuova coda.
+        _loadToken++;
+        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        _exerciseMode = false;
         _ripassoMode = true;
         _reviewMode = false;
+        _completedViaFullHint = false;
+        _exercisePhase = 'translation';
+        _exerciseIndex = 0;
         const poolRip = shuffleArr(appunti).slice(0, RIPASSO_QUANTI).map(a => ({
           text: a.testo,
           hint: a.traduzione || '',
@@ -570,9 +582,6 @@ if (exercise.mode === 'review') {
           const textIndex = k % 2 === 0 ? (k / 2) % totalRip : (Math.floor(k / 2) + 2) % totalRip;
           _exerciseQueue.push({ ...poolRip[textIndex], mode });
         }
-        _exercisePhase = 'translation';
-        _exerciseTimer = null;
-        _exerciseIndex = 0;
         hidePrimaryViews();
         document.body.classList.remove('view-song');
         document.getElementById('esercizi').classList.remove('d-none');
@@ -580,6 +589,7 @@ if (exercise.mode === 'review') {
         updateBottomNav('home');
         window.scrollTo(0, 0);
         renderCurrentExercise();
+        return true;
       }
 
       function chiudiEsercizi() {
@@ -588,6 +598,14 @@ if (exercise.mode === 'review') {
         _exerciseQueue = [];
         _exerciseIndex = 0;
         _exercisePhase = 'translation';
+        // Torna alla home passando dal router (URL #/): così Indietro/Avanti del
+        // browser e tab della bottom-nav restano coerenti con la vista. Se
+        // l'hash è già #/ (o manca) il router ignora la navigazione, quindi
+        // mostriamo la home direttamente.
+        if (window.router && location.hash && location.hash !== '#/') {
+          router.navigate('#/');
+          return;
+        }
         showHomeView();
       }
 

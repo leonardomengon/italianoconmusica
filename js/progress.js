@@ -211,7 +211,7 @@
     const box=document.getElementById('currentSongHome');
     const nextBox=document.getElementById('nextSongHome');
     if (!current) {
-      box.innerHTML=`<div class="current-song-card text-center"><div class="celebration-icon">🏆</div><h2 class="current-song-title">Recorrido completado</h2><p>Has completado todas las canciones disponibles.</p><div class="current-actions" style="align-items:center;margin:20px auto 0;"><button class="btn btn-primary" onclick="openRipasso()">🔁 REPASO COMPLETO</button></div></div>`;
+      box.innerHTML=`<div class="current-song-card text-center"><div class="celebration-icon">🏆</div><h2 class="current-song-title">Recorrido completado</h2><p>Has completado todas las canciones disponibles.</p><div class="current-actions" style="align-items:center;margin:20px auto 0;"><button class="btn btn-primary" onclick="window.router ? router.navigate('#/ripasso') : openRipasso()">🔁 REPASO COMPLETO</button></div></div>`;
       document.getElementById('ripassoHome').innerHTML=``;
       nextBox.innerHTML=``; return;
     }
@@ -225,7 +225,7 @@
     const appuntiCount = getAppunti().filter(a => a.testo && a.testo.trim()).length;
     const ripassoBox = document.getElementById('ripassoHome');
     if (appuntiCount >= 10) {
-      ripassoBox.innerHTML=`<article class="ripasso-card" onclick="openRipasso()" role="button"><div class="ripasso-icon"><span class="material-symbols-outlined">description</span></div><div class="ripasso-info"><h3>Practica con tus notas</h3><p>${appuntiCount} frases guardadas</p></div><span class="ripasso-arrow material-symbols-outlined">chevron_right</span></article>`;
+      ripassoBox.innerHTML=`<article class="ripasso-card" onclick="window.router ? router.navigate('#/ripasso') : openRipasso()" role="button"><div class="ripasso-icon"><span class="material-symbols-outlined">description</span></div><div class="ripasso-info"><h3>Practica con tus notas</h3><p>${appuntiCount} frases guardadas</p></div><span class="ripasso-arrow material-symbols-outlined">chevron_right</span></article>`;
     } else {
       ripassoBox.innerHTML=``;
     }

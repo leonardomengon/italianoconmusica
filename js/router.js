@@ -9,6 +9,7 @@
   const ROUTES = [
     { re: /^#\/canzone\/([^/]+)\/esercizi$/, view: 'home',     default: false, handler: songExercisesHandler },
     { re: /^#\/canzone\/([^/]+)$/,            view: 'home',     default: false, handler: songHandler },
+    { re: /^#\/ripasso$/,                     view: 'home',     default: false, handler: ripassoHandler },
     { re: /^#\/notas$/,                       view: 'appunti',  default: false, handler: notebookHandler },
     { re: /^#\/biblioteca$/,                  view: 'library',  default: false, handler: libraryHandler },
     { re: /^#\/ajustes$/,                     view: 'settings', default: false, handler: settingsHandler },
@@ -67,6 +68,20 @@
   function notebookHandler() { return (typeof openNotebookView === 'function') ? openNotebookView() : Promise.resolve(); }
   function libraryHandler()  { return (typeof showLibreria === 'function') ? showLibreria() : Promise.resolve(); }
   function settingsHandler() { return (typeof openSettingsView === 'function') ? openSettingsView() : Promise.resolve(); }
+
+  // Ripasso generale dagli appunti (#/ripasso). La rotta vive nel tab "home"
+  // perché il ripasso riusa la sezione #esercizi (come #/canzone/:id/esercizi).
+  // Se non c'è nessuna frase salvata la sessione non parte: in quel caso
+  // riallineiamo l'URL a #/ così "Inicio" e il back button restano coerenti.
+  function ripassoHandler() {
+    if (typeof openRipasso !== 'function') return Promise.resolve();
+    const started = openRipasso();
+    if (started === false) {
+      try { navigate('#/', { replace: true }); } catch (e) {}
+      return homeHandler();
+    }
+    return Promise.resolve();
+  }
 
   function songHandler(id) {
     if (!songExists(id)) { notFoundFallback(); return Promise.resolve(); }
