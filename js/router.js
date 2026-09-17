@@ -118,8 +118,12 @@
     if (typeof hideAppLoader === 'function') hideAppLoader();
   }
 
+  let _dispatchToken = 0;
+
   // Esegue la vista corrispondente alla rotta corrente.
   async function dispatch() {
+    const token = ++_dispatchToken;
+    const hash = location.hash;
     clearLoadingState();
     const r = parse();
     if (!r) {
@@ -133,6 +137,11 @@
       console.error('[router] dispatch:', e);
     }
     syncBottomNav();
+    // Ripristina la navbar anche sulle viste che non chiamano showBottomNav.
+    // Un dispatch superato o l'onboarding non devono riaprire la barra.
+    if (token === _dispatchToken && hash === location.hash &&
+        !(typeof _onboardingActive !== 'undefined' && _onboardingActive) &&
+        typeof showBottomNav === 'function') showBottomNav();
   }
 
   // Deep-link all'avvio: se nell'URL c'è una rotta specifica (es. #/canzone/123,
