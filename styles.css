@@ -440,16 +440,11 @@
       visibility: hidden;
       opacity: 0;
     }
-    button.exercise-assessment-btn {
-      transition: opacity .2s ease-out, transform .1s ease;
-    }
-    button.exercise-assessment-btn:disabled {
-      cursor: default;
-    }
-    /* Autovalutazione ("Piensa en la traducción"): due scelte equivalenti,
-       non corretto/sbagliato — niente rosso/verde, entrambe avanzano.
-       Selettori con tag (button.*) per battere la regola globale .btn
-       (font-weight 800 !important) nella cascade a parità di ordine. */
+    /* Autovalutazione ("Piensa en la traducción"): stessa UI dei bottoni
+       dell'app ("Siguiente" = .btn-primary). "Lo sabía" blu pieno/testo
+       bianco, "No lo sabía" sfondo bianco/testo blu; entrambe le scelte
+       sono legittime e avanzano allo stesso modo (niente rosso/verde).
+       Il tag button.* serve a battere la regola globale .btn nella cascade. */
     .exercise-actions.exercise-self-assessment {
       width: 100%;
       flex-direction: row;
@@ -460,39 +455,27 @@
       flex: 1 1 0;
       min-width: 0;
       min-height: 44px;
-      border-radius: 14px !important;
-      padding: 10px 12px !important;
-      font-size: 14px !important;
-      font-weight: 600 !important;
-      text-transform: none !important;
-      letter-spacing: .2px;
-      border: 2px solid transparent !important;
-      border-bottom-width: 4px !important;
-      justify-content: center;
-    }
-    button.exercise-assessment-btn:active {
-      transform: translateY(2px);
-      border-bottom-width: 2px !important;
     }
     button.exercise-assessment-btn:focus-visible {
-      outline: 2px solid var(--primary-dark);
+      outline: 2px solid var(--secondary-dark);
       outline-offset: 2px;
     }
-    button.exercise-assessment-unknown {
-      background: #F3E8FF !important;
-      color: #6D28D9 !important;
-      border-color: #E4D3FA !important;
-      border-bottom-color: #D5BEF5 !important;
-    }
+    /* "Lo sabía": identico a .btn-primary ("Siguiente") */
     button.exercise-assessment-known {
-      background: #E8F1FE !important;
-      color: #3D2B52 !important;
-      border-color: #CBE0FA !important;
-      border-bottom-color: #AFCEF6 !important;
+      background: var(--secondary) !important;
+      color: white !important;
+      border: 0 !important;
+      border-bottom: 4px solid var(--secondary-dark) !important;
+    }
+    /* "No lo sabía": contorno, sfondo bianco e testo blu */
+    button.exercise-assessment-unknown {
+      background: #fff !important;
+      color: var(--secondary-dark) !important;
+      border: 2px solid #CFE3FF !important;
+      border-bottom: 4px solid #CFE3FF !important;
     }
     @media (max-width: 768px) {
       .exercise-actions.exercise-self-assessment { flex-direction: row; flex-wrap: nowrap; gap: 8px; }
-      button.exercise-assessment-btn { min-height: 44px; font-size: 13px !important; padding: 9px 10px !important; }
     }
     /* Box appunti: diversa dalla traduzione sopra. Qui lo stato "nascosto"
        (frase non tra i preferiti) è spesso permanente per quell'esercizio,
