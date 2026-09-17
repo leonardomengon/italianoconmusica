@@ -25,11 +25,15 @@
       const ONB_VERSES_COUNT = 3; // versi tutorial A/B/C
       const ONB_ACTIVE_PHASES = [1, 2, 3, 4, 5, 7, 8]; // Fase 6 (spiegazione appunti) eliminata, integrata nel salvataggio preferito
       
-      // Segmenti audio da riprodurre nelle fasi "play" (secondi reali della traccia):
-      // - PRIMO ascolto (Fase 3): verso 1 → 10–15 s
-      // - SECONDO ascolto (Fase 6): verso 1 + verso 2 → 0–19.25 s
-      const ONB_PLAY_FIRST = [10, 15];
-      const ONB_PLAY_SECOND = [0, 19.25];
+      // Tracce tutorial delle fasi "play": file statici nella cartella "resources"
+      // del repo GitHub (niente link Cloudinary e niente intervalli temporali).
+      // NOTA: nel repo GitHub i due file sono salvati come "tut v1.mp3" e
+      // "tut v1_2.mp3" (con lo SPAZIO nel nome) -> nell'URL lo spazio va
+      // codificato come %20, altrimenti su GitHub Pages si ottiene un 404.
+      // - PRIMO ascolto (Fase 3): solo verso 1 -> risorsa "resources/tut v1.mp3"
+      // - SECONDO ascolto (Fase 7): verso 1 + verso 2 -> risorsa "resources/tut v1_2.mp3"
+      const ONB_AUDIO_FIRST = 'resources/tut%20v1.mp3'; // Fase 3: solo verso 1
+      const ONB_AUDIO_SECOND = 'resources/tut%20v1_2.mp3'; // Fase 7: verso 1 + verso 2
 
       let _onbPhase = 0;
       let _onbSong = null;
@@ -39,6 +43,8 @@
       let _onbExFrase = '';
       let _onbExTrad = '';
       let _onbPlayerOnDone = null;
+      let _onbPlayerSrc = ''; // traccia tutorial della fase corrente (resources/tut v1*.mp3)
+      let _onbPlayerCleanup = null; // rimuove i listener della traccia precedente
       let _onbPlaying = false; // NEW: stato play/pausa del player onboarding
       let _onbPlayFrom = null; // posizione (sec) da cui riprendere dopo la pausa
 
@@ -51,7 +57,10 @@
       function onbClear() {
         const r = onbRoot();
         if (r) { const tb = document.getElementById('onbTopbar'); r.innerHTML = ''; if (tb) r.appendChild(tb); }
+        if (typeof _onbPlayerCleanup === 'function') { try { _onbPlayerCleanup(); } catch (e) {} _onbPlayerCleanup = null; }
         if (_onbAudio) { try { _onbAudio.pause(); } catch (e) {} }
+        _onbPlaying = false;
+        _onbPlayFrom = null;
         _onbPlayerOnDone = null; // evita callback audio "vecchie" sulla fase successiva
         onbHidePlayer();
       }
@@ -140,21 +149,29 @@
       }
 
       // ---- audio + player dedicato (pinato in basso, solo play) ----
-      function ensureOnbAudio() {
+      function ensureOnbAudio(src) {
         if (!_onbAudio) {
           _onbAudio = document.createElement('audio');
           _onbAudio.id = 'onb-audio';
-          _onbAudio.src = _onbSong ? (_onbSong.soundcloud_link || '') : '';
+          _onbAudio.preload = 'auto';
           document.body.appendChild(_onbAudio);
+        }
+        // Cambio traccia tra le fasi (Fase 3 -> Fase 7): imposta il file tutorial
+        // solo quando è diverso da quello già caricato (niente link della canzone).
+        const next = src || '';
+        if (next && _onbAudio.getAttribute('src') !== next) {
+          _onbAudio.src = next;
+          try { _onbAudio.load(); } catch (e) {}
         }
         return _onbAudio;
       }
       // Player ONBOARDING: renderizzato IN-FLOW (sotto il verso) con stile standard
       // (pulsante .btn .btn-primary + barra di progresso), senza essere fixed.
-      function onbShowPlayer(container, range, unused, onDone) {
-        _onbPlayerRange = range || [0, 10];
+      function onbShowPlayer(container, src, unused, onDone) {
+        _onbPlayerSrc = src || ''; // file tutorial della fase (resources/tut v1*.mp3)
         _onbPlayerOnDone = onDone;
-        _onbPlayFrom = null; // nuovo segmento: riparte dall'inizio
+        _onbPlayFrom = null; // nuova traccia: riparte dall'inizio
+        ensureOnbAudio(_onbPlayerSrc); // pre-carica la traccia della fase
         const p = document.createElement('div');
         p.className = 'onb-player onb-enter';
         p.innerHTML =
@@ -174,41 +191,69 @@
         const ic = document.querySelector('#onboardingSection .onb-play-icon');
         if (ic) ic.textContent = name;
       }
+      // Riproduce la traccia tutorial della fase corrente dall'inizio alla fine
+      // (nessun intervallo temporale: il file è già ritagliato sul verso da ascoltare).
       function onbTogglePlay() {
-        const el = ensureOnbAudio();
+        const el = ensureOnbAudio(_onbPlayerSrc);
         if (!el) return;
-        const range = _onbPlayerRange || [0, 10];
-        const start0 = range[0], end = range[1];
         if (_onbPlaying) { // click durante la riproduzione: PAUSA (ricorda la posizione)
           try { el.pause(); } catch (e) {}
-          if (isFinite(el.currentTime) && el.currentTime > start0 && el.currentTime < end) _onbPlayFrom = el.currentTime;
+          if (isFinite(el.currentTime) && el.currentTime > 0) _onbPlayFrom = el.currentTime;
           _onbPlaying = false;
           onbSetPlayIcon('play_arrow');
           return;
         }
-        // PLAY: riparte da dove si era messo in pausa (o dall'inizio del segmento)
-        const start = (typeof _onbPlayFrom === 'number' && _onbPlayFrom > start0) ? Math.min(_onbPlayFrom, end - 0.05) : start0;
         const bar = document.querySelector('#onboardingSection .onb-progress-bar');
         onbSetPlayIcon('pause');
         const pulseBtn = document.querySelector('#onboardingSection .onb-play-btn.onb-play-attention'); // ferma il pulse al primo play
         if (pulseBtn) pulseBtn.classList.remove('onb-play-attention');
+        let done = false;
+        let fallback = null;
+        // Barra di avanzamento sull'intera durata del file tutorial.
         const tick = () => {
-          if (bar && isFinite(el.duration)) {
-            // Conteggio dall'inizio del segmento (start0): dopo la pausa la barra
-            // riparte dallo stato di pausa (non da 0).
-            bar.style.width = Math.min(100, Math.max(0, ((el.currentTime - start0) / (end - start0)) * 100)) + '%';
-          }
+          if (!bar) return;
+          const dur = (isFinite(el.duration) && el.duration > 0) ? el.duration : 0;
+          if (dur) bar.style.width = Math.min(100, Math.max(0, (el.currentTime / dur) * 100)) + '%';
         };
-        el.addEventListener('timeupdate', tick);
-        _onbPlaying = true;
-        playVerseInterval(el, start, end, () => {
+        const detach = () => {
           el.removeEventListener('timeupdate', tick);
+          el.removeEventListener('ended', finish);
+          el.removeEventListener('error', finish);
+          el.removeEventListener('loadedmetadata', begin);
+          if (fallback) { clearTimeout(fallback); fallback = null; }
+        };
+        const finish = () => {
+          if (done) return; done = true;
+          detach();
           if (bar) bar.style.width = '100%';
           onbSetPlayIcon('play_arrow');
           _onbPlaying = false;
           _onbPlayFrom = null;
           if (typeof _onbPlayerOnDone === 'function') _onbPlayerOnDone();
-        });
+        };
+        const begin = () => {
+          // File non disponibile: sblocca comunque la fase (bottone Adelante).
+          if (el.error) { finish(); return; }
+          // PLAY: riprende dalla posizione di pausa (stessa traccia) o dall'inizio.
+          const start = (typeof _onbPlayFrom === 'number' && _onbPlayFrom > 0) ? _onbPlayFrom : 0;
+          try { el.currentTime = start; } catch (e) {}
+          el.play().catch(() => {});
+        };
+        // Cleanup al cambio fase: la traccia vecchia non deve più agire sulla UI nuova.
+        _onbPlayerCleanup = () => { done = true; detach(); };
+        _onbPlaying = true;
+        el.addEventListener('timeupdate', tick);
+        el.addEventListener('ended', finish);
+        el.addEventListener('error', finish);
+        // File tutorial già fallito in fase di preload (404 / formato non supportato):
+        // sblocca subito la fase, senza attendere il timeout di sicurezza.
+        if (el.error) { finish(); return; }
+        // Fallback: se la traccia non termina (file mancante/bloccato), il bottone
+        // Adelante compare comunque.
+        const span = (isFinite(el.duration) && el.duration > 0) ? el.duration : 25;
+        fallback = setTimeout(finish, (span + 15) * 1000);
+        if (el.readyState >= 1) begin();
+        else el.addEventListener('loadedmetadata', begin, { once: true });
       }
 
       // ==================== LANDING PAGE ====================
@@ -368,7 +413,7 @@
         } else if (n === 3) {
           wrap = onbPhaseShell('Haz clic en play para escuchar cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
-          onbShowPlayer(wrap, ONB_PLAY_FIRST, null, () => onbShowAdelante(wrap, () => onbFase(4)));
+          onbShowPlayer(wrap, ONB_AUDIO_FIRST, null, () => onbShowAdelante(wrap, () => onbFase(4)));
         } else if (n === 4) {
           wrap = onbPhaseShell('Intenta entender y toca para ver la traducción');
           onbVerseCard(wrap, _onbVerses[1], { tap: true, onTap: () => onbShowAdelante(wrap, () => onbFase(5)) });
@@ -383,7 +428,7 @@
           wrap = onbPhaseShell('Escucha cómo suena');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbVerseCard(wrap, _onbVerses[1], { tap: false });
-          onbShowPlayer(wrap, ONB_PLAY_SECOND, null, () => onbShowAdelante(wrap, () => onbFase(8)));
+          onbShowPlayer(wrap, ONB_AUDIO_SECOND, null, () => onbShowAdelante(wrap, () => onbFase(8)));
         } else if (n === 8) {
           onbEsercizio();
         }
