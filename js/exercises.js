@@ -198,8 +198,9 @@ if (exercise.mode === 'review') {
                   <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                 </div>
                 <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
-                <div class="exercise-actions">
-                  <button id="exerciseContinueBtn" class="btn btn-primary${isRevealed?'':' exercise-reveal-hidden'}" ${isRevealed?'':'disabled aria-hidden="true" '}onclick="advanceExercisePhase()">Continuar</button>
+                <div class="exercise-actions exercise-self-assessment" role="group" aria-label="Autoevaluación">
+                  <button type="button" class="btn exercise-assessment-btn exercise-assessment-unknown exercise-reveal-hidden" disabled aria-hidden="true" onclick="advanceExercisePhase(this)">No lo sabía</button>
+                  <button type="button" class="btn exercise-assessment-btn exercise-assessment-known exercise-reveal-hidden" disabled aria-hidden="true" onclick="advanceExercisePhase(this)">Lo sabía</button>
                 </div>
               </div>
             </div>
@@ -213,8 +214,9 @@ if (exercise.mode === 'review') {
             const totalMs = revealTotalMs(exercise.text || '');
             _exerciseTimer = setTimeout(() => {
               _exerciseTimer = null;
-              const btn = document.getElementById('exerciseContinueBtn');
-              if (btn) { btn.disabled = false; btn.removeAttribute('aria-hidden'); btn.classList.remove('exercise-reveal-hidden'); }
+              if (_exercisePhase === 'revealed' && _exerciseQueue[_exerciseIndex] === exercise) {
+                setExerciseAssessmentVisible(true);
+              }
             }, totalMs + 150);
           }
           return;
@@ -242,12 +244,23 @@ if (exercise.mode === 'review') {
         renderEsercizio(_ripassoMode ? 'ripasso' : 'studio');
       }
 
-      // "Continuar" è cliccabile solo quando l'animazione di reveal è finita
-      // (il bottone è disabled/nascosto fino a quel momento, vedi
-      // toggleExerciseReveal), quindi qui basta avanzare — non serve più
-      // controllare la fase.
-      function advanceExercisePhase() {
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+      function setExerciseAssessmentVisible(visible) {
+        document.querySelectorAll('#eserciziLyrics .exercise-assessment-btn').forEach(btn => {
+          btn.disabled = !visible;
+          btn.classList.toggle('exercise-reveal-hidden', !visible);
+          if (visible) btn.removeAttribute('aria-hidden');
+          else btn.setAttribute('aria-hidden', 'true');
+        });
+      }
+
+      // Entrambe le autovalutazioni completano l'attività, non misurano correttezza.
+      function advanceExercisePhase(btn) {
+        const wrap = document.getElementById('eserciziLyrics');
+        const exercise = _exerciseQueue[_exerciseIndex];
+        if (!btn || btn.disabled || !wrap || !wrap.contains(btn) ||
+            !exercise || exercise.mode !== 'review' || _exercisePhase !== 'revealed' || _exerciseTimer) return;
+        // Disabilita entrambe prima di avanzare: anche click su vecchi nodi sono ignorati.
+        setExerciseAssessmentVisible(false);
         // Il conteggio della sfida vale solo in modalità studio, non in ripasso.
         if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
         nextExercise();
@@ -267,9 +280,9 @@ if (exercise.mode === 'review') {
         if (!ex) return;
         const wrap = document.getElementById('eserciziLyrics');
         const reveal = wrap ? wrap.querySelector('#exerciseReveal') : null;
-        const btn = wrap ? wrap.querySelector('#exerciseContinueBtn') : null;
+        const buttons = wrap ? wrap.querySelectorAll('.exercise-assessment-btn') : [];
         const testo = wrap ? wrap.querySelector('.exercise-text-clickable') : null;
-        if (!reveal || !btn) return;
+        if (!reveal || !buttons.length) return;
 
         if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
 
@@ -281,9 +294,7 @@ if (exercise.mode === 'review') {
           reveal.innerHTML = revealWordsHtml(ex.text || '');
           reveal.classList.add('exercise-reveal-hidden');
           reveal.setAttribute('aria-hidden', 'true');
-          btn.disabled = true;
-          btn.setAttribute('aria-hidden', 'true');
-          btn.classList.add('exercise-reveal-hidden');
+          setExerciseAssessmentVisible(false);
           if (testo) {
             testo.classList.remove('revealing');
             testo.setAttribute('aria-expanded', 'false');
@@ -307,9 +318,7 @@ if (exercise.mode === 'review') {
         _exerciseTimer = setTimeout(() => {
           _exerciseTimer = null;
           if (_exercisePhase !== 'revealed') return;
-          btn.disabled = false;
-          btn.removeAttribute('aria-hidden');
-          btn.classList.remove('exercise-reveal-hidden');
+          setExerciseAssessmentVisible(true);
         }, totalMs + 150);
       }
 
