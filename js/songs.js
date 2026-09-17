@@ -206,9 +206,7 @@
         // P0.5: tag didattici sotto il titolo, nella pagina di dettaglio canzone.
         const songTagsEl = document.getElementById("songTags");
         if (songTagsEl) songTagsEl.innerHTML = songTagPillItemsHtml(song);
-        document.getElementById("songArtist").textContent = song.artist
-          ? `${song.artist} (${song.lang1} / ${song.lang2})`
-          : `(${song.lang1} / ${song.lang2})`;
+        document.getElementById("songArtist").textContent = song.artist || "";
         // In modalità esercizi: nascondi toggle e header canzone (solo herocard)
         const swapToggle = document.querySelector('.song-actions-header .toggle-switch');
         if (swapToggle) swapToggle.style.display = _exerciseMode ? 'none' : 'inline-flex';
