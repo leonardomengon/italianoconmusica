@@ -369,6 +369,12 @@
       background: var(--primary, #9B5DE5);
       color: #fff;
     }
+    /* Negli esercizi il contenitore precedente ospita solo elementi nascosti
+       e l'header fisso: riduci lo spazio vuoto sopra il contatore. */
+    body:has(#esercizi:not(.d-none)) > .container.py-4 {
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
+    }
     /* Contatore degli esercizi FUORI dalla card: sopra il box, centrato */
     .exercise-counter-wrap {
       display: flex;
