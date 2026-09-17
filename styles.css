@@ -466,6 +466,17 @@
       outline: 2px solid var(--secondary-dark);
       outline-offset: 2px;
     }
+    /* Entrata in dissolvenza quando si rimuove .exercise-reveal-hidden:
+       riusa la @keyframes fadeIn globale dell'app (opacità 0→1 + risalita
+       di 10px in .3s), identica a quella delle sezioni (.fade-in).
+       Selettori con :not() così l'animazione parte solo al passaggio
+       nascosto→visibile e non tocca l'effetto :active del tocco. */
+    button.exercise-assessment-btn:not(.exercise-reveal-hidden) {
+      animation: fadeIn .3s ease-in-out;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      button.exercise-assessment-btn:not(.exercise-reveal-hidden) { animation: none; }
+    }
     /* "Lo sabía": identico a .btn-primary ("Siguiente") */
     button.exercise-assessment-known {
       background: var(--secondary) !important;
