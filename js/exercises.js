@@ -180,8 +180,9 @@ if (exercise.mode === 'review') {
           // (visibility, non display — vedi styles.css). Così la card ha già
           // l'altezza definitiva al primo render e il click non causa reflow.
           wrap.innerHTML = `
+            <div class="exercise-counter-wrap"><span class="exercise-counter">${num}/${tot}</span></div>
             <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
-              <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span><span class="exercise-counter">${num}/${tot}</span></div>
+              <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
               <div class="exercise-body">
                 <div class="exercise-text exercise-text-clickable${isRevealed?' revealing':''}" role="button" tabindex="0"
                   aria-expanded="${isRevealed ? 'true' : 'false'}" aria-controls="exerciseReveal"
@@ -224,8 +225,9 @@ if (exercise.mode === 'review') {
 
         const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
         wrap.innerHTML = `
+          <div class="exercise-counter-wrap"><span class="exercise-counter">${num}/${tot}</span></div>
           <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
-            <div class="exercise-header"><span class="exercise-progress">Completa la frase</span><span class="exercise-counter">${num}/${tot}</span></div>
+            <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
             <div class="exercise-text">
               <span class="exercise-verse-text">${textWithBlanks || '<em>Texto no disponible</em>'}</span>
               <button class="btn btn-sm ${btnClass} exercise-fav-btn" style="${starBtnCompleteStyle}" onclick="event.stopPropagation(); togglePreferitoFromExercise(this, ${_exerciseIndex});">${starIcon}</button>

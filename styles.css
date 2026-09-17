@@ -369,6 +369,12 @@
       background: var(--primary, #9B5DE5);
       color: #fff;
     }
+    /* Contatore degli esercizi FUORI dalla card: sopra il box, centrato */
+    .exercise-counter-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
     .exercise-body {
       display: flex;
       flex-direction: column;
