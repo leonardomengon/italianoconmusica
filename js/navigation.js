@@ -71,10 +71,12 @@
       }
 
       // ==================== TOAST ====================
-      function showToast(msg, duration = 2400) {
+      function showToast(msg, duration = 2400, options = {}) {
           const c = document.getElementById('toastContainer');
+          if (options.unique && Array.from(c.children).some(t => t.dataset.toastMessage === msg)) return;
           const t = document.createElement('div');
-          t.className = 'toast-msg';
+          t.className = options.subtle ? 'toast-msg toast-msg-subtle' : 'toast-msg';
+          t.dataset.toastMessage = msg;
           t.innerHTML = msg;
           c.appendChild(t);
           setTimeout(() => t.remove(), duration + 50);
