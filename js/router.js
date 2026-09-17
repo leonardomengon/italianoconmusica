@@ -105,8 +105,22 @@
     return view;
   }
 
+  // Chiude lo stato di caricamento globale (overlay #appLoader e spinner
+  // #loadingMessage) prima di eseguire una vista.
+  // Perché serve: chi apre una vista incrementa _loadToken (es. openSong,
+  // openNotebookView, openRipasso) invalidando la continuation di
+  // showHomeView(), che è l'unico punto che spegneva spinner e loader. In
+  // deep-link/ricarica su una rotta non-home (es. #/ripasso) quella
+  // continuation esce subito e lo "Cargando..." resterebbe visibile per sempre.
+  function clearLoadingState() {
+    const lm = document.getElementById('loadingMessage');
+    if (lm) lm.style.display = 'none';
+    if (typeof hideAppLoader === 'function') hideAppLoader();
+  }
+
   // Esegue la vista corrispondente alla rotta corrente.
   async function dispatch() {
+    clearLoadingState();
     const r = parse();
     if (!r) {
       try { navigate('#/', { replace: true }); } catch (e) {}
@@ -135,6 +149,7 @@
     replace: replace,
     current: current,
     dispatch: dispatch,
+    clearLoadingState: clearLoadingState,
     syncBottomNav: syncBottomNav,
     handleDeepLink: handleDeepLink
   };

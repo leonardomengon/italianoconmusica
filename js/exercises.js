@@ -564,6 +564,18 @@ if (exercise.mode === 'review') {
         // precedente prima di generare la nuova coda.
         _loadToken++;
         if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        // Stessa difesa di openSong: questa apertura invalida la continuation
+        // di showHomeView(), che è l'unico punto che spegneva lo stato di
+        // caricamento. Senza questa pulizia lo "Cargando..." (overlay
+        // #appLoader + spinner #loadingMessage) resterebbe infinito quando la
+        // vista si apre da rotta/deep-link (es. ricarica su #/ripasso).
+        if (window.router && typeof router.clearLoadingState === 'function') {
+          router.clearLoadingState();
+        } else {
+          const lm = document.getElementById('loadingMessage');
+          if (lm) lm.style.display = 'none';
+          if (typeof hideAppLoader === 'function') hideAppLoader();
+        }
         _exerciseMode = false;
         _ripassoMode = true;
         _reviewMode = false;
