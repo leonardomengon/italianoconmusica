@@ -25,12 +25,33 @@
           );
 
           if (index > -1) {
+              // Snapshot completo PRIMA della rimozione: "Deshacer" rimette
+              // l'appunto identico (id, nota personale, data e posizione), non
+              // una voce nuova con la nota vuota.
+              const rimosso = { ...appunti[index] };
+              const removedIndex = index;
               appunti.splice(index, 1);
               saveAppunti(appunti);
               btn.innerHTML = '☆';
               btn.classList.remove('btn-outline-warning');
               btn.classList.add('btn-outline-secondary');
-              showToast('🗑️ Eliminado de favoritos');
+              showToast('Eliminado de favoritos', 6000, {
+                  action: {
+                      label: 'Deshacer',
+                      onClick: () => {
+                          // Se nel frattempo la frase è stata ri-salvata a mano,
+                          // ripristinaAppunto non fa nulla: non si duplica e non
+                          // si sovrascrive la nuova nota.
+                          if (!ripristinaAppunto(rimosso, removedIndex)) return;
+                          if (btn.isConnected) {
+                              btn.innerHTML = '⭐';
+                              btn.classList.remove('btn-outline-secondary');
+                              btn.classList.add('btn-outline-warning');
+                          }
+                          if (typeof opts.onUndo === 'function') opts.onUndo(rimosso);
+                      }
+                  }
+              });
               return false;
           } else {
               appunti.push({
@@ -73,6 +94,35 @@
           }
       }
 
+      // Crea (se manca) la box nota sotto il verso. Dopo un "Deshacer" la box
+      // viene ricreata e il campo ripopolato con la nota appena ripristinata.
+      function _ensureVerseNoteEl(lyricIndex, valore) {
+          let noteEl = document.getElementById(`verse-note-${lyricIndex}`);
+          if (!noteEl) {
+              const verseEl = document.querySelector(`.verse[data-index="${lyricIndex}"]`);
+              if (!verseEl) return null;
+              noteEl = document.createElement('div');
+              noteEl.className = 'verse-note';
+              noteEl.id = `verse-note-${lyricIndex}`;
+              noteEl.innerHTML = `<textarea placeholder="Añade nota" onblur="saveNotaFromVerse(this, ${lyricIndex})" onclick="event.stopPropagation()"></textarea>`;
+              const textDiv = verseEl.querySelector('.d-flex.justify-content-between');
+              if (textDiv && textDiv.nextSibling) {
+                  verseEl.insertBefore(noteEl, textDiv.nextSibling);
+              } else {
+                  verseEl.appendChild(noteEl);
+              }
+          }
+          if (typeof valore === 'string' && valore) {
+              const ta = noteEl.querySelector('textarea');
+              if (ta && !ta.value) ta.value = valore;
+          }
+          return noteEl;
+      }
+      function _removeVerseNoteEl(lyricIndex) {
+          const noteEl = document.getElementById(`verse-note-${lyricIndex}`);
+          if (noteEl) noteEl.remove();
+      }
+
       function togglePreferito(btn, lyricIndex) {
           if (!currentSongBackup || !currentSongBackup.lyrics) return;
           const lyric = currentSongBackup.lyrics[lyricIndex];
@@ -88,29 +138,15 @@
               songTitle: currentSongBackup.title || '',
               artist: currentSongBackup.artist || '',
               lingua: currentSongBackup.lang1 || '',
-              linguaTrad: currentSongBackup.lang2 || ''
+              linguaTrad: currentSongBackup.lang2 || '',
+              // "Deshacer": ricrea la box nota e rimette il testo salvato prima.
+              onUndo: (a) => _ensureVerseNoteEl(lyricIndex, a.nota || '')
           });
 
           if (added) {
-              let noteEl = document.getElementById(`verse-note-${lyricIndex}`);
-              if (!noteEl) {
-                  const verseEl = document.querySelector(`.verse[data-index="${lyricIndex}"]`);
-                  if (verseEl) {
-                      noteEl = document.createElement('div');
-                      noteEl.className = 'verse-note';
-                      noteEl.id = `verse-note-${lyricIndex}`;
-                      noteEl.innerHTML = `<textarea placeholder="Añade nota" onblur="saveNotaFromVerse(this, ${lyricIndex})" onclick="event.stopPropagation()"></textarea>`;
-                      const textDiv = verseEl.querySelector('.d-flex.justify-content-between');
-                      if (textDiv && textDiv.nextSibling) {
-                          verseEl.insertBefore(noteEl, textDiv.nextSibling);
-                      } else {
-                          verseEl.appendChild(noteEl);
-                      }
-                  }
-              }
+              _ensureVerseNoteEl(lyricIndex);
           } else {
-              const noteEl = document.getElementById(`verse-note-${lyricIndex}`);
-              if (noteEl) noteEl.remove();
+              _removeVerseNoteEl(lyricIndex);
           }
       }
 
@@ -352,9 +388,22 @@
           let appunti = getAppunti();
           const idx = appunti.findIndex(a => a.id === id);
           if (idx < 0) return;
+          // Snapshot completo: "Deshacer" rimette l'appunto identico, con
+          // nota, data e posizione originali.
+          const rimosso = { ...appunti[idx] };
           appunti.splice(idx, 1);
           saveAppunti(appunti);
-          showToast('🗑️ Nota eliminada');
+          showToast('Nota eliminada', 6000, {
+              action: {
+                  label: 'Deshacer',
+                  onClick: () => {
+                      if (!ripristinaAppunto(rimosso, idx)) return;
+                      popolaFiltriAppunti();
+                      renderAppuntiAuto();
+                      if (currentSongBackup && _exerciseMode) renderCurrentExercise();
+                  }
+              }
+          });
           popolaFiltriAppunti();
           renderAppuntiAuto();
           if (currentSongBackup && _exerciseMode) {

@@ -147,6 +147,21 @@
         rebuildSavedIndex();
         updateAppuntiBadge();
       }
+      // Ripristina un appunto rimosso (snapshot completo: id, nota, data).
+      // Lo reinserisce nella posizione originale, così l'ordine della lista
+      // resta quello di prima. Non sovrascrive nulla: se l'id è già tornato
+      // nel frattempo (es. la frase è stata ri-salvata a mano) non fa niente.
+      function ripristinaAppunto(snapshot, index) {
+        if (!snapshot) return false;
+        const appunti = getAppunti();
+        if (snapshot.id && appunti.some(a => a.id === snapshot.id)) return false;
+        const target = normalizza(snapshot.testo || snapshot.text || '');
+        if (target && appunti.some(a => normalizza(a.testo) === target || normalizza(a.traduzione) === target)) return false;
+        const at = (typeof index === 'number' && index >= 0 && index <= appunti.length) ? index : appunti.length;
+        appunti.splice(at, 0, snapshot);
+        saveAppunti(appunti);
+        return true;
+      }
       // Core: imposta la nota sul primo appunto che soddisfa il predicato.
       function aggiornaNota(matchFn, value) {
         const appunti = getAppunti();
@@ -203,9 +218,22 @@
         let appunti = getAppunti();
         const idx = appunti.findIndex(a => a.id === id);
         if (idx < 0) return;
+        // Snapshot completo: "Deshacer" rimette l'appunto identico (nota, data
+        // e posizione originali), senza passar da conferme.
+        const rimosso = { ...appunti[idx] };
         appunti.splice(idx, 1);
         saveAppunti(appunti);
-        showToast('🗑️ Nota eliminada');
+        showToast('Nota eliminada', 6000, {
+          action: {
+            label: 'Deshacer',
+            onClick: () => {
+              if (!ripristinaAppunto(rimosso, idx)) return;
+              popolaFiltriAppunti();
+              renderAppuntiAuto();
+              if (currentSongBackup && _exerciseMode) renderCurrentExercise();
+            }
+          }
+        });
         popolaFiltriAppunti();
         renderAppuntiAuto();
         if (currentSongBackup && _exerciseMode) {

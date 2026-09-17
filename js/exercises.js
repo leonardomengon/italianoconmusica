@@ -358,7 +358,15 @@ if (exercise.mode === 'review') {
             songTitle: currentSongBackup ? (currentSongBackup.title || '') : '',
             artist: currentSongBackup ? (currentSongBackup.artist || '') : '',
             lingua: currentSongBackup ? (currentSongBackup.lang1 || '') : '',
-            linguaTrad: currentSongBackup ? (currentSongBackup.lang2 || '') : ''
+            linguaTrad: currentSongBackup ? (currentSongBackup.lang2 || '') : '',
+            // "Deshacer": riapre la box nota e rimette il testo appena perso.
+            onUndo: (a) => {
+                const noteEl = document.getElementById(`exercise-note-${exerciseIdx}`);
+                if (!noteEl) return;
+                noteEl.classList.remove('exercise-note-hidden');
+                const ta = noteEl.querySelector('textarea');
+                if (ta && !ta.value) ta.value = a.nota || '';
+            }
         });
 
         // La box degli appunti è SEMPRE nel DOM (renderEsercizio), subito
