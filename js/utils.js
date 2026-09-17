@@ -223,7 +223,7 @@
         const rimosso = { ...appunti[idx] };
         appunti.splice(idx, 1);
         saveAppunti(appunti);
-        showToast('Nota eliminada', 6000, {
+        showToast('Nota eliminada', 4000, {
           action: {
             label: 'Deshacer',
             onClick: () => {
