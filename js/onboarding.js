@@ -403,7 +403,7 @@
           // Fase 1: verso NON interattivo. Il bottone è subito attivo: la
           // riflessione è già garantita dalla struttura (la traduzione appare
           // solo nella Fase 2), senza bloccare l'utente con un timer.
-          wrap = onbPhaseShell('Intenta adivinar el significado');
+          wrap = onbPhaseShell('Intenta entender el significado');
           onbVerseCard(wrap, _onbVerses[0], { tap: false });
           onbShowAdelante(wrap, () => onbFase(2));
         } else if (n === 2) {
@@ -732,8 +732,8 @@
         sec.className = 'onb-landing onb-enter';
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
-          '<h1 class="onb-splash-title">Música creada para que aprendas</h1>' +
-          '<p class="onb-splash-sub">Cada canción usa frases y vocabulario que siguen un camino estructurado, de lo básico a lo más avanzado. No es una playlist: es un curso que avanza paso a paso.</p>' +
+          '<h1 class="onb-splash-title">Música creada para aprender</h1>' +
+          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones diseñadas para que puedas progresar en el aprendizaje del idioma. Cada canción se centra en diferentes palabras y estructuras.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza

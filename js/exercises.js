@@ -389,7 +389,7 @@ if (exercise.mode === 'review') {
         }
       }
 
-      function generaVersoStudio(testoOriginale, numBlanks) {
+      function generaVersoStudio(testoOriginale, numBlanks, parolaFissa) {
         if (!testoOriginale) return "";
         let frammenti = testoOriginale.split(/([\s.,!?'";:]+)/);
         function contaOccorrenze(parola, lista) {
@@ -413,8 +413,14 @@ if (exercise.mode === 'review') {
         let quante = Math.max(1, (typeof numBlanks === 'number' ? numBlanks : 1));
         let poolCand = [...candidati];
         let scelti = [];
-        while (scelti.length < quante && poolCand.length > 0) {
-          scelti.push(poolCand.splice(Math.floor(Math.random() * poolCand.length), 1)[0]);
+        if (parolaFissa) {
+          // Solo il tutorial passa una parola fissa: nessuna selezione casuale.
+          const index = frammenti.findIndex(f => f.toLowerCase() === parolaFissa.toLowerCase());
+          if (index >= 0) scelti.push({ testo: frammenti[index], index });
+        } else {
+          while (scelti.length < quante && poolCand.length > 0) {
+            scelti.push(poolCand.splice(Math.floor(Math.random() * poolCand.length), 1)[0]);
+          }
         }
         scelti.forEach(scelta => {
           let targetParola = scelta.testo.toLowerCase();

@@ -1739,6 +1739,17 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
   .reveal-word { animation: none; opacity: 1; }
 }
 
+/* Solo onboarding: focus e dissolvenza, nessuna entrata verticale. */
+@keyframes onb-reveal-word-focus {
+  from { opacity: 0; filter: blur(1px); }
+  to   { opacity: 1; filter: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #onboardingSection .reveal-word {
+    animation-name: onb-reveal-word-focus;
+  }
+}
+
 /* --- Banner di successo salvataggio preferito (Endowed Progress) --- */
 .onb-success-banner {
   width: 100%; max-width: 560px;
