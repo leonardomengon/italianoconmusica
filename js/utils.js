@@ -14,15 +14,33 @@
 
       // ==================== TAG DIDATTICI (P0.5) ====================
       // Ogni canzone espone le proprie etichette grammaticali/lessicali
-      // (es. "futuro semplice", "indicazioni stradali") tramite il campo "tag"
-      // del catalogo, che è un array di stringhe. Finché il catalogo non è
-      // aggiornato con i tag reali, si applicano questi placeholder.
+      // (es. "futuro semplice", "indicazioni stradali") tramite:
+      //  - campo "tag"      : array di stringhe (catalogo aggiornato)
+      //  - campo "tagword"  : stringa comma-separated (catalogo corrente, es. "Pop,Dias,,Rutina")
+      // Finché nessuno dei due campi è popolato si applicano questi placeholder.
       const DEFAULT_SONG_TAGS = ["verbos esenciales", "presente"];
+      // Parsa il campo "tagword" (stringa comma-separated) in un array di
+      // stringhe non vuote. Ritorna null se il valore è assente o vuoto.
+      function parseTagword(tagword) {
+        if (typeof tagword !== 'string' || tagword.trim() === '') return null;
+        const parsed = tagword.split(',').map(t => t.trim()).filter(t => t !== '');
+        return parsed.length ? parsed : null;
+      }
       // Accetta indifferentemente un array di tag o un oggetto canzone.
+      // Risoluzione in ordine di priorità: tag (array) → tagword (stringa) → DEFAULT_SONG_TAGS.
       function getSongTags(songOrTags) {
-        const raw = Array.isArray(songOrTags)
-          ? songOrTags
-          : (songOrTags && Array.isArray(songOrTags.tag) ? songOrTags.tag : null);
+        let raw;
+        if (Array.isArray(songOrTags)) {
+          raw = songOrTags;
+        } else if (songOrTags) {
+          // 1) campo "tag" (array) — preferito se presente e non vuoto
+          if (Array.isArray(songOrTags.tag) && songOrTags.tag.length > 0) {
+            raw = songOrTags.tag;
+          } else if (songOrTags.tagword) {
+            // 2) campo "tagword" (stringa comma-separated)
+            raw = parseTagword(songOrTags.tagword);
+          }
+        }
         const tags = (raw || []).filter(t => t !== null && t !== undefined && String(t).trim() !== '');
         return tags.length ? tags : DEFAULT_SONG_TAGS;
       }

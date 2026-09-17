@@ -118,11 +118,14 @@
           const n = normalizza(s.corso);
           if (n && s.corsoDesc) courseDescriptions[n] = s.corsoDesc;
         });
-        // P0.5: normalizza il tag didattico su ogni canzone. Il campo "tag" del
-        // catalogo è un array di etichette grammaticali/lessicali; finché non è
-        // presente (catalogo non ancora aggiornato) si applicano i placeholder.
+        // P0.5: normalizza il tag didattico su ogni canzone. Il catalogo espone
+        // i tag come stringa comma-separated nel campo "tagword" (es. "Pop,Dias,,Rutina").
+        // La parsiamo in array; se assente o vuota si cade su DEFAULT_SONG_TAGS.
         (data || []).forEach(s => {
-          if (!Array.isArray(s.tag) || s.tag.length === 0) s.tag = DEFAULT_SONG_TAGS.slice();
+          if (!Array.isArray(s.tag) || s.tag.length === 0) {
+            const parsed = parseTagword(s.tagword);
+            s.tag = parsed && parsed.length ? parsed : DEFAULT_SONG_TAGS.slice();
+          }
         });
         // === DEBUG: sorgente usata e primi elementi ===
         console.log(`[fetchSongs] SORGENTE USATA: ${source} | canzoni: ${(data||[]).length}`);
