@@ -682,7 +682,7 @@
         wrap.className = 'onb-funnel';
         while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
         onbRenderStepsHeader('Completa tu primer ejercicio', 'onb-phase-header-ex');
-        const textWithBlanks = generaVersoStudio(escapeHtml(frase), 1);
+        const textWithBlanks = generaVersoStudio(frase, 1);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
         card.innerHTML =

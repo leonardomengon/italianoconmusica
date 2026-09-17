@@ -124,6 +124,11 @@
         const wrap = document.getElementById('eserciziLyrics');
         if (!wrap) return;
 
+        // Esclude solo i completamenti futuri senza parole ammesse. Nessun punto
+        // assegnato e nessuna ricorsione, anche se tutta la coda è da saltare.
+        _exerciseQueue = _exerciseQueue.filter((ex, index) => index < _exerciseIndex ||
+          ex.mode === 'review' || candidatiVersoStudio(ex.text, ex.hint).candidati.length > 0);
+
         const phase = _exercisePhase;
         const nextHandler = 'nextExercise()';
         const hintHandler = 'useHint(this)';
@@ -151,7 +156,7 @@
               <div class="exercise-card text-center p-4">
                 <div class="celebration-icon">🍾</div>
                 <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
-                <p class="text-muted">${(() => { const tot = (typeof ESERCIZI_PER_SFIDA === 'number') ? ESERCIZI_PER_SFIDA : (_exerciseQueue.length || 0); const pensa = Math.ceil(tot / 2); const completa = Math.floor(tot / 2); return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
+                <p class="text-muted">${(() => { const tot = _exerciseQueue.length; const pensa = _exerciseQueue.filter(ex => ex.mode === 'review').length; const completa = tot - pensa; return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
                 <div class="exercise-actions">
                   <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>
                   <button class="btn btn-outline-secondary" onclick="chiudiEsercizi()">← Inicio</button>
@@ -223,7 +228,7 @@ if (exercise.mode === 'review') {
           return;
         }
 
-        const textWithBlanks = generaVersoStudio(escapeHtml(exercise.text || ''), numBlanks);
+        const textWithBlanks = generaVersoStudio(exercise.text || '', numBlanks, null, exercise.hint);
         wrap.innerHTML = `
           <div class="exercise-counter-wrap"><span class="exercise-counter">${num}/${tot}</span></div>
           <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
@@ -389,27 +394,26 @@ if (exercise.mode === 'review') {
         }
       }
 
-      function generaVersoStudio(testoOriginale, numBlanks, parolaFissa) {
+      // Confronto su testo normale: ignora maiuscole e punteggiatura, non gli accenti.
+      function candidatiVersoStudio(testoOriginale, traduzione) {
+        const key = word => word.normalize('NFC').toLowerCase();
+        const frammenti = (testoOriginale || '').split(/([^\p{L}\p{M}\p{N}]+)/u);
+        const condivise = new Set(((traduzione || '').match(/[\p{L}\p{M}\p{N}]+/gu) || []).map(key));
+        const parole = frammenti.map((testo, index) => ({ testo, index }))
+          .filter(p => /^[\p{L}\p{N}][\p{L}\p{M}\p{N}]*$/u.test(p.testo));
+        const ammesse = parole.filter(p => !condivise.has(key(p.testo)));
+        const trova = (min, unica) => ammesse.filter(p => p.testo.length >= min &&
+          (!unica || parole.filter(q => key(q.testo) === key(p.testo)).length === 1));
+        let candidati = trova(5, true);
+        if (!candidati.length) candidati = trova(3, true);
+        if (!candidati.length) candidati = trova(1, false);
+        return { frammenti, candidati };
+      }
+
+      // Input non escapato; la conversione HTML avviene soltanto dopo la selezione.
+      function generaVersoStudio(testoOriginale, numBlanks, parolaFissa, traduzione) {
         if (!testoOriginale) return "";
-        let frammenti = testoOriginale.split(/([\s.,!?'";:]+)/);
-        function contaOccorrenze(parola, lista) {
-          let target = parola.toLowerCase();
-          return lista.filter(f => f.toLowerCase() === target).length;
-        }
-        function trovaCandidati(lunghezzaMinima, richiediUnicita) {
-          let candidati = [];
-          frammenti.forEach((frammento, idx) => {
-            let valido = /^[\p{L}\p{N}]+$/u.test(frammento) && frammento.length >= lunghezzaMinima;
-            if (valido && richiediUnicita) {
-              if (contaOccorrenze(frammento, frammenti) > 1) valido = false;
-            }
-            if (valido) candidati.push({ testo: frammento, index: idx });
-          });
-          return candidati;
-        }
-        let candidati = trovaCandidati(5, true);
-        if (candidati.length === 0) candidati = trovaCandidati(3, true);
-        if (candidati.length === 0) candidati = trovaCandidati(1, false);
+        const { frammenti, candidati } = candidatiVersoStudio(testoOriginale, traduzione);
         let quante = Math.max(1, (typeof numBlanks === 'number' ? numBlanks : 1));
         let poolCand = [...candidati];
         let scelti = [];
@@ -422,10 +426,11 @@ if (exercise.mode === 'review') {
             scelti.push(poolCand.splice(Math.floor(Math.random() * poolCand.length), 1)[0]);
           }
         }
+        const htmlFrammenti = frammenti.map(escapeHtml);
         scelti.forEach(scelta => {
           let targetParola = scelta.testo.toLowerCase();
           let larghezza = Math.max(80, targetParola.length * 16);
-          frammenti[scelta.index] = `<input type="text" autocomplete="off" autocorrect="off" spellcheck="false"
+          htmlFrammenti[scelta.index] = `<input type="text" autocomplete="off" autocorrect="off" spellcheck="false"
             class="form-control form-control-sm d-inline-block study-input text-center"
             data-answer="${targetParola}"
             data-answer-original="${scelta.testo}"
@@ -434,7 +439,7 @@ if (exercise.mode === 'review') {
             placeholder="${'*'.repeat(targetParola.length)}"
             style="width: ${larghezza}px; height: 28px; padding: 0 4px; vertical-align: middle; box-sizing: border-box;">`;
         });
-        return frammenti.join("");
+        return htmlFrammenti.join("");
       }
 
       // Sostituisce useHint() + useRipassoHint(). In modalità studio c'è un

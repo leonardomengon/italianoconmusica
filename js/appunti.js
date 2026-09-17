@@ -337,13 +337,19 @@
               [frasi[i], frasi[j]] = [frasi[j], frasi[i]];
           }
 
+          frasi = frasi.filter(frase => candidatiVersoStudio(frase.text, frase.hint).candidati.length > 0);
+          if (!frasi.length) {
+              lista.innerHTML = '<p style="text-align:center;color:#958AAD;padding:20px 0;">No hay palabras diferentes de la traducción para completar.</p>';
+              info.textContent = '';
+              return;
+          }
           // Max 10
           const selected = frasi.slice(0, 10);
           info.textContent = `🧠 ${selected.length} frases de estudio (de ${frasi.length} favoritos disponibles)`;
 
           let html = '<div class="lyrics-container">';
           selected.forEach((frase) => {
-              const textWithBlanks = generaVersoStudio(escapeHtml(frase.text));
+              const textWithBlanks = generaVersoStudio(frase.text, 1, null, frase.hint);
               const hintHTML = frase.hint && frase.hint.trim()
                   ? `
                     <div class="translation" style="display:block; opacity:0.85; border-left-color:#5B9BF6;">
