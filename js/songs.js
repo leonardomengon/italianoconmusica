@@ -417,6 +417,58 @@
       }
     }
 
+      // Chiude le traduzioni aperte diverse dal verso cliccato mantenendo
+      // FERMO il verso cliccato: chiudere un verso più in alto accorcia il
+      // documento, quindi tutto ciò che sta sotto slitterebbe verso l'alto.
+      // Si misura la posizione del verso cliccato (rect.top, cioè relativa alla
+      // viewport) prima e dopo la chiusura: lo scostamento residuo viene
+      // annullato con una compensazione di scroll ISTANTANEA (niente behaviour
+      // smooth: il salto verrebbe animato invece che annullato).
+      // Usare rect.top + scrollY (coordinate di documento) sarebbe sbagliato:
+      // quando il browser ha già corretto da sé (scroll anchoring oppure clamp
+      // del max-scroll perché il documento si è accorciato) quello scostamento
+      // verrebbe contato due volte e il verso saltarebbe in basso.
+      function _closeOtherVersesKeepingAnchor(index, isOnboarding) {
+        const openVerses = [];
+        document.querySelectorAll(".verse.active").forEach(activeVerse => {
+          if (Number(activeVerse.dataset.index) !== index) openVerses.push(activeVerse);
+        });
+        if (openVerses.length === 0) return;
+
+        // In onboarding il layout è assoluto (nessun reflow) e lo scroll non
+        // deve cambiare: la compensazione sarebbe un no-op, quindi si salta.
+        const anchorEl = isOnboarding ? null : document.querySelector(`.verse[data-index="${index}"]`);
+        const beforeTop = anchorEl ? anchorEl.getBoundingClientRect().top : null;
+
+        openVerses.forEach(activeVerse => {
+          const activeIndex = activeVerse.dataset.index;
+          const activeTranslationEl = activeVerse.querySelector(".translation");
+          if (activeTranslationEl) activeTranslationEl.style.display = "none";
+          activeVerse.classList.remove("active");
+          const activeAltLinkEl = document.getElementById(`alt-link-${activeIndex}`);
+          if (activeAltLinkEl) activeAltLinkEl.classList.add("d-none");
+        });
+
+        if (beforeTop === null) return;
+        const drift = anchorEl.getBoundingClientRect().top - beforeTop;
+        if (drift === 0) return;
+        const scroller = document.scrollingElement || document.documentElement;
+        scroller.scrollTop += drift;
+      }
+
+      // Scrolla il verso SOLO se la sua testa è fuori dallo spazio visibile:
+      // sopra il bordo della viewport oppure nascosta dietro al player fisso /
+      // bottom nav. Con la compensazione l'apertura non sposta più nulla, quindi
+      // il movimento deve restare un'eccezione, non la norma.
+      function _ensureVerseVisible(verseEl) {
+        if (!verseEl) return;
+        const rect = verseEl.getBoundingClientRect();
+        const topBound = 8;                            // bordo alto della viewport
+        const bottomBound = window.innerHeight - 160;  // player fisso (72px) + bottom nav
+        if (rect.top >= topBound && rect.top <= bottomBound) return;
+        verseEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
       function toggleTranslation(index) {
         if (_exerciseMode) return;
         // In onboarding (layout assoluto vh) NON scrollare verso/contenitore:
@@ -425,43 +477,26 @@
         const translationEl = document.getElementById(`translation-${index}`);
         const verseEl = document.querySelector(`.verse[data-index="${index}"]`);
         const altLinkEl = document.getElementById(`alt-link-${index}`);
-        // Chiudi tutti gli altri versi aperti, tranne quello cliccato
-        document.querySelectorAll(".verse.active").forEach(activeVerse => {
-          const activeIndex = activeVerse.dataset.index;
-          if (Number(activeIndex) !== index) {
-            const activeTranslationEl = activeVerse.querySelector(".translation");
-            if (activeTranslationEl) activeTranslationEl.style.display = "none";
-            activeVerse.classList.remove("active");
-            const activeAltLinkEl = document.getElementById(`alt-link-${activeIndex}`);
-            if (activeAltLinkEl) activeAltLinkEl.classList.add("d-none");
-          }
-        });
+        // Chiude i versi aperti diversi da quello cliccato compensando lo scroll
+        // (vedi _closeOtherVersesKeepingAnchor): il verso cliccato resta fermo.
+        _closeOtherVersesKeepingAnchor(index, isOnboarding);
 
         if (translationEl.style.display === "block") {
           translationEl.style.display = "none";
           if (verseEl) verseEl.classList.remove("active");
           if (altLinkEl) altLinkEl.classList.add("d-none");
-          // Scrolla il verso chiuso solo se necessario (minimo movimento; NON in onboarding)
-          if (!isOnboarding) setTimeout(() => {
-            verseEl.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest"
-            });
-          }, 100);
+          // Il verso chiuso si accorcia sotto la propria riga: la sua testa non
+          // si muove, quindi si scrolla solo se è (quasi) fuori dal viewport.
+          if (!isOnboarding) setTimeout(() => _ensureVerseVisible(verseEl), 100);
         } else {
           translationEl.style.display = "block";
           recordVerseExplored(index);
           try { logEvent('verse_expanded', { verseId: positionalVerseId(currentSongId, index) }); } catch (e) {}
           if (verseEl) verseEl.classList.add("active");
           if (altLinkEl) altLinkEl.classList.remove("d-none");
-          // Scrolla il verso cliccato solo se necessario (minimo movimento),
-          // dopo che la traduzione si è espansa (NON in onboarding)
-          if (!isOnboarding) setTimeout(() => {
-            verseEl.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest"
-            });
-          }, 100);
+          // La traduzione si espande DENTRO il verso, sotto la sua riga: la testa
+          // resta ferma, quindi si scrolla solo se è fuori dal viewport.
+          if (!isOnboarding) setTimeout(() => _ensureVerseVisible(verseEl), 100);
         }
       }
 
