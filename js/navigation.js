@@ -50,6 +50,9 @@
           if (token !== _loadToken) return;
           document.getElementById('loadingMessage').style.display = "none";
           console.error('Errore caricamento canzone:', error);
+          // La vista torna alla home: riallinea l'URL alla rotta home, così
+          // l'hash non resta su #/canzone/:id dopo un caricamento fallito.
+          if (window.router && typeof router.replace === 'function') router.replace('#/');
           await showHomeView();
           alert('Error al cargar la canción.');
         }

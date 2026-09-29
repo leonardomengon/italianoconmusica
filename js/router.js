@@ -58,6 +58,20 @@
     return songs.some(s => s && String(s.id) === String(id));
   }
 
+  // True se la canzone è già completata. Riaprire una canzone completata è una
+  // rilettura (review mode): la UI non deve ricalcolare il progresso, mentre la
+  // canzone in corso continua a registrarlo normalmente. Usa l'helper di
+  // progress.js quando presente, altrimenti legge direttamente il progresso.
+  function songCompleted(id) {
+    try {
+      if (typeof songIsCompleted === 'function') return !!songIsCompleted(id);
+    } catch (e) {}
+    try {
+      if (typeof getProgress !== 'function') return false;
+      return (getProgress().completedSongIds || []).map(String).includes(String(id));
+    } catch (e) { return false; }
+  }
+
   function notFoundFallback() {
     try { navigate('#/', { replace: true }); } catch (e) {}
     if (typeof showHomeView === 'function') showHomeView();
@@ -86,6 +100,8 @@
   function songHandler(id) {
     if (!songExists(id)) { notFoundFallback(); return Promise.resolve(); }
     resetOpenSongFlags();
+    // Canzone già completata (es. riga della libreria o deep-link): review mode.
+    if (songCompleted(id)) { try { _reviewMode = true; } catch (e) {} }
     return (typeof openSong === 'function') ? openSong(id) : Promise.resolve();
   }
 

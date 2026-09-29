@@ -506,6 +506,35 @@
     if (_exerciseQueue.length === 0 && currentSongBackup) generaCodaEsercizi(currentSongBackup);
     renderCurrentExercise();
   }
+  // True se la canzone risulta già completata. Usata dal router per decidere
+  // se una riapertura (#/canzone/:id) va trattata come "review mode".
+  function songIsCompleted(songId) {
+    const completed = (getProgress().completedSongIds || []).map(String);
+    return completed.includes(String(songId));
+  }
+  // Apre una canzone dalla libreria passando dal router (#/canzone/:id): così
+  // URL, storico del browser e tab della bottom-nav restano allineati alla
+  // canzone aperta. Senza router (o se l'hash è già quello della canzone) si
+  // apre direttamente, senza passare dal dispatch.
+  async function openLibrarySong(id) {
+    const target = '#/canzone/' + String(id);
+    if (window.router && typeof router.navigate === 'function') {
+      if (location.hash === target) router.dispatch();
+      else router.navigate(target);
+      return;
+    }
+    // Fallback senza router: stesse regole di songHandler (review mode solo per
+    // le canzoni già completate).
+    if (songIsCompleted(id)) return openCompletedSong(id);
+    _exerciseMode = false;
+    _exerciseQueue = [];
+    _exerciseIndex = 0;
+    _reviewMode = false;
+    await openSong(id);
+  }
+  // Riapertura di una canzone già completata: sempre in review mode, così il
+  // progresso non viene ricalcolato. Resta come fallback quando il router non
+  // è disponibile (la rotta #/canzone/:id usa songHandler).
   async function openCompletedSong(id) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=true; await openSong(id); }
   function recordVerseExplored(index) {
     if (_reviewMode || !currentSongBackup) return;
@@ -616,7 +645,7 @@
 
     if (isUnlocked) {
       return `
-        <div class="course-song-row" role="button" tabindex="0" onclick="openCompletedSong('${s.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCompletedSong('${s.id}')}">
+        <div class="course-song-row" role="button" tabindex="0" onclick="openLibrarySong('${s.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLibrarySong('${s.id}')}">
           <div class="course-song-meta">
             ${badge}
             <h3 class="course-song-title">${escapeHtml(s.title)}</h3>
