@@ -66,7 +66,7 @@
       // Nessun blocco: il tocco dell'utente è il momento di impegno,
       // l'animazione (vedi .reveal-phrase nel CSS) dà "peso" alla soluzione.
       // I tempi sono centralizzati qui per essere tarati facilmente.
-      const REVEAL_PHRASE_DUR_MS = 1100;  // DEVE combaciare con --reveal-phrase-dur nel CSS (1.1s)
+      const REVEAL_PHRASE_DUR_MS = 2000;  // DEVE combaciare con --reveal-phrase-dur nel CSS (1.1s)
       const REVEAL_INITIAL_DELAY_MS = 200; // pausa prima che compaia la frase
       function revealPhraseHtml(text) {
         // Whitespace normalizzato come faceva la vecchia tokenizzazione
