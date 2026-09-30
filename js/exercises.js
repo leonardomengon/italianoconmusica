@@ -203,7 +203,7 @@ if (exercise.mode === 'review') {
                 <div class="exercise-note${isSavedFlag?'':' exercise-note-hidden'}" id="exercise-note-${_exerciseIndex}">
                   <textarea placeholder="Añade nota" onblur="saveNotaFromExercise(this, ${_exerciseIndex})">${notaValue}</textarea>
                 </div>
-                <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealWordsHtml(exercise.text || '')}</div>
+                <div class="exercise-translation${isRevealed?'':' exercise-reveal-hidden'}" id="exerciseReveal"${isRevealed?'':' aria-hidden="true"'}>${revealPhraseHtml(exercise.text || '')}</div>
                 <div class="exercise-actions exercise-self-assessment" role="group" aria-label="Autoevaluación">
                   <button type="button" class="btn exercise-assessment-btn exercise-assessment-unknown exercise-reveal-hidden" disabled aria-hidden="true" onclick="advanceExercisePhase(this)">No lo sabía</button>
                   <button type="button" class="btn exercise-assessment-btn exercise-assessment-known exercise-reveal-hidden" disabled aria-hidden="true" onclick="advanceExercisePhase(this)">Lo sabía</button>
@@ -278,9 +278,11 @@ if (exercise.mode === 'review') {
       // (vedi renderEsercizio): qui si agisce solo sulle loro classi/attributi,
       // MAI un re-render — così la card non cambia altezza e la nota che
       // l'utente sta scrivendo non viene persa. Il click ALTERNA mostra/nascondi:
-      // la prima volta rivela la traduzione con l'animazione parola-per-parola
-      // (poi "Continuar" si abilita a reveal concluso); un nuovo click la
-      // nasconde di nuovo, e il click successivo la rimostra da capo.
+      // la prima volta rivela la traduzione facendo comparire l'INTERA frase in
+      // una volta, come unico elemento animato (dissolvenza + blur su tutta la
+      // frase, vedi revealPhraseHtml); poi "Continuar" si abilita a comparsa
+      // conclusa; un nuovo click la nasconde di nuovo, e il click successivo la
+      // rimostra da capo.
       function toggleExerciseReveal(el) {
         if (!el) return;
         const ex = (_exerciseQueue && _exerciseQueue[_exerciseIndex]) || null;
@@ -295,10 +297,10 @@ if (exercise.mode === 'review') {
 
         if (_exercisePhase === 'revealed') {
           // Nascondi di nuovo: il markup resta al suo posto (l'altezza della
-          // card non cambia). Il contenuto viene rigenerato così il prossimo
-          // reveal riparte da capo con l'animazione parola-per-parola.
+          // card non cambia). Il contenuto viene rigenerato così la prossima
+          // comparsa riparte da capo con l'intera frase animata insieme.
           _exercisePhase = 'translation';
-          reveal.innerHTML = revealWordsHtml(ex.text || '');
+          reveal.innerHTML = revealPhraseHtml(ex.text || '');
           reveal.classList.add('exercise-reveal-hidden');
           reveal.setAttribute('aria-hidden', 'true');
           setExerciseAssessmentVisible(false);
@@ -312,7 +314,7 @@ if (exercise.mode === 'review') {
         if (_exercisePhase !== 'translation') return;
 
         _exercisePhase = 'revealed';
-        reveal.innerHTML = revealWordsHtml(ex.text || '');
+        reveal.innerHTML = revealPhraseHtml(ex.text || '');
         reveal.classList.remove('exercise-reveal-hidden');
         reveal.removeAttribute('aria-hidden');
         if (testo) {

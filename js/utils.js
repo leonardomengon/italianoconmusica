@@ -58,44 +58,35 @@
         return '<div class="' + cls + '">' + items + '</div>';
       }
 
-      // ==================== RIVELAZIONE PROGRESSIVA ====================
-      // Rivelazione della soluzione "parola per parola", molto lenta e calma:
-      // ogni parola entra dopo una pausa iniziale e con un ampio intervallo.
+      // ==================== RIVELAZIONE DELLA SOLUZIONE ====================
+      // La soluzione è UN UNICO elemento: l'intera frase compare in una volta,
+      // con dissolvenza + blur applicati insieme a tutte le sue parole. Non è
+      // più tokenizzata in span per parola, quindi non c'è (né serve) alcuno
+      // stagger: un solo nodo, una sola animazione.
       // Nessun blocco: il tocco dell'utente è il momento di impegno,
-      // l'animazione dà "peso" alla soluzione.
-      // I tempi (durata/stagger/cap) sono centralizzati qui per essere tarati facilmente.
-      const REVEAL_WORD_DUR_MS = 1100;   // DEVE combaciare con --reveal-word-dur nel CSS (1.1s)
-      const REVEAL_STAGGER_MS = 340;     // passo tra una parola e la successiva
-      const REVEAL_INITIAL_DELAY_MS = 200; // pausa prima della prima parola
-      const REVEAL_MAX_TOTAL_MS = 3000;  // cap: le frasi lunghe non superano ~3s
-      function revealWordsHtml(text) {
-        const safe = escapeHtml(text || '');
-        const words = safe.split(/\s+/).filter(Boolean);
-        if (!words.length) return '';
-        // Stagger effettivo: quello nominale, ridotto (mai sotto 40ms) affinché
-        // pausa iniziale + ultimo delay + durata non sfondino il cap totale.
-        const gap = words.length <= 1 ? 0
-          : Math.max(40, Math.min(REVEAL_STAGGER_MS,
-              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_INITIAL_DELAY_MS - REVEAL_WORD_DUR_MS) / (words.length - 1))));
-        const usedGap = Number.isFinite(gap) ? gap : 0;
-        return words
-          .map((w, i) => '<span class="reveal-word" style="animation-delay:' + (REVEAL_INITIAL_DELAY_MS + i * usedGap) + 'ms">' + w + '</span>')
-          .join(' ');
+      // l'animazione (vedi .reveal-phrase nel CSS) dà "peso" alla soluzione.
+      // I tempi sono centralizzati qui per essere tarati facilmente.
+      const REVEAL_PHRASE_DUR_MS = 1100;  // DEVE combaciare con --reveal-phrase-dur nel CSS (1.1s)
+      const REVEAL_INITIAL_DELAY_MS = 200; // pausa prima che compaia la frase
+      function revealPhraseHtml(text) {
+        // Whitespace normalizzato come faceva la vecchia tokenizzazione
+        // (split(/\s+/) + join(' ')): il rendering resta identico.
+        const clean = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!clean) return '';
+        // Un solo wrapper di solo testo, con il delay inline: la frase anima
+        // come blocco unico, così il blur coinvolge insieme tutte le parole.
+        return '<span class="reveal-phrase" style="animation-delay:' + REVEAL_INITIAL_DELAY_MS + 'ms">' + escapeHtml(clean) + '</span>';
       }
-      // Durata totale (ms) del reveal prodotto da revealWordsHtml: serve per
-      // mostrare il bottone "avanti" solo a reveal concluso. Se l'utente
-      // preferisce il movimento ridotto, il reveal è istantaneo → durata 0.
+      // Durata totale (ms) della comparsa prodotta da revealPhraseHtml: serve per
+      // mostrare il bottone "avanti" solo a frase comparsa. Essendo la frase un
+      // unico elemento, la durata NON dipende dal numero di parole.
+      // Se l'utente preferisce il movimento ridotto, la comparsa è istantanea → 0.
       function revealTotalMs(text) {
         try {
           if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
         } catch (e) {}
-        const safe = String(text || '').split(/\s+/).filter(Boolean);
-        if (!safe.length) return 0;
-        const gap = safe.length <= 1 ? 0
-          : Math.max(40, Math.min(REVEAL_STAGGER_MS,
-              Math.floor((REVEAL_MAX_TOTAL_MS - REVEAL_INITIAL_DELAY_MS - REVEAL_WORD_DUR_MS) / (safe.length - 1))));
-        const usedGap = Number.isFinite(gap) ? gap : 0;
-        return REVEAL_INITIAL_DELAY_MS + usedGap * (safe.length - 1) + REVEAL_WORD_DUR_MS;
+        if (!String(text || '').trim()) return 0;
+        return REVEAL_INITIAL_DELAY_MS + REVEAL_PHRASE_DUR_MS;
       }
 
       // ==================== MIGRAZIONE DATI ====================

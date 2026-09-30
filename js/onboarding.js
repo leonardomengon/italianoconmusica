@@ -4,6 +4,8 @@
 // PIANO-3: rimosso il timer d'attesa sui bottoni soluzione -> reveal immediato + animazione parola-per-parola.
 // PIANO-4: stella vuota->colorata con animazione + banner successo con hint appunti; fase 6 rimossa.
 // PIANO-5: modale finale breve.
+// PIANO-6 (2026-09-29): negli esercizi "pensa" la frase compare TUTTA INSIEME,
+// come UNICO elemento animato (blur su tutta la frase), non parola per parola.
 //
 // NOTA TECNICA: il tool editor ha problemi con old_text multi-linea su questo file;
 // le modifiche sono applicate con inserimenti + sostituzioni a riga singola.
@@ -558,7 +560,7 @@
 
       // ==================== FASE 8: ESERCIZI (struttura classica: review + complete) ====================
       // Due sotto-fasi locali: 'review' (pensa traduzione, click sulla frase con
-      // freccia di espansione e reveal parola-per-parola) e 'complete' (completa
+      // freccia di espansione e comparsa dell'intera frase in una volta) e 'complete' (completa
       // la frase, una parola). Look identico agli esercizi classici
       // (.exercise-card / .exercise-header / .exercise-text / actions).
       let _onbExPhase = 'review';
@@ -597,11 +599,12 @@
           phrase.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOnbExReveal(card); } };
         }
       }
-      // Reveal in-place + "Adelante" solo a reveal concluso (specchio di toggleExerciseReveal).
-      // Il click sulla prima frase ALTERNA mostra/nascondi: la traduzione entrata
-      // parola per parola viene nascosta al click successivo e rimostrata (con
-      // l'animazione da capo) a quello dopo. "Adelante" segue il reveal: compare
-      // a reveal concluso e sparisce quando la traduzione viene nascosta.
+      // Reveal in-place + "Adelante" solo a comparsa conclusa (specchio di toggleExerciseReveal).
+      // Il click sulla prima frase ALTERNA mostra/nascondi: la traduzione, che
+      // compare come unico elemento animato (dissolvenza + blur), viene
+      // nascosta al click successivo e rimostrata (con l'animazione da capo) a
+      // quello dopo. "Adelante" segue la comparsa: appare a comparsa conclusa e
+      // sparisce quando la traduzione viene nascosta.
       function toggleOnbExReveal(cardEl) {
         if (!cardEl) return;
         if (cardEl.dataset.revealStarted === '1') { hideOnbExReveal(cardEl); return; }
@@ -625,7 +628,7 @@
           if (phraseEl) phraseEl.insertAdjacentElement('afterend', transEl);
           else cardEl.appendChild(transEl);
         }
-        transEl.innerHTML = (!solText.trim() || reduced) ? escapeHtml(solText) : revealWordsHtml(solText);
+        transEl.innerHTML = (!solText.trim() || reduced) ? escapeHtml(solText) : revealPhraseHtml(solText);
         const showNext = () => {
           const actions = cardEl.querySelector('.exercise-actions');
           if (!actions || actions.querySelector('#onbExBtn') || !cardEl.isConnected) return;
@@ -648,10 +651,12 @@
           showNext();
         };
         try {
-          const last = transEl.querySelector('.reveal-word:last-child');
-          if (last) {
-            const onEnd = function() { try { last.removeEventListener('animationend', onEnd); } catch (e2) {} finishOnce(); };
-            last.addEventListener('animationend', onEnd);
+          // La frase è un unico elemento animato: si attende la fine della SUA
+          // animazione (niente più ':last-child' tra i vecchi span per parola).
+          const phrase = transEl.querySelector('.reveal-phrase');
+          if (phrase) {
+            const onEnd = function() { try { phrase.removeEventListener('animationend', onEnd); } catch (e2) {} finishOnce(); };
+            phrase.addEventListener('animationend', onEnd);
           }
         } catch (e) {}
         cardEl.dataset.revealTimer = String(setTimeout(finishOnce, total + 150));

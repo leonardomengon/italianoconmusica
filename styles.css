@@ -1723,21 +1723,24 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
 .onb-success-banner.onb-inline .onb-success-hint { text-align: center; }
 .onb-steps-fill { height: 100%; background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED)); border-radius: 999px; transition: width 1.2s var(--onb-ease, cubic-bezier(.2,.7,.3,1)); }
 
-/* --- Rivelazione progressiva della soluzione (nessun blocco, parola per parola) ---
-   Volutamente molto lenta: la durata per parola è tarata via --reveal-word-dur,
-   che deve restare allineata a REVEAL_WORD_DUR_MS in js/utils.js. */
-.reveal-word {
-  display: inline-block;
+/* --- Rivelazione della soluzione (nessun blocco: la frase entra come unico blocco) ---
+   La frase NON è più tokenizzata in span per parola: è un SOLO elemento che
+   compare in una volta, con dissolvenza + blur applicati insieme a tutte le
+   parole. Il delay è impostato inline da js/utils.js → revealPhraseHtml; la
+   durata è tarata via --reveal-phrase-dur, che deve restare allineata a
+   REVEAL_PHRASE_DUR_MS in js/utils.js. */
+.reveal-phrase {
+  display: block;
   opacity: 0;
-  animation: reveal-word-kf var(--reveal-word-dur, 1.1s) cubic-bezier(.2,.7,.25,1) forwards;
+  animation: reveal-phrase-kf var(--reveal-phrase-dur, 1.1s) cubic-bezier(.2,.7,.25,1) forwards;
 }
 /* Focus e dissolvenza condivisi da onboarding, esercizi classici e ripasso. */
-@keyframes reveal-word-kf {
+@keyframes reveal-phrase-kf {
   from { opacity: 0; filter: blur(1px); }
   to   { opacity: 1; filter: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .reveal-word { animation: none; opacity: 1; }
+  .reveal-phrase { animation: none; opacity: 1; }
 }
 
 /* --- Banner di successo salvataggio preferito (Endowed Progress) --- */
