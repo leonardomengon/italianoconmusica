@@ -40,7 +40,9 @@
       font-optical-sizing: none;
       background: #ffffff;
       color: var(--text-main);
-      padding-top: calc(var(--header-h) + 4px + var(--header-gap));
+      padding-top: 0px;
+
+     /*padding-top: calc(var(--header-h) + 4px + var(--header-gap));*/
       padding-bottom: 160px; padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
       font-weight: 700;
     }
