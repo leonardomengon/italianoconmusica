@@ -15,6 +15,10 @@
       --font-display: 'Outfit', 'Segoe UI', sans-serif;
       --font-body: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       --radius-duo: 16px;
+      /* Topbar: altezza reale della barra fixed e respiro sotto la barra.
+         Usati da body/#mainHeader per azzerare il vuoto con il primo elemento. */
+      --header-h: 68px;
+      --header-gap: 8px;
       /* ONB: token colore sezione onboarding (derivati da primary/success) */
       --onb-header-bg: #F3E8FF;
       --onb-header-border: #E4D3FA;
@@ -36,12 +40,18 @@
       font-optical-sizing: none;
       background: #ffffff;
       color: var(--text-main);
-      padding-top: 88px;
+      padding-top: calc(var(--header-h) + 4px + var(--header-gap));
       padding-bottom: 160px; padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
       font-weight: 700;
     }
     html { scroll-padding-bottom: 96px; }
-    .container.py-4 { max-width: 1040px; }
+    /* L'header e' fixed: non occupa flusso, quindi il suo py-4 generava un
+       vuoto morto sopra il primo elemento. Lo stacco dalla barra e' gia'
+       garantito dal padding-top del body (--header-gap). */
+    .container.py-4 { max-width: 1040px; padding-top: 0; }
+    /* Nella vista canzone l'header e' nascosto: qui il padding del container
+       e' l'unico spazio sopra la card, quindi va ripristinato. */
+    body.view-song > .container.py-4 { padding-top: 24px; }
     /* App loader */
     .app-loader {
       position: fixed;
@@ -69,7 +79,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 68px;
+      height: var(--header-h);
       background: #fff;
       border-bottom: 4px solid var(--surface-border);
       z-index: 1050;
@@ -775,8 +785,9 @@
     ::-webkit-scrollbar-thumb { background: #EDE5F5; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #DBCCEC; }
     @media (max-width: 768px) {
-      body { padding-top: 78px; padding-bottom: 180px; }
-      #mainHeader { padding: 0 16px; height: 64px; }
+      :root { --header-h: 64px; --header-gap: 6px; }
+      body { padding-top: calc(var(--header-h) + 4px + var(--header-gap)); padding-bottom: 180px; }
+      #mainHeader { padding: 0 16px; height: var(--header-h); }
       .brand-duo { font-size: 27px; }
       #songTitle { font-size: 24px; }
       .btn { padding: 10px 14px !important; font-size: 13px !important; }
@@ -944,7 +955,10 @@
   .overall-count { white-space:normal; }
 }
 @media (max-width:768px) and (max-height:760px) {
-  body { padding-top: 62px; }
+  /* Schermi bassi: niente respiro extra, il contenuto parte a filo della barra
+     (prima 62px faceva finire il primo elemento sotto l'header). */
+  :root { --header-gap: 0px; }
+  body { padding-top: calc(var(--header-h) + 4px); }
   .current-song-card { padding: 14px 14px 10px; }
   .current-song-title { margin: 0 0 0px; gap: 6px; }
   .song-tag-pill { font-size: 10px; padding: 2px 8px; }
