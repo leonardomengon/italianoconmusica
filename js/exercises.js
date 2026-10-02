@@ -3,21 +3,28 @@
         if (!song || !song.lyrics) return;
         const currentSongId = String(song.id);
         const appunti = getAppunti();
+        // Provenienza delle frasi "di questa canzone" (cat2 e cat4): la stessa
+        // per tutte, calcolata una volta. cat1/cat3 usano invece la provenienza
+        // del singolo appunto (cat3 = canzoni PRECEDENTI, non quella aperta).
+        const songMetaCorrente = songMetaDa(song);
 
         // Categoria 1: Preferiti della canzone corrente
         let cat1 = appunti
           .filter(a => String(a.songId) === currentSongId && a.testo && a.testo.trim())
-          .map(a => ({ text: a.testo, hint: a.traduzione || '', isAlt: false, isFav: true, isCurrent: true }));
+          .map(a => ({ text: a.testo, hint: a.traduzione || '', isAlt: false, isFav: true, isCurrent: true, songMeta: songMetaDa(a) }));
 
-        // Categoria 2: Frasi originali della canzone corrente
+        // Categoria 2: Frasi originali della canzone corrente.
+        // index() PRIMA del filter: l'indice reale nel testo serve all'analytics
+        // (verseId canonico v_<songId>_<index>).
         let cat2 = (song.lyrics || [])
-          .filter(l => l.text1 && l.text1.trim())
-          .map(l => ({ text: l.text1, hint: l.text2 || '', isAlt: false, isFav: false, isCurrent: true }));
+          .map((l, index) => ({ l, index }))
+          .filter(x => x.l.text1 && x.l.text1.trim())
+          .map(({ l, index }) => ({ text: l.text1, hint: l.text2 || '', isAlt: false, isFav: false, isCurrent: true, lyricIndex: index, songMeta: songMetaCorrente }));
 
         // Categoria 3: Preferiti delle canzoni precedenti
         let cat3 = appunti
           .filter(a => String(a.songId) !== currentSongId && a.testo && a.testo.trim())
-          .map(a => ({ text: a.testo, hint: a.traduzione || '', isAlt: false, isFav: true, isCurrent: false }));
+          .map(a => ({ text: a.testo, hint: a.traduzione || '', isAlt: false, isFav: true, isCurrent: false, songMeta: songMetaDa(a) }));
 
         // Categoria 4: Frasi alternative della canzone corrente
         let cat4 = [];
@@ -26,9 +33,9 @@
             l.alternative.split('\n').filter(line => line.trim()).forEach(line => {
               const match = line.trim().match(/^(.+?)\s*\(([^)]+)\)\s*$/);
               if (match) {
-                cat4.push({ text: match[1].trim(), hint: match[2].trim(), isAlt: true, isFav: false, isCurrent: true });
+                cat4.push({ text: match[1].trim(), hint: match[2].trim(), isAlt: true, isFav: false, isCurrent: true, songMeta: songMetaCorrente });
               } else {
-                cat4.push({ text: line.trim(), hint: '', isAlt: true, isFav: false, isCurrent: true });
+                cat4.push({ text: line.trim(), hint: '', isAlt: true, isFav: false, isCurrent: true, songMeta: songMetaCorrente });
               }
             });
           }
@@ -358,14 +365,22 @@ if (exercise.mode === 'review') {
         const testo = exercise.text;
         if (!testo) return;
 
+        // Provenienza: la porta la coda (songMeta). Il fallback su
+        // currentSongBackup vale solo per code senza metadati — nel ripasso è
+        // null, e senza songMeta la nota perderebbe la canzone nella tab Note.
+        const meta = songMetaDa(exercise.songMeta || currentSongBackup);
+
         const added = _togglePreferitoCore(btn, {
             testo: testo,
             traduzione: exercise.hint || '',
-            songId: currentSongBackup ? currentSongBackup.id : '',
-            songTitle: currentSongBackup ? (currentSongBackup.title || '') : '',
-            artist: currentSongBackup ? (currentSongBackup.artist || '') : '',
-            lingua: currentSongBackup ? (currentSongBackup.lang1 || '') : '',
-            linguaTrad: currentSongBackup ? (currentSongBackup.lang2 || '') : '',
+            songId: meta.songId,
+            songTitle: meta.songTitle,
+            artist: meta.artist,
+            lingua: meta.lingua,
+            linguaTrad: meta.linguaTrad,
+            // Indice reale nel testo, noto solo per le frasi "di questa canzone"
+            // (cat2): evita di risolverlo cercando il testo tra i versi.
+            lyricIndex: (typeof exercise.lyricIndex === 'number') ? exercise.lyricIndex : undefined,
             // "Deshacer": riapre la box nota e rimette il testo appena perso.
             onUndo: (a) => {
                 const noteEl = document.getElementById(`exercise-note-${exerciseIdx}`);
@@ -602,7 +617,10 @@ if (exercise.mode === 'review') {
         const poolRip = shuffleArr(appunti).slice(0, RIPASSO_QUANTI).map(a => ({
           text: a.testo,
           hint: a.traduzione || '',
-          source: 'ripasso'
+          source: 'ripasso',
+          // Il ripasso non ha una canzone "corrente" (currentSongBackup è null):
+          // la provenienza la porta l'appunto da cui viene la frase.
+          songMeta: songMetaDa(a)
         }));
         const totalRip = poolRip.length;
         _exerciseQueue = [];

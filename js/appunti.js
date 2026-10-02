@@ -67,14 +67,21 @@
                   createdAt: Date.now()
               });
               saveAppunti(appunti);
-              recordSavedNoteForProgress(testo);
+              // Dagli esercizi si possono salvare anche preferiti di canzoni
+              // diverse da quella aperta (coda "canzoni precedenti", ripasso):
+              // sia la mission "note salvate" sia l'indice del verso valgono
+              // solo per la canzone corrente, altrimenti si contano/nominano
+              // con i dati di un'altra canzone.
+              const _stessaCanzone = !currentSongBackup ||
+                  String(currentSongBackup.id) === String(songId ?? '');
+              if (_stessaCanzone) recordSavedNoteForProgress(testo);
               // Analytics: engagement emotivo sui contenuti (preferiti).
               // verseId usa l'ID canonico posizionale v_<songId>_<index>, identico
               // a quello di verse_expanded, così i due eventi sono join-abili.
               // Se l'indice non è noto (alternative/esercizi), si risolve cercando
               // il testo tra i versi della canzone corrente; fallback: prefisso "alt".
               try {
-                let verseIndex = (typeof lyricIndex === 'number') ? lyricIndex : _resolveVerseIndex(testo);
+                let verseIndex = (typeof lyricIndex === 'number') ? lyricIndex : (_stessaCanzone ? _resolveVerseIndex(testo) : null);
                 let verseId;
                 if (verseIndex !== null && verseIndex !== undefined) {
                   verseId = positionalVerseId(songId, verseIndex);

@@ -138,6 +138,38 @@
         rebuildSavedIndex();
         updateAppuntiBadge();
       }
+      // ==================== PROVENIENZA CANZONE ====================
+      // Cerca una canzone del catalogo per id. Le canzoni hanno `id`, gli
+      // appunti `songId`: per questo accetta entrambi i confronti. Ritorna
+      // null se l'id è assente o non corrisponde a nessuna canzone caricata
+      // (es. canzone filtrata per lingua, o catalogo non ancora pronto).
+      function findSongById(songId) {
+        if (songId === null || songId === undefined || songId === '') return null;
+        const target = String(songId);
+        if (typeof songs === 'undefined' || !Array.isArray(songs)) return null;
+        return songs.find(s => s && String(s.id) === target) || null;
+      }
+      // Metadati di provenienza di una frase, normalizzati dai tre "formati"
+      // che circolano nell'app: un oggetto canzone (id/title/artist/lang1/lang2),
+      // un appunto salvato (songId/songTitle/artist/lingua/linguaTrad) o un item
+      // di coda esercizi ({songMeta}). I campi mancanti vengono completati dal
+      // catalogo, così la stessa frase dà sempre lo stesso badge 🎵 nella tab
+      // Note. Ritorna TUTTI i campi presenti (stringa vuota se sconosciuti).
+      function songMetaDa(source) {
+        const src = source || {};
+        const hasId = v => v !== undefined && v !== null && v !== '';
+        const songId = hasId(src.songId) ? src.songId : (hasId(src.id) ? src.id : '');
+        // Se la fonte non ha un id usabile ma è già una canzone (ha il titolo),
+        // la si usa direttamente; altrimenti si cerca nel catalogo.
+        const song = findSongById(songId) || (src.title ? src : null);
+        return {
+          songId: hasId(songId) ? songId : '',
+          songTitle: src.songTitle || (song && song.title) || '',
+          artist: src.artist || (song && song.artist) || '',
+          lingua: src.lingua || (song && song.lang1) || '',
+          linguaTrad: src.linguaTrad || (song && song.lang2) || ''
+        };
+      }
       // Ripristina un appunto rimosso (snapshot completo: id, nota, data).
       // Lo reinserisce nella posizione originale, così l'ordine della lista
       // resta quello di prima. Non sovrascrive nulla: se l'id è già tornato
@@ -183,21 +215,29 @@
           appunti[idx].nota = value;
           saveAppunti(appunti);
         } else {
-          // Crea nuovo appunto dalla frase dell'esercizio
+          // Crea nuovo appunto dalla frase dell'esercizio. Stessa forma degli
+          // altri salvaggi (campo `testo`, NON `text`) e provenienza presa dalla
+          // coda: nel ripaso currentSongBackup è null, quindi senza songMeta la
+          // nota resterebbe senza canzone nella tab Note.
+          const meta = songMetaDa(exercise.songMeta || currentSongBackup);
           appunti.push({
-            id: 'ex_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-            text: testo,
+            id: genId(),
+            testo: testo,
             traduzione: exercise.hint || '',
-            songId: currentSongBackup ? String(currentSongBackup.id) : '',
-            songTitle: currentSongBackup ? currentSongBackup.title : '',
-            artist: currentSongBackup ? currentSongBackup.artist : '',
-            lingua: '',
-            linguaTrad: '',
+            songId: meta.songId,
+            songTitle: meta.songTitle,
+            artist: meta.artist,
+            lingua: meta.lingua,
+            linguaTrad: meta.linguaTrad,
             nota: value,
             createdAt: Date.now()
           });
           saveAppunti(appunti);
-          if (currentSongBackup) recordSavedNoteForProgress(testo);
+          // La mission "note salvate" vale solo per la canzone aperta: una
+          // frase che arriva da un'altra canzone non deve contarne.
+          if (currentSongBackup && String(currentSongBackup.id) === String(meta.songId)) {
+            recordSavedNoteForProgress(testo);
+          }
         }
       }
       function saveNotaFromAppunto(textarea, id) {
