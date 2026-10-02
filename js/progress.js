@@ -265,7 +265,7 @@
     _reviewMode = false;
     _ripassoMode = false;
     _exercisePhase = 'translation';
-    if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+    if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
   }
 
   function hideAppLoader() {

@@ -27,6 +27,10 @@
       // indica la sola visualizzazione di una canzone già completata.
       let _exercisePhase = 'translation';
       let _exerciseTimer = null;
+      // Annullamento dell'attesa di fine reveal agganciata ad animationend
+      // (vedi onPhraseRevealEnd in js/utils.js). Va azzerato insieme a
+      // _exerciseTimer: clearExerciseTimer() azzera entrambi in un punto solo.
+      let _exerciseRevealCancel = null;
       let _completedViaFullHint = false;
       let _savedTextsIndex = new Set();
       let _appuntiFilter = '';

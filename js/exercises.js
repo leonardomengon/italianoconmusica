@@ -219,18 +219,18 @@ if (exercise.mode === 'review') {
             </div>
           `;
 
-          if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+          if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
           // Se il render avviene già in fase 'revealed' (es. renderCurrentExercise
-          // richiamato da fuori mentre la frase è aperta), riparte il timer che
-          // sblocca "Continuar": il contenuto qui sopra è già quello rivelato.
+          // richiamato da fuori mentre la frase è aperta), riparte l'attesa che
+          // sblocca "Lo sabía"/"No lo sabía": il contenuto qui sopra è già
+          // quello rivelato e la frase riparte la sua dissolvenza.
           if (isRevealed) {
-            const totalMs = revealTotalMs(exercise.text || '');
-            _exerciseTimer = setTimeout(() => {
-              _exerciseTimer = null;
+            const revealEl = wrap.querySelector('#exerciseReveal');
+            scheduleAssessmentOnRevealEnd(revealEl, exercise.text || '', () => {
               if (_exercisePhase === 'revealed' && _exerciseQueue[_exerciseIndex] === exercise) {
                 setExerciseAssessmentVisible(true);
               }
-            }, totalMs + 150);
+            });
           }
           return;
         }
@@ -267,6 +267,30 @@ if (exercise.mode === 'review') {
         });
       }
 
+      // Azzera insieme il timer di fallback e l'attesa su animationend:
+      // _exerciseTimer "occupa" il reveal (advanceExercisePhase lo usa come
+      // guardia per ignorare i click a frase non ancora conclusa), quindi
+      // annullarli in modo separato lascierebbe callback appesi.
+      function clearExerciseTimer() {
+        if (_exerciseTimer) { clearTimeout(_exerciseTimer); _exerciseTimer = null; }
+        if (_exerciseRevealCancel) { _exerciseRevealCancel(); _exerciseRevealCancel = null; }
+      }
+
+      // Programma la comparsa dei bottoni "Lo sabía"/"No lo sabía" per quando
+      // la dissolvenza della frase è DAVVERO finita (animationend), non dopo un
+      // timer che slittava e aggiungeva centinaia di ms di ritardo percepito.
+      // Il fallback di onPhraseRevealEnd copre reduced-motion/testo vuoto.
+      function scheduleAssessmentOnRevealEnd(revealEl, text, onDone) {
+        clearExerciseTimer();
+        // Guardia per i click: truthy finché il reveal non è concluso.
+        _exerciseTimer = true;
+        _exerciseRevealCancel = onPhraseRevealEnd(revealEl, text, () => {
+          _exerciseTimer = null;
+          _exerciseRevealCancel = null;
+          onDone();
+        });
+      }
+
       // Entrambe le autovalutazioni completano l'attività, non misurano correttezza.
       function advanceExercisePhase(btn) {
         const wrap = document.getElementById('eserciziLyrics');
@@ -300,7 +324,7 @@ if (exercise.mode === 'review') {
         const testo = wrap ? wrap.querySelector('.exercise-text-clickable') : null;
         if (!reveal || !buttons.length) return;
 
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
 
         if (_exercisePhase === 'revealed') {
           // Nascondi di nuovo: il markup resta al suo posto (l'altezza della
@@ -330,20 +354,17 @@ if (exercise.mode === 'review') {
           testo.setAttribute('title', 'Haz clic para ocultar la traducción');
         }
 
-        const totalMs = revealTotalMs(ex.text || '');
-        _exerciseTimer = setTimeout(() => {
-          _exerciseTimer = null;
+        // I bottoni sfumano appena la dissolvenza della frase è conclusa:
+        // aggancio ad animationend (cadenza reale di frame) + fallback.
+        scheduleAssessmentOnRevealEnd(reveal, ex.text || '', () => {
           if (_exercisePhase !== 'revealed') return;
           setExerciseAssessmentVisible(true);
-        }, totalMs + 150);
+        });
       }
 
       // Sostituisce nextExercise() + nextRipassoExercise().
       function nextExercise() {
-        if (_exerciseTimer) {
-          clearInterval(_exerciseTimer);
-          _exerciseTimer = null;
-        }
+        if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
         const wasCompletedViaHint = _completedViaFullHint;
         _completedViaFullHint = false;
         _exercisePhase = 'translation';
@@ -595,7 +616,7 @@ if (exercise.mode === 'review') {
         // showHomeView ancora in corso) e azzera timer/stato della sessione
         // precedente prima di generare la nuova coda.
         _loadToken++;
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
         // Stessa difesa di openSong: questa apertura invalida la continuation
         // di showHomeView(), che è l'unico punto che spegneva lo stato di
         // caricamento. Senza questa pulizia lo "Cargando..." (overlay
@@ -641,7 +662,7 @@ if (exercise.mode === 'review') {
 
       function chiudiEsercizi() {
         _ripassoMode = false;
-        if (_exerciseTimer) { clearInterval(_exerciseTimer); _exerciseTimer = null; }
+        if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
         _exerciseQueue = [];
         _exerciseIndex = 0;
         _exercisePhase = 'translation';

@@ -89,6 +89,47 @@
         return REVEAL_INITIAL_DELAY_MS + REVEAL_PHRASE_DUR_MS;
       }
 
+      // ==================== FINE REVEAL DELLA FRASE ====================
+      // Aggancia una callback alla fine VERA della dissolvenza della frase
+      // tramite l'evento `animationend`: l'evento viene emesso nel frame in cui
+      // l'animazione è effettivamente conclusa, quindi non accumula il ritardo
+      // di un timer "a orologio" (che in più slittava con il frame rate).
+      // Il setTimeout resta solo come rete di sicurezza per i casi in cui
+      // l'animazione non parte (testo vuoto, prefers-reduced-motion, browser
+      // senza animationend utile).
+      // Riceve il contenitore del reveal (per isolare il .reveal-phrase) e
+      // restituisce la funzione di annullamento: annulla sia il listener che il
+      // timer, così chiudere/ri-nascondere la frase non lascia callback appesi.
+      function onPhraseRevealEnd(revealEl, text, cb) {
+        let done = false;
+        let timer = null;
+        const phrase = revealEl ? revealEl.querySelector('.reveal-phrase') : null;
+        const onEnd = (ev) => {
+          // Ignora eventuali animationend di altri elementi/animazioni.
+          if (!phrase || ev.target !== phrase) return;
+          if (ev.animationName && ev.animationName !== 'reveal-phrase-kf') return;
+          finish();
+        };
+        const finish = () => {
+          if (done) return;
+          done = true;
+          if (timer) { clearTimeout(timer); timer = null; }
+          if (phrase) phrase.removeEventListener('animationend', onEnd);
+          cb();
+        };
+        if (phrase) phrase.addEventListener('animationend', onEnd);
+        const total = revealTotalMs(text);
+        // +60ms di margine sul fallback: rete di sicurezza, mai di ritardo
+        // percepito (l'evento animationend di norma arriva prima).
+        timer = setTimeout(finish, total > 0 ? total + 60 : 0);
+        return function cancel() {
+          if (done) return;
+          done = true;
+          if (timer) { clearTimeout(timer); timer = null; }
+          if (phrase) phrase.removeEventListener('animationend', onEnd);
+        };
+      }
+
       // ==================== MIGRAZIONE DATI ====================
       function migraAppunti() {
         const raw = JSON.parse(localStorage.getItem('mieiAppunti') || '[]');
