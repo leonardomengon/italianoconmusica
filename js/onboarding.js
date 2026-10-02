@@ -24,7 +24,7 @@
 
       const ONB_COMPLETED_KEY = 'onboardingCompleted';
       const ONB_COMPLETED_VALUE = '1';
-      const ONB_VERSES_COUNT = 3; // versi tutorial A/B/C
+      const ONB_VERSES_COUNT = 2; // versi tutorial A/B = indici 0 e 1 della canzone
       const ONB_ACTIVE_PHASES = [1, 2, 3, 4, 5, 7, 8]; // Fase 6 (spiegazione appunti) eliminata, integrata nel salvataggio preferito
       
       // Tracce tutorial delle fasi "play": file statici nella cartella "resources"
@@ -36,6 +36,13 @@
       // - SECONDO ascolto (Fase 7): verso 1 + verso 2 -> risorsa "resources/tut v1_2.mp3"
       const ONB_AUDIO_FIRST = 'resources/tut%20v1.mp3'; // Fase 3: solo verso 1
       const ONB_AUDIO_SECOND = 'resources/tut%20v1_2.mp3'; // Fase 7: verso 1 + verso 2
+// Canzone usata dal tutorial. Su dispositivo vergine coincide con songs[0];
+      // l'id permette di pinnarla se l'ordine del catalogo (Cloudinary/Sheets) cambia.
+      // Deve restare allineata agli audio statici tut v1*.mp3 (tagliati su questa canzone).
+      const ONB_TUTORIAL_SONG_ID = ''; // '' = usa songs[0]
+      // Parola da completare nell'esercizio "Completa la frase" (fase 8):
+      // è sempre la stessa, mai scelta a caso (vedi generaVersoStudio/parolaFissa).
+      const ONB_EX_PALOLA = 'Ascolta';
 
       let _onbPhase = 0;
       let _onbSong = null;
@@ -568,9 +575,15 @@
         _onbPhase = 8;
         _onbExPhase = 'review';
         const appunti = getAppunti();
-        const fav = appunti.find(a => String(a.songId) === String(_onbSong.id) && a.testo && a.testo.trim());
-        _onbExFrase = fav ? fav.testo : (_onbSong.lyrics[_onbVerses[1]].text1 || '');
-        _onbExTrad = (fav ? fav.traduzione : (_onbSong.lyrics[_onbVerses[1]].text2 || '')) || '';
+        // SEMPRE il secondo verso mostrato nelle fasi precedenti (indice _onbVerses[1]).
+        // L'appunto viene riusato SOLO se combacia esattamente con quel testo: altrimenti
+        // si prende il primo appunto "qualsiasi" della canzone e l'esercizio mostrerebbe
+        // una frase diversa da quella appena insegnata.
+        const _onbL2 = _onbSong.lyrics[_onbVerses[1]];
+        const _onbTesto2 = ((_onbL2 && _onbL2.text1) || '').trim();
+        const fav = appunti.find(a => String(a.songId) === String(_onbSong.id) && a.testo && a.testo.trim() === _onbTesto2);
+        _onbExFrase = fav ? fav.testo : (_onbL2.text1 || '');
+        _onbExTrad = (fav ? fav.traduzione : (_onbL2.text2 || '')) || '';
         onbRenderExReview();
       }
       function onbRenderExReview() {
@@ -687,7 +700,14 @@
         wrap.className = 'onb-funnel';
         while (wrap.lastChild && wrap.lastChild.id !== 'onbTopbar') wrap.removeChild(wrap.lastChild); // preserva la barra persistente
         onbRenderStepsHeader('Completa tu primer ejercicio', 'onb-phase-header-ex');
-        const textWithBlanks = generaVersoStudio(frase, 1);
+        // Parola da completare FISSA (ONB_EX_PALOLA, es. "Ascolta"): passa a
+        // generaVersoStudio come terzo argomento -> nessuna selezione casuale.
+        // Fallback: se il verso non contiene la parola, generaVersoStudio restituirebbe
+        // un frase senza input e il bottone "Siguiente" resterebbe bloccato (onboarding
+        // infinito): in quel caso si passa null e si torna al comportamento casuale.
+        const _onbNorm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+        const _onbHasPalola = !!ONB_EX_PALOLA && _onbNorm(frase).includes(_onbNorm(ONB_EX_PALOLA));
+        const textWithBlanks = generaVersoStudio(frase, 1, _onbHasPalola ? ONB_EX_PALOLA : null);
         const card = document.createElement('div');
         card.className = 'exercise-card onb-enter';
         card.innerHTML =
@@ -739,7 +759,10 @@
         if (onbIsDone()) return;
         // Nascondi subito il loader di app (evita race sul _loadToken → spinner infinito).
         if (typeof hideAppLoader === 'function') hideAppLoader();
-        const s = getCurrentSong() || songs[0];
+        // Canzone del tutorial: PIN esplicito. Non usare getCurrentSong() perché
+        // durante l'onboarding currentSongBackup/currentSongId vengono (ri)impostati
+        // più avanti e i versi/audio del tutorial non devono dipenderne.
+        const s = (ONB_TUTORIAL_SONG_ID ? songs.find(x => String(x.id) === String(ONB_TUTORIAL_SONG_ID)) : null) || songs[0];
       // ===== PIANO 2026-09-11: OVERRIDE FUNZIONI (function hoisting: queste definizioni vincono) =====
       // PIANO-1: landing unica (fuse le 2 schermate, testo sintetico, bottone -> onbFase(1)).
       function onbLanding1() {
@@ -809,11 +832,12 @@
         _onbSong = s;
         try { if (!s.lyrics || !s.lyrics.length) s.lyrics = await fetchLyrics(s.id); } catch (e) { s.lyrics = s.lyrics || []; }
         if (!s.lyrics || !s.lyrics.length) { onbShowEntryError('No logramos cargar la letra de la canción de introducción. Recarga la página para reintentar.'); return; }
-        _onbVerses = [];
-        (s.lyrics || []).forEach((l, i) => {
-          if (_onbVerses.length < ONB_VERSES_COUNT && l.text1 && l.text1.trim()) _onbVerses.push(i);
-        });
-        if (_onbVerses.length < 2) { onbShowEntryError('Esta canción no tiene suficientes versos para la introducción. Prueba con otra canción o recarga la página.'); return; }
+        _onbVerses = [0, 1]; // SEMPRE i primi due versi, per indice (non "i primi non vuoti")
+        // Requisiti rigidi: entrambi devono esistere ed avere testo non vuoto, altrimenti
+        // le card e gli audio statici del tutorial (tagliati sui versi 1 e 2) non
+        // corrisponderebbero. Niente fallback su altri indici: si mostra l'errore.
+        const _onbVOk = _onbVerses.every(i => s.lyrics[i] && s.lyrics[i].text1 && s.lyrics[i].text1.trim());
+        if (!_onbVOk) { onbShowEntryError('La introducción necesita los dos primeros versos de la canción. Recarga la página para reintentar.'); return; }
         // La canzone corrente come "current": fa contare versi aperti e preferiti
         // (recordVerseExplored / recordSavedNoteForProgress usano currentSongBackup).
         currentSongId = String(s.id);

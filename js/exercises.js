@@ -421,7 +421,11 @@ if (exercise.mode === 'review') {
         let scelti = [];
         if (parolaFissa) {
           // Solo il tutorial passa una parola fissa: nessuna selezione casuale.
-          const index = frammenti.findIndex(f => f.toLowerCase() === parolaFissa.toLowerCase());
+          // Confronto normalizzato (NFD, senza accenti, spazi compattati) così la parola
+          // viene trovata anche se nel testo è accentata o seguita da altri separatori.
+          const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+          const target = norm(parolaFissa);
+          const index = frammenti.findIndex(f => norm(f) === target);
           if (index >= 0) scelti.push({ testo: frammenti[index], index });
         } else {
           while (scelti.length < quante && poolCand.length > 0) {
