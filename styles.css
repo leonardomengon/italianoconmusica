@@ -786,7 +786,8 @@
     ::-webkit-scrollbar-thumb:hover { background: #DBCCEC; }
     @media (max-width: 768px) {
       :root { --header-h: 64px; --header-gap: 6px; }
-      body { padding-top: calc(var(--header-h) + 4px + var(--header-gap)); padding-bottom: 180px; }
+      body {padding-top: 0px}
+      /*body { padding-top: calc(var(--header-h) + 4px + var(--header-gap)); padding-bottom: 180px; } */
       #mainHeader { padding: 0 16px; height: var(--header-h); }
       .brand-duo { font-size: 27px; }
       #songTitle { font-size: 24px; }
