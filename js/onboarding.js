@@ -508,7 +508,16 @@
           const exists = getAppunti().some(a =>
             normalizza(a.testo) === target || normalizza(a.traduzione) === target
           );
-          if (!exists && !_togglePreferitoCore(starBtn, {
+          if (exists) {
+            // Preferito già presente in mieiAppunti (es. onboarding rieseguito
+            // dopo un reset che conserva le note, vedi resetProgressToNewUser):
+            // il core NON va chiamato (salterebbe anche il ramo di aggiunta),
+            // ma la missione "Guarda una frase" va comunque registrata, altrimenti
+            // la home resta 0/1 nonostante la stella ⭐ e il banner di successo.
+            // Idempotente: recordSavedNoteForProgress deduplica per chiave e si
+            // ferma a REQUIRED_NOTES_FOR(song).
+            recordSavedNoteForProgress(lyr.text1);
+          } else if (!_togglePreferitoCore(starBtn, {
             testo: lyr.text1,
             traduzione: lyr.text2 || '',
             songId: _onbSong.id,
