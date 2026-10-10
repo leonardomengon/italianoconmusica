@@ -901,17 +901,6 @@
 .progress-modal-box p { color:#7B6F8C; font-weight:800; }
 .progress-modal-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:22px; }
 .progress-modal-actions .btn-primary { background:var(--primary)!important; border-bottom-color:var(--primary-dark)!important; }
-/* Banner inline de canción completada (reemplaza al modal #completionModal):
-   vive en el flujo del body, sobre la vista activa (canción o ejercicios). */
-.song-completed-banner {
-  background:#fff; border:3px solid var(--primary); border-bottom:8px solid var(--primary-dark);
-  border-radius:24px; padding:26px 22px; text-align:center; margin:0 auto 20px;
-  max-width:520px; animation:overlayFadeIn .25s ease;
-}
-.song-completed-banner h2 { font-weight:900; color:#3D2B52; text-transform:uppercase; margin:6px 0 8px; }
-.song-completed-banner p { color:#7B6F8C; font-weight:800; margin:0 0 16px; }
-.song-completed-banner .celebration-icon { font-size:48px; }
-.song-completed-banner .btn-primary { background:var(--primary)!important; border-bottom-color:var(--primary-dark)!important; }
     .lang-choice-buttons { display:flex; flex-direction:column; gap:12px; margin-top:22px; }
     .lang-choice-buttons button {
       background: #fff;
@@ -936,7 +925,6 @@
     #songTitle, .card-title, .current-song-title, .section-heading h2,
     .path-summary h1, .missions-count, .eyebrow, .overall-count,
     .song-lang-pill, .start-pill, .current-song-badge, .progress-modal-box h2,
-    .song-completed-banner h2,
     .btn, .pagination-container button {
       font-family: var(--font-display) !important;
     }
@@ -1608,7 +1596,7 @@ body.onboarding-active #fixedPlayer,
 body.onboarding-active #toastContainer,
 body.onboarding-active #appLoader,
 body.onboarding-active #editModal,
-body.onboarding-active #songCompletedBanner,
+body.onboarding-active #completionModal,
 body.onboarding-active #altOverlay { display: none !important; }
 /* Difesa aggiuntiva: qualunque altro modale/overlay (z-index > 1500) non deve
    comparire sopra l'onboarding, tranne la modale finale (#onbEndModal). */
