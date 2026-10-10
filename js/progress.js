@@ -616,16 +616,24 @@
     renderFixedPlayerMissions();
     maybeShowMissionFeedback(before, missionState(song));
   }
+  // Devuelve true SOLO si esta llamada acaba de completar la canción (4 misiones):
+  // la card final de ejercicios usa el flag para reemplazar "¡Desafío completado!".
   function recordSfidaCompleta() {
-    if (_onboardingActive || _ripassoMode || _reviewMode || !currentSongBackup) return;
-    if (_sfidaCountedSession) return;
+    if (_onboardingActive || _ripassoMode || _reviewMode || !currentSongBackup) return false;
+    if (_sfidaCountedSession) return false;
     _sfidaCountedSession = true;
     const p=getProgress(), sp=p.songs[String(currentSongBackup.id)] || ensureSongProgress(currentSongBackup.id); sp.completedSfideCount=Math.min((sp.completedSfideCount||0)+1,REQUIRED_SFIDE_FOR(currentSongBackup)); saveProgress(p);
-    checkSongCompletion(currentSongBackup);
+    const wasCompleted = !!sp.completed;
+    // skipBanner: en este flujo la confirmación la renderiza la card final.
+    checkSongCompletion(currentSongBackup, true);
     trackMissionCompletion(currentSongBackup);
     renderFixedPlayerMissions();
+    const after = getProgress().songs[String(currentSongBackup.id)];
+    return !wasCompleted && !!(after && after.completed);
   }
-  function checkSongCompletion(song) {
+  // skipBanner=true: no mostrar el banner inline en el body (la card final de
+  // ejercicios pinta su propio texto de confirmación en su propio div).
+  function checkSongCompletion(song, skipBanner) {
     if (_reviewMode || _completionLock || !song) return;
     const p=getProgress(), sp=p.songs[String(song.id)], m=missionState(song);
     if(sp?.completed || !(m.translationsDone&&m.notesDone&&m.listensDone&&m.exercisesDone)) return;
@@ -636,21 +644,25 @@
     // Sin modal: el lock se libera ya (si no, bloquearía el completamiento de
     // las canciones siguientes) y la confirmación se muestra como banner inline.
     _completionLock=false;
-    showSongCompletedBanner(next);
+    if (!skipBanner) showSongCompletedBanner(next);
+  }
+  // Texto (en español) de confirmación de canción completada + desbloqueo.
+  // Compartido por el banner del body y la card final de ejercicios.
+  function songCompletedMessage(next) {
+    return next
+      ? '¡Has desbloqueado: “'+escapeHtml(next.title)+'”!'
+      : '¡Has completado todas las canciones disponibles!';
   }
   // Banner inline de canción completada (reemplaza al antiguo #completionModal):
   // texto de confirmación en español + botón "Volver a inicio", en el cuerpo
-  // de la vista activa (canción o ejercicios).
+  // de la página de la canción (el flujo de ejercicios usa la card final).
   function showSongCompletedBanner(next) {
     const banner=document.getElementById('songCompletedBanner');
     if(!banner) return;
-    const msg = next
-      ? '¡Has desbloqueado: “'+escapeHtml(next.title)+'”!'
-      : '¡Has completado todas las canciones disponibles!';
     banner.innerHTML=`
       <div class="celebration-icon">🎉</div>
       <h2>¡Canción completada!</h2>
-      <p>${msg}</p>
+      <p>${songCompletedMessage(next)}</p>
       <button class="btn btn-primary" type="button" onclick="window.router ? router.navigate('#/') : location.reload()">Volver a inicio</button>
     `;
     banner.classList.remove('d-none');

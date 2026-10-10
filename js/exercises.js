@@ -157,19 +157,38 @@
               </div>
             </div>`;
           } else {
-            if (_exerciseIndex > 0) recordSfidaCompleta();
-            const sfideCompleted = Math.min((currentSongBackup ? (ensureSongProgress(currentSongBackup.id).completedSfideCount || 0) : 0), REQUIRED_SFIDE());
-            wrap.innerHTML = `
-              <div class="exercise-card text-center p-4">
-                <div class="celebration-icon">🍾</div>
-                <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
-                <p class="text-muted">${(() => { const tot = _exerciseQueue.length; const pensa = _exerciseQueue.filter(ex => ex.mode === 'review').length; const completa = tot - pensa; return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
-                <div class="exercise-actions">
-                  <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>
-                  <button class="btn btn-outline-secondary" onclick="chiudiEsercizi()">← Inicio</button>
+            const justCompletedSong = _exerciseIndex > 0 ? !!recordSfidaCompleta() : false;
+            // Si la canción se acaba de completar, ESTA MISMA card muestra la
+            // confirmación (texto en español + "Volver a inicio") reemplazando
+            // "¡Desafío completado!". Se oculta también cualquier banner previo
+            // en el body para no duplicar el mensaje.
+            document.getElementById('songCompletedBanner')?.classList.add('d-none');
+            if (justCompletedSong) {
+              const nextSong = getNextSong(currentSongBackup);
+              wrap.innerHTML = `
+                <div class="exercise-card text-center p-4">
+                  <div class="celebration-icon">🎉</div>
+                  <h3 style="font-weight:900;color:#3D2B52;">¡Canción completada!</h3>
+                  <p class="text-muted">${songCompletedMessage(nextSong)}</p>
+                  <div class="exercise-actions">
+                    <button class="btn btn-primary" type="button" onclick="window.router ? router.navigate('#/') : location.reload()">Volver a inicio</button>
+                  </div>
                 </div>
-              </div>
-            `;
+              `;
+            } else {
+              const sfideCompleted = Math.min((currentSongBackup ? (ensureSongProgress(currentSongBackup.id).completedSfideCount || 0) : 0), REQUIRED_SFIDE());
+              wrap.innerHTML = `
+                <div class="exercise-card text-center p-4">
+                  <div class="celebration-icon">🍾</div>
+                  <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
+                  <p class="text-muted">${(() => { const tot = _exerciseQueue.length; const pensa = _exerciseQueue.filter(ex => ex.mode === 'review').length; const completa = tot - pensa; return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
+                  <div class="exercise-actions">
+                    <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>
+                    <button class="btn btn-outline-secondary" onclick="chiudiEsercizi()">← Inicio</button>
+                  </div>
+                </div>
+              `;
+            }
           }
           return;
         }
