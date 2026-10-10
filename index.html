@@ -161,6 +161,9 @@
 
     <div id="home" class="row d-none" aria-hidden="true"></div>
 
+    <!-- Banner de canción completada (reemplaza al antiguo modal #completionModal) -->
+    <div id="songCompletedBanner" class="song-completed-banner d-none" role="status" aria-live="polite"></div>
+
     <div id="song" class="d-none fade-in">
       <div class="card">
         <div class="card-header">
@@ -198,18 +201,6 @@
     </div>
   </div>
 
-
-  <div id="completionModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
-    <div class="progress-modal-box">
-      <div class="celebration-icon">🎉</div>
-      <h2 id="completionTitle">Canción completada</h2>
-      <p id="completionMessage"></p>
-      <div class="progress-modal-actions">
-        <button id="completionHomeBtn" class="btn btn-outline-secondary" type="button">Volver a inicio</button>
-        <button id="completionNextBtn" class="btn btn-primary" type="button">Empezar la siguiente</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Modale di chiusura onboarding (funnel di primo avvio) -->
   <div id="onbEndModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="onbEndTitle">

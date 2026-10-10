@@ -252,6 +252,9 @@
     document.getElementById('song').classList.add('d-none');
     document.getElementById('fixedPlayer').classList.add('d-none');
     document.getElementById('esercizi')?.classList.add('d-none');
+    // Banner de canción completada: solo visible tras el completamento de la
+    // sesión; se oculta al cambiar de vista (home, otra canción, ejercicios…).
+    document.getElementById('songCompletedBanner')?.classList.add('d-none');
   }
 
   function resetSongViewState() {
@@ -629,15 +632,30 @@
     _completionLock=true; sp.completed=true; sp.completedAt=Date.now();
     logEvent('song_completed', { songId: String(song.id) });
     if(!(p.completedSongIds||[]).map(String).includes(String(song.id))) p.completedSongIds.push(song.id);
-    const next=getNextSong(song); p.currentSongId=next?next.id:null; saveProgress(p); showCompletionModal(song,next);
+    const next=getNextSong(song); p.currentSongId=next?next.id:null; saveProgress(p);
+    // Sin modal: el lock se libera ya (si no, bloquearía el completamiento de
+    // las canciones siguientes) y la confirmación se muestra como banner inline.
+    _completionLock=false;
+    showSongCompletedBanner(next);
   }
-  function showCompletionModal(song,next) {
-    document.getElementById('completionMessage').textContent=next ? ('¡Has desbloqueado: “'+next.title+'”') : '¡Has completado tutte le canzoni disponibili!';
-    const nb=document.getElementById('completionNextBtn'); nb.style.display='none'; nb.onclick=null;
-    document.getElementById('completionHomeBtn').onclick=function(){closeCompletionModal();location.reload();};
-    document.getElementById('completionModal').classList.add('open');
+  // Banner inline de canción completada (reemplaza al antiguo #completionModal):
+  // texto de confirmación en español + botón "Volver a inicio", en el cuerpo
+  // de la vista activa (canción o ejercicios).
+  function showSongCompletedBanner(next) {
+    const banner=document.getElementById('songCompletedBanner');
+    if(!banner) return;
+    const msg = next
+      ? '¡Has desbloqueado: “'+escapeHtml(next.title)+'”!'
+      : '¡Has completado todas las canciones disponibles!';
+    banner.innerHTML=`
+      <div class="celebration-icon">🎉</div>
+      <h2>¡Canción completada!</h2>
+      <p>${msg}</p>
+      <button class="btn btn-primary" type="button" onclick="window.router ? router.navigate('#/') : location.reload()">Volver a inicio</button>
+    `;
+    banner.classList.remove('d-none');
+    banner.scrollIntoView({ behavior:'smooth', block:'center' });
   }
-  function closeCompletionModal(){ document.getElementById('completionModal').classList.remove('open'); _completionLock=false; }
 
   function nomeCorso(song) {
     const raw = song && (song.Corso ?? song.corso);
