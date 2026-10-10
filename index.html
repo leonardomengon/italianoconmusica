@@ -86,6 +86,24 @@
       <div id="completedEmpty" class="empty-state d-none">No has completado ninguna canción todavía.</div>
     </section>
 
+    <!-- Gate di accesso alle Impostazioni: richiede la password prima dei contenuti -->
+    <section id="settingsGate" class="d-none fade-in">
+      <div class="section-heading">
+        <div>
+          <h2>Ajustes · Acceso</h2>
+        </div>
+      </div>
+      <div class="settings-card">
+        <p class="settings-intro">Área reservada. Introduce la contraseña para acceder a los ajustes.</p>
+        <label class="backup-label" for="settingsPasswordInput">Contraseña</label>
+        <div class="backup-code-row">
+          <input id="settingsPasswordInput" class="backup-code-input" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" onkeydown="if(event.key==='Enter'){unlockSettings()}">
+          <button class="btn btn-outline-primary" type="button" onclick="unlockSettings()">Entrar</button>
+        </div>
+        <div id="settingsPasswordError" class="settings-gate-error d-none" role="alert"></div>
+      </div>
+    </section>
+
     <!-- Sezione Impostazioni: utile per testare diversi stati di avanzamento -->
     <section id="settings" class="d-none fade-in">
       <div class="section-heading">

@@ -1474,6 +1474,13 @@
   letter-spacing: 0;
   opacity: .75;
 }
+/* Messaggio di errore del gate password impostazioni */
+.settings-gate-error {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #D64545;
+}
 /* ==================== BACKUP UTENTE ==================== */
 .settings-card-title {
   font-size: 18px;

@@ -24,6 +24,8 @@
   function REQUIRED_NOTES_FOR(song)   { return NOTES_LADDER[_songLevel(song)]; }
   function REQUIRED_SFIDE_FOR(song)   { return SFIDE_LADDER[_songLevel(song)]; }
   const ESERCIZI_PER_SFIDA = 14;
+  // Password di accesso alle Impostazioni (gate mostrato prima dei contenuti).
+  const SETTINGS_PASSWORD = '1324';
   let _reviewMode = false;
   let _completionLock = false;
   let _animatingMissions = false;
@@ -245,6 +247,7 @@
     document.getElementById('progressionHome')?.classList.add('d-none');
     document.getElementById('libreria')?.classList.add('d-none');
     document.getElementById('appuntiSection')?.classList.add('d-none');
+    document.getElementById('settingsGate')?.classList.add('d-none');
     document.getElementById('settings')?.classList.add('d-none');
     document.getElementById('song').classList.add('d-none');
     document.getElementById('fixedPlayer').classList.add('d-none');
@@ -347,9 +350,44 @@
     _ripassoMode = false;
     resetSongViewState();
     hidePrimaryViews();
-    document.getElementById('settings').classList.remove('d-none');
+    // Accesso protetto: mostra prima il gate con la password, non i contenuti.
+    _resetSettingsGate();
+    document.getElementById('settingsGate').classList.remove('d-none');
     updateNavigation('settings');
     document.body.classList.remove('view-song');
+    window.scrollTo(0, 0);
+  }
+
+  // Azzera il campo password e l'eventuale errore a ogni apertura del gate.
+  function _resetSettingsGate() {
+    const input = document.getElementById('settingsPasswordInput');
+    const error = document.getElementById('settingsPasswordError');
+    if (input) input.value = '';
+    if (error) { error.textContent = ''; error.classList.add('d-none'); }
+  }
+
+  // Verifica la password inserita: se corretta sblocca i contenuti reali
+  // delle impostazioni, altrimenti mostra un messaggio di errore.
+  function unlockSettings() {
+    const input = document.getElementById('settingsPasswordInput');
+    const error = document.getElementById('settingsPasswordError');
+    const value = input ? String(input.value).trim() : '';
+    if (value === SETTINGS_PASSWORD) {
+      renderSettingsContent();
+      return;
+    }
+    if (error) {
+      error.textContent = '❌ Contraseña incorrecta. Inténtalo de nuevo.';
+      error.classList.remove('d-none');
+    }
+    if (input) { input.value = ''; input.focus(); }
+  }
+
+  // Mostra il contenuto effettivo delle impostazioni (dopo lo sblocco).
+  function renderSettingsContent() {
+    _loadToken++;
+    document.getElementById('settingsGate')?.classList.add('d-none');
+    document.getElementById('settings').classList.remove('d-none');
     try { renderCodiceUtente(); } catch (e) { console.warn('[settings] render codice:', e); }
     try { renderSettingsStats(); } catch (e) { console.warn('[settings] render stats:', e); }
     window.scrollTo(0, 0);
