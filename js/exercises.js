@@ -144,6 +144,7 @@
         const etichetta = 'Ejercicio';
         const num = isRipasso ? (_exerciseIndex + 1) : _eserciziFatti;
         const tot = isRipasso ? _exerciseQueue.length : ESERCIZI_PER_SFIDA;
+        const pct = Math.max(0, Math.min(100, Math.round((num / (tot || 1)) * 100)));
 
         if (_exerciseQueue.length === 0 || _exerciseIndex >= _exerciseQueue.length) {
           if (isRipasso) {
@@ -211,7 +212,7 @@ if (exercise.mode === 'review') {
           // (visibility, non display — vedi styles.css). Così la card ha già
           // l'altezza definitiva al primo render e il click non causa reflow.
           wrap.innerHTML = `
-            <div class="exercise-counter-wrap"><span class="exercise-counter">${num}/${tot}</span></div>
+            <div class="ex-steps-bar"><div class="ex-steps-fill" style="width:${pct}%"></div></div>
             <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
               <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
               <div class="exercise-body">
@@ -256,7 +257,7 @@ if (exercise.mode === 'review') {
 
         const textWithBlanks = generaVersoStudio(exercise.text || '', numBlanks, null, exercise.hint);
         wrap.innerHTML = `
-          <div class="exercise-counter-wrap"><span class="exercise-counter">${num}/${tot}</span></div>
+          <div class="ex-steps-bar"><div class="ex-steps-fill" style="width:${pct}%"></div></div>
           <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
             <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
             <div class="exercise-text">

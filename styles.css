@@ -1824,3 +1824,68 @@ body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #
 #onboardingSection .onb-fb-check{ font:inherit; font-weight:inherit; color:inherit; }
 #onboardingSection .onb-success-banner .onb-success-msg{ font-size:15px; font-weight:700; }
 #onboardingSection .onb-success-banner .onb-success-hint{ font-size:15px; font-style:normal; font-weight:600; }
+/* ==================== ESERCIZI: look funnel onboarding ==================== */
+/* Attivo solo quando #esercizi e' la vista corrente (stesso trucco :has usato
+   altrove). Header e bottom-nav restano visibili: non sono toccati qui. */
+body:has(#esercizi:not(.d-none)) #esercizi {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 8px 16px calc(112px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+body:has(#esercizi:not(.d-none)) #eserciziLyrics {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+/* Barra di avanzamento (sostituisce il badge numerico): gradiente viola,
+   coerente con la topbar onboarding, sticky in cima durante lo scroll. */
+body:has(#esercizi:not(.d-none)) .ex-steps-bar {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  width: 100%;
+  height: 8px;
+  background: var(--onb-step-track, #EDE5F5);
+  border-radius: 999px;
+  overflow: hidden;
+}
+body:has(#esercizi:not(.d-none)) .ex-steps-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED));
+  border-radius: 999px;
+  transition: width 1.2s var(--onb-ease, cubic-bezier(.2,.7,.3,1));
+}
+/* Card esercizi: piena larghezza della colonna, ingresso in dissolvenza come
+   le card delle fasi onboarding (stesso keyframe/easing). */
+body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card {
+  width: 100%;
+  margin: 0;
+  animation: onb-fade-kf var(--onb-dur, .35s) var(--onb-ease, cubic-bezier(.2,.7,.3,1));
+}
+/* CTA ancorata in basso, sopra la bottom-nav (72px): stessa idea del bottone
+   "Adelante" dell'onboarding, ma senza coprire la nav bar. */
+body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-actions {
+  position: sticky;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  z-index: 6;
+  width: 100%;
+  background: linear-gradient(to top, var(--surface-dim, #FDF8FF) 60%, rgba(253,248,255,0));
+  padding: 12px 8px;
+  gap: 14px;
+  justify-content: center;
+}
+body:has(#esercizi:not(.d-none)) .exercise-actions .btn-primary {
+  min-width: 200px;
+}
+/* Le card di completamento (celebrazione / stati finali) restano compatte:
+   niente CTA sticky, niente animazione ridondante. */
+body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card.text-center {
+  animation: none;
+}
