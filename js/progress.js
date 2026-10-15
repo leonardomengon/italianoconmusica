@@ -488,32 +488,35 @@
     try { localStorage.removeItem('mpCursosOfertados'); } catch (e) {}
     // Azzera anche il registro anti-duplicati degli eventi mission_completed:
     // senza questa pulizia, dopo un reset le missioni ri-completate non
-    // verrebbero mai più loggate (le chiavi appMissionLogged_<songId> restano).
+    // verrebbero mai piu loggate (le chiavi appMissionLogged_<songId> restano).
     try {
       Object.keys(localStorage)
         .filter(k => k.indexOf('appMissionLogged_') === 0)
         .forEach(k => localStorage.removeItem(k));
     } catch (e) {}
-    // Conserva 'mieiAppunti' y reconstruye el índice en memoria y el badge.
+    // Reset esplicito dello STATO IN MEMORIA. Azzerare solo il localStorage
+    // non basta: variabili di modulo come _reviewMode restano attive tra un
+    // "Nuovo utente" e l'altro. recordSavedNoteForProgress() fa
+    // "if (_reviewMode || !currentSongBackup) return;" quindi con _reviewMode
+    // true la missione "frasi salvate" NON progredisce al secondo onboarding.
+    try { _reviewMode = false; } catch (e) {}
+    try { _completionLock = false; } catch (e) {}
+    try { _animatingMissions = false; } catch (e) {}
+    try { _onboardingActive = false; } catch (e) {}
+    try { _sfidaCountedSession = false; } catch (e) {}
+    try { currentSongId = null; } catch (e) {}
+    try { currentSongBackup = null; } catch (e) {}
+
+    // Conserva 'mieiAppunti' e ricostruisci indice in memoria e badge.
     rebuildSavedIndex();
     updateAppuntiBadge();
 
-    // Recarga la lista completa de canciones (como al primer arranque).
-    try { songs = await fetchSongs(); } catch (e) {}
-
-    hideBottomNav();
-    if (songs.length > 0) {
-      // Clona i bottoni della modale per evitare di accumulare listener
-      // duplicati quando si ri-simula il primo avvio più volte.
-      const itDe = document.getElementById('langChoiceItDe');
-      const esIt = document.getElementById('langChoiceEsIt');
-      if (itDe) itDe.replaceWith(itDe.cloneNode(true));
-      if (esIt) esIt.replaceWith(esIt.cloneNode(true));
-      // appLangChoice está vacío → aplicaSceltaLingua muestra la modale.
-      applicaSceltaLingua();
-    } else {
-      showHomeView();
-    }
+    // Ricarica COMPLETA della pagina: al riavvio boot.js riesegue
+    // fetchSongs -> applicaSceltaLingua (modale lingua, perche appLangChoice
+    // e stato rimosso) -> avviaOnboarding, con TUTTO lo stato in memoria
+    // vergine. Senza questo reload l'onboarding non riparte da solo e un
+    // _reviewMode residuo puo impedire il riconteggio delle missioni.
+    location.reload();
   }
 
   async function openCurrentSong() { const s=getCurrentSong(); if (s) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=false; await openSong(s.id); } }
