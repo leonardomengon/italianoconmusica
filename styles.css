@@ -1721,16 +1721,16 @@ body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
 /* Barra di avanzamento in cima, senza titolo app (rimosso): la sola barra comunica il progresso. */
-.onb-splash { display: flex; flex-direction: column; text-align: center; max-width: 560px; padding: 0 8px 32px; margin: 28px auto 0; }
+.onb-splash { display: flex; flex-direction: column; text-align: center; max-width: 560px; padding: 0 8px 32px; margin: 50px auto 0; height: 100%; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; margin: 0; }
 .onb-splash-title { margin: 8px -0.5px 16px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
-/* Wrapper dei due sottotitoli: allineati a sinistra, distanziati tra loro. */
-.onb-splash-subs { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; text-align: left; margin: 0; }
+/* Wrapper dei due sottotitoli: centrato verticalmente nello splash, testo allineato a sinistra. */
+.onb-splash-subs { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; text-align: left; margin-top: auto; margin-bottom: auto; }
 /* Sottotitoli: font leggibile e pesante, testo a sinistra. */
 .onb-splash-sub { margin: 0; font-size: 18px; font-weight: 600; color: #5A4E7A; line-height: 1.5; text-align: left; }
-/* Bottone centrato orizzontalmente e più vicino al secondo paragrafo. */
-.onb-splash-btn { margin-top: 24px; align-self: center; min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
+/* Bottone centrato orizzontalmente, più vicino al secondo paragrafo. */
+.onb-splash-btn { margin-top: 16px; align-self: center; min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
 .onb-instruction { font-size: 21px; line-height: 1.35; background: #fff; border: 2px solid #EDE5F5; border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 14px rgba(61,43,82,.06); }
 /* Fase 5: solo "guárdala en tus favoritos" in viola, il resto neutro scuro. */
 body.onboarding-active .onb-phase-header .onb-instr-base { color: #3D2B52; font-weight: 600; }
