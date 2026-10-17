@@ -792,7 +792,7 @@
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para aprender</h1>' +
           '<p class="onb-splash-sub">Los cursos utilizan canciones diseñadas para progresar en el aprendizaje del idioma.</p>'+
-          '<p Cada canción se centra en diferentes palabras y estructuras.</p>' +
+          '<p class="onb-splash-sub"> Cada canción se centra en diferentes palabras y estructuras.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
