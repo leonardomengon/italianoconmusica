@@ -438,6 +438,8 @@
           if (verseEl) verseEl.classList.remove("active");
           if (altLinkEl) altLinkEl.classList.add("d-none");
         } else {
+          // Solo l'ultimo verso toccato resta attivo (sfondo violaceo)
+          document.querySelectorAll('.verse').forEach(v => v.classList.remove('active'));
           translationEl.style.display = "block";
           recordVerseExplored(index);
           try { logEvent('verse_expanded', { verseId: positionalVerseId(currentSongId, index) }); } catch (e) {}
