@@ -500,6 +500,14 @@
           animate();
           return false;
         }
+        // ---- FIX: allinea currentSongBackup alla canzone dell'onboarding ----
+        // Senza questo, dopo un "nuovo utente" + reload currentSongBackup può
+        // essere null e recordSavedNoteForProgress() esce subito senza
+        // incrementare savedNoteKeys, lasciando la missione a 0.
+        if (!currentSongBackup || String(currentSongBackup.id) !== String(_onbSong.id)) {
+          currentSongBackup = _onbSong;
+        }
+        // ------------------------------------------------------------------
         const lyr = _onbSong && _onbSong.lyrics[index];
         if (!lyr || !lyr.text1) return false;
         try {
