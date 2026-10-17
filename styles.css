@@ -1718,10 +1718,10 @@ body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
 /* Barra di avanzamento in cima, senza titolo app (rimosso): la sola barra comunica il progresso. */
-.onb-splash { text-align: center; max-width: 560px; padding: 6px 8px 24px; }
+.onb-splash { text-align: center; max-width: 560px; padding: 2px 8px 24px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
-.onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; }
-.onb-splash-title { margin: 10px -0.5px 8px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
+.onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; margin-top: 0; }
+.onb-splash-title { margin: 4px -0.5px 8px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
 /* Terzo copy: allineato a sinistra con a capo prima della seconda frase; il resto dello splash resta centrato. */
 .onb-splash-sub { margin: 0 0 28px; font-size: 17px; font-weight: 500; color: #8A7FA3; line-height: 1.6; text-align: left; }
 .onb-splash-btn { min-width: 220px; font-size: 18px; padding: 12px 34px; border-radius: 999px; }
