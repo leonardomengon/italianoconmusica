@@ -188,7 +188,7 @@
           '<div class="onb-controls">' +
           '<button type="button" class="btn btn-primary onb-play-btn" aria-label="Reproducir">' +
           '<span class="material-symbols-outlined onb-play-icon">play_arrow</span></button>' +
-          '</div>';
+          '</div>'
         container.appendChild(p);
         _onbPlayerBtn = p.querySelector('.onb-play-btn');
         if (_onbPlayerBtn) {
@@ -791,7 +791,7 @@
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para aprender</h1>' +
-          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones diseñadas para que puedas progresar en el aprendizaje del idioma.<br><br>Cada canción se centra en diferentes palabras y estructuras.</p>' +
+          '<p class="onb-splash-sub">Nuestros cursos utilizan canciones diseñadas para que puedas progresar en el aprendizaje del idioma. Cada canción se centra en diferentes palabras y estructuras.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
