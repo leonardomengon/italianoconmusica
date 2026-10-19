@@ -435,27 +435,41 @@ if (exercise.mode === 'review') {
         _exercisePhase = 'translation';
         const wrap = document.getElementById('eserciziLyrics');
         const card = wrap ? wrap.querySelector('.exercise-card') : null;
-        const goNext = () => {
+
+        const finalizeAdvance = () => {
           _exerciseIndex++;
           renderCurrentExercise();
-          if (wasCompletedViaHint) return;
-          const counter = document.querySelector('#eserciziLyrics .exercise-counter');
-          if (counter) {
-            counter.classList.add('highlight');
-            setTimeout(() => counter.classList.remove('highlight'), 1000);
+          updateExerciseBarAnimated();
+          if (!wasCompletedViaHint) {
+            const counter = document.querySelector('#eserciziLyrics .exercise-counter');
+            if (counter) {
+              counter.classList.add('highlight');
+              setTimeout(() => counter.classList.remove('highlight'), 1000);
+            }
           }
         };
+
+        const proceed = () => {
+          if (wasCompletedViaHint) {
+            // Mostra l'avviso nella barra, poi avanza dopo il tempo di pausa
+            showExerciseRepeatNotice(2200);
+            setTimeout(finalizeAdvance, 2200);
+          } else {
+            finalizeAdvance();
+          }
+        };
+
         // Dissolvenza in uscita (180ms) poi render del successivo che entra già
-        if (!card || !card.isConnected) { goNext(); return; }
+        if (!card || !card.isConnected) { proceed(); return; }
         try {
           const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (reduced) { goNext(); return; }
+          if (reduced) { proceed(); return; }
           let done = false;
-          const finish = () => { if (done) return; done = true; goNext(); };
+          const finish = () => { if (done) return; done = true; proceed(); };
           card.addEventListener('transitionend', function h(ev) { if (ev.target !== card) return; card.removeEventListener('transitionend', h); finish(); });
           setTimeout(finish, 220);
           requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('exercise-leaving')));
-        } catch (e) { goNext(); }
+        } catch (e) { proceed(); }
       }
 
       function togglePreferitoFromExercise(btn, exerciseIdx) {
@@ -613,7 +627,6 @@ if (exercise.mode === 'review') {
           input.classList.add("is-valid");
           input.disabled = true;
           _completedViaFullHint = true;
-          showExerciseRepeatNotice();
           if (!_ripassoMode) {
             // Solo in modalità studio: rivelare l'intera parola non conta come
             // punteggio e l'esercizio torna in fondo alla coda.
