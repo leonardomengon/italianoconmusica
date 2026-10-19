@@ -938,7 +938,7 @@
 
   function renderLibreriaSongs() {
     const list = document.getElementById('completedSongsList');
-    const empty = document.getElementById('completedEmpty');
+   // const empty = document.getElementById('completedEmpty');
 
     if (!songs || songs.length === 0) {
       empty.classList.remove('d-none');
