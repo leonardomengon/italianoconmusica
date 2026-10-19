@@ -1857,28 +1857,42 @@ body:has(#esercizi:not(.d-none)) .ex-steps-bar {
   top: 8px;
   z-index: 5;
   width: 100%;
-  height: 8px;
-  background: var(--onb-step-track, #EDE5F5);
-  border-radius: 999px;
-  overflow: hidden;
-}
-body:has(#esercizi:not(.d-none)) .ex-steps-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED));
-  border-radius: 999px;
-  transition: width .6s ease;
-}
-body:has(#esercizi:not(.d-none)) .ex-steps-bar.ex-steps-notice {
-  height: auto;
-  min-height: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
-  background: #F3E8FF;
+  padding: 0 12px;
+  background: transparent;
+  border-radius: 999px;
   overflow: visible;
 }
+body:has(#esercizi:not(.d-none)) .ex-steps-fill {
+  height: 8px;
+  width: 100%;
+  background: var(--onb-step-track, #EDE5F5);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  transition: none;
+}
+body:has(#esercizi:not(.d-none)) .ex-steps-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--ex-fill, 0%);
+  background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED));
+  border-radius: 999px;
+  transition: width .6s cubic-bezier(.22,.9,.28,1);
+}
+body:has(#esercizi:not(.d-none)) .ex-steps-bar.ex-steps-notice {
+  background: #F3E8FF;
+}
 body:has(#esercizi:not(.d-none)) .ex-steps-notice-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 14px;
   font-weight: 800;
   color: var(--primary-dark, #7C3AED);

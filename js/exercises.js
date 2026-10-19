@@ -273,7 +273,7 @@ if (exercise.mode === 'review') {
           </div>`;
       }
       function exerciseBarHtml(pct) {
-        return '<div class="ex-steps-bar"><div class="ex-steps-fill" style="width:' + pct + '%"></div></div>';
+        return '<div class="ex-steps-bar"><div class="ex-steps-fill" style="--ex-fill:' + pct + '%"></div></div>';
       }
       function exerciseBarPct() {
         if (_ripassoMode) {
@@ -291,21 +291,21 @@ if (exercise.mode === 'review') {
           bar.classList.remove('ex-steps-notice');
           const note = bar.querySelector('.ex-steps-notice-text');
           if (note) note.remove();
-          fill.style.display = '';
+          fill.style.visibility = '';
           void fill.offsetWidth;
           const target = exerciseBarPct();
-          fill.style.width = target + '%';
+          fill.style.setProperty('--ex-fill', target + '%');
         } catch (e) {}
       }
-      function showExerciseRepeatNotice(cb) {
+      function showExerciseRepeatNotice(durationMs) {
         try {
           const wrap = document.getElementById('eserciziLyrics');
           const bar = wrap ? wrap.querySelector('.ex-steps-bar') : null;
           const fill = bar ? bar.querySelector('.ex-steps-fill') : null;
-          if (!bar || !fill) { if (cb) cb(); return; }
+          if (!bar || !fill) return false;
           const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           bar.classList.add('ex-steps-notice');
-          fill.style.display = 'none';
+          fill.style.visibility = 'hidden';
           let note = bar.querySelector('.ex-steps-notice-text');
           if (!note) {
             note = document.createElement('div');
@@ -313,10 +313,10 @@ if (exercise.mode === 'review') {
             bar.appendChild(note);
           }
           note.textContent = 'Repetiremos esta frase en breve';
-          let done = false;
-          const finish = () => { if (done) return; done = true; if (cb) cb(); };
-          setTimeout(finish, reduced ? 400 : 2200);
-        } catch (e) { if (cb) cb(); }
+          const ms = (typeof durationMs === 'number') ? durationMs : (reduced ? 400 : 2200);
+          setTimeout(() => { try { updateExerciseBarAnimated(); } catch (e) {} }, ms);
+          return true;
+        } catch (e) { return false; }
       }
       function renderCurrentExercise() {
         renderEsercizio(_ripassoMode ? 'ripasso' : 'studio');
@@ -438,7 +438,7 @@ if (exercise.mode === 'review') {
         const goNext = () => {
           _exerciseIndex++;
           renderCurrentExercise();
-          if (wasCompletedViaHint) { showExerciseRepeatNotice(() => updateExerciseBarAnimated()); return; }
+          if (wasCompletedViaHint) return;
           const counter = document.querySelector('#eserciziLyrics .exercise-counter');
           if (counter) {
             counter.classList.add('highlight');
@@ -613,6 +613,7 @@ if (exercise.mode === 'review') {
           input.classList.add("is-valid");
           input.disabled = true;
           _completedViaFullHint = true;
+          showExerciseRepeatNotice();
           if (!_ripassoMode) {
             // Solo in modalità studio: rivelare l'intera parola non conta come
             // punteggio e l'esercizio torna in fondo alla coda.
