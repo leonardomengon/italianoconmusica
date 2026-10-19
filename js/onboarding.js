@@ -791,15 +791,22 @@
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para aprender</h1>' +
-          '<div class="onb-splash-subs">' +
           '<p class="onb-splash-sub">Los cursos utilizan canciones diseñadas para progresar en el aprendizaje del idioma.</p>' +
-          '<p class="onb-splash-sub"> Cada canción se centra en diferentes palabras y estructuras.</p>' +
-          '</div>' +
-          '<button type="button" class="btn btn-primary onb-splash-btn">¡Empezamos!</button></div>';
+          '<button type="button" class="btn btn-primary onb-splash-btn">Siguiente</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
-        sec.querySelector('.onb-splash-btn'); // noop (fix applicato sotto)
-        const btnSplash = sec.querySelector('.onb-splash-btn'); if (btnSplash) btnSplash.addEventListener('click', () => onbFase(1), { once: true }); // PIANO-1: fix selettore splash
+        const btnSplash = sec.querySelector('.onb-splash-btn');
+        const pSplash = sec.querySelector('.onb-splash-sub');
+        let splashPrimo = true;
+        btnSplash.addEventListener('click', () => {
+          if (splashPrimo) {
+            pSplash.textContent = 'Cada canción se centra en diferentes palabras y estructuras.';
+            btnSplash.textContent = 'Empecemos';
+            splashPrimo = false;
+          } else {
+            onbFase(1);
+          }
+        });
         const btn = sec.querySelector('.onb-landing-btn');
         if (btn) btn.addEventListener('click', () => onbFase(1), { once: true });
       }
