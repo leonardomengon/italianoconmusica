@@ -618,23 +618,74 @@
               '<span class="toggle-hint" title="Haz clic para mostrar/ocultar la traducción">▼</span>' +
             '</div>' +
           '</div>' +
-          '<div class="exercise-actions"></div>';
+          '<div class="exercise-translation exercise-reveal-hidden" id="onbExReveal" aria-hidden="true"></div>' +
+          '<div class="exercise-actions exercise-self-assessment" role="group" aria-label="Autoevaluación">' +
+          '<button type="button" class="btn exercise-assessment-btn exercise-assessment-unknown exercise-reveal-hidden" disabled aria-hidden="true" onclick="onbExAssess()">No lo sabía</button>' +
+          '<button type="button" class="btn exercise-assessment-btn exercise-assessment-known exercise-reveal-hidden" disabled aria-hidden="true" onclick="onbExAssess()">Lo sabía</button></div>';
         wrap.appendChild(card);
         onbFitPhase(); // imposta top prima del paint → niente twitch
-        // Click sulla frase (come nei versi): niente bottone "Mostrar", il reveal
-        // parte subito e "Adelante" appare solo a reveal concluso.
+        // Click sulla frase (come nei classici): reveal + autovalutazione in dissolvenza.
+        // I bottoni "Lo sabía"/"No lo sabía" appaiono a comparsa conclusa.
         const phrase = card.querySelector('.exercise-text-clickable');
         if (phrase) {
           phrase.onclick = () => toggleOnbExReveal(card);
           phrase.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOnbExReveal(card); } };
         }
       }
-      // Reveal in-place + "Adelante" solo a comparsa conclusa (specchio di toggleExerciseReveal).
+      // Reveal + autovalutazione come negli esercizi classici.
       // Il click sulla prima frase ALTERNA mostra/nascondi: la traduzione, che
       // compare come unico elemento animato (dissolvenza + blur), viene
       // nascosta al click successivo e rimostrata (con l'animazione da capo) a
-      // quello dopo. "Adelante" segue la comparsa: appare a comparsa conclusa e
-      // sparisce quando la traduzione viene nascosta.
+      // quello dopo. "Lo sabía"/"No lo sabía" seguono la comparsa.
+      // revealStarted: l'animazione parte una volta sola, come nei classici.
+      // revealStarted=1 sia per impedire l'appiattimento sia per renderla di nuovo.
+      function onbExSetAssessmentVisible(cardEl, visible) {
+        if (!cardEl) return;
+        const btns = cardEl.querySelectorAll('.exercise-assessment-btn');
+        btns.forEach(function(b) {
+          b.disabled = !visible;
+          b.classList.toggle('exercise-reveal-hidden', !visible);
+          if (visible) b.removeAttribute('aria-hidden');
+          else b.setAttribute('aria-hidden', 'true');
+        });
+      }
+      function onbExAssess() {
+        if (_onbPhase !== 8 || _onbExPhase !== 'review') return;
+        const root = onbRoot();
+        const card = root ? root.querySelector('.exercise-card') : null;
+        if (!card || card.dataset.revealStarted !== '1') return;
+        try { if (_onbExRevealCancel) { _onbExRevealCancel(); _onbExRevealCancel = null; } } catch (e) {}
+        onbRenderExComplete();
+      }
+      function onbExHint(btn) {
+        try {
+          const root = onbRoot();
+          const inp = root ? root.querySelector('.study-input') : null;
+          if (!inp || inp.disabled) return;
+          const target = (inp.getAttribute('data-answer') || '').trim();
+          const targetOrig = inp.getAttribute('data-answer-original') || target;
+          if (!target) return;
+          const cur = inp.value || '';
+          const revealed = parseInt(inp.getAttribute('data-hint-state') || '0', 10) || 0;
+          let newRevealed = 0;
+          if (revealed === 0) {
+            const isCorrectPrefix = cur.length > 0 && target.toLowerCase().indexOf(cur.toLowerCase()) === 0;
+            if (!isCorrectPrefix) newRevealed = Math.ceil(target.length / 2);
+            else newRevealed = cur.length + Math.ceil((target.length - cur.length) / 2);
+          } else newRevealed = target.length;
+          newRevealed = Math.min(newRevealed, target.length);
+          inp.value = targetOrig.substring(0, newRevealed);
+          inp.setAttribute('data-hint-state', String(newRevealed));
+          inp.blur();
+          if (newRevealed >= target.length) {
+            inp.classList.add('is-valid');
+            inp.disabled = true;
+            if (btn) { btn.disabled = true; btn.style.display = 'none'; }
+            const nextBtn = root ? root.querySelector('#onbExNext') : null;
+            if (nextBtn) nextBtn.classList.remove('exercise-next-hidden');
+          }
+        } catch (e) {}
+      }
       function toggleOnbExReveal(cardEl) {
         if (!cardEl) return;
         if (cardEl.dataset.revealStarted === '1') { hideOnbExReveal(cardEl); return; }
@@ -658,18 +709,19 @@
           if (phraseEl) phraseEl.insertAdjacentElement('afterend', transEl);
           else cardEl.appendChild(transEl);
         }
-        transEl.innerHTML = (!solText.trim() || reduced) ? escapeHtml(solText) : revealPhraseHtml(solText);
-        const showNext = () => {
-          const actions = cardEl.querySelector('.exercise-actions');
-          if (!actions || actions.querySelector('#onbExBtn') || !cardEl.isConnected) return;
-          if (_onbPhase !== 8 || _onbExPhase !== 'review') return;
-          const b = document.createElement('button');
-          b.id = 'onbExBtn';
-          b.type = 'button';
-          b.className = 'btn btn-primary';
-          b.textContent = 'Adelante';
-          b.onclick = () => onbRenderExComplete();
-          actions.appendChild(b);
+        transEl.innerHTML = (!solText.trim() || reduced) ? escapeHtml(solText) : revealPhraseHtml(solText); transEl.classList.remove('exercise-reveal-hidden'); transEl.removeAttribute('aria-hidden');
+        const showNext = () => { if (_onbPhase !== 8 || _onbExPhase !== 'review') return; if (!cardEl.isConnected) return; onbExSetAssessmentVisible(cardEl, true); };
+        // ONB-CLASSIC: showNext mostra i bottoni di autovalutazione riservati.
+          // ONB-CLASSIC: riga legacy neutralizzata.
+          // ONB-CLASSIC: guardia legacy neutralizzata.
+          // ONB-CLASSIC: blocco legacy neutralizzato (bottoni autovalutazione già nel DOM).
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+          // ONB-CLASSIC: blocco legacy neutralizzato.
+        if (false) {
         };
         if (total <= 0 || !solText.trim()) { showNext(); return; }
         let finished = false;
@@ -691,12 +743,12 @@
         } catch (e) {}
         cardEl.dataset.revealTimer = String(setTimeout(finishOnce, total + 150));
       }
-      // Nasconde la traduzione espansa (e il bottone "Adelante") riportando la
-      // card allo stato iniziale: il click successivo rifà il reveal animato.
+      // Nasconde traduzione e autovalutazione riportando la card allo stato iniziale.
+      // card allo stato iniziale: il click successivo rifà il reveal da capo.
       function hideOnbExReveal(cardEl) {
         if (!cardEl || cardEl.dataset.revealStarted !== '1') return;
         cardEl.dataset.revealStarted = '0';
-        // Nuova generazione + timer azzerato: nessun "Adelante" fuori tempo.
+        // Nuova generazione + timer azzerato: nessuna comparsa fuori tempo.
         cardEl.dataset.revealGen = String((Number(cardEl.dataset.revealGen) || 0) + 1);
         const timer = Number(cardEl.dataset.revealTimer);
         if (timer) clearTimeout(timer);
@@ -707,9 +759,9 @@
           phraseEl.title = 'Haz clic para mostrar la traducción';
         }
         const transEl = cardEl.querySelector('.exercise-translation');
-        if (transEl) transEl.remove();
-        const btn = cardEl.querySelector('#onbExBtn');
-        if (btn) btn.remove();
+        if (transEl) { transEl.classList.add('exercise-reveal-hidden'); transEl.setAttribute('aria-hidden', 'true'); }
+        onbExSetAssessmentVisible(cardEl, false);
+        // ONB-CLASSIC: bottoni già nascosti sopra, nessuna rimozione.
       }
       function onbRenderExComplete() {
         const frase = _onbExFrase;
@@ -731,7 +783,8 @@
           '<div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>' +
           '<div class="exercise-text"><span class="exercise-verse-text">' + (textWithBlanks || escapeHtml(frase)) + '</span></div>' +
           (_onbExTrad ? '<div class="exercise-translation">' + escapeHtml(_onbExTrad) + '</div>' : '') +
-          '<div class="exercise-actions"><button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente →</button></div>';
+          '<div class="exercise-actions"><button class="btn btn-primary exercise-hint-btn" onclick="onbExHint(this)" title="Revelar una letra">💡 Ayuda</button>' +
+          '<button class="btn btn-primary exercise-next-btn exercise-next-hidden" id="onbExNext" onclick="onbComplete()">Siguiente →</button></div>';
         wrap.appendChild(card);
         onbFitPhase(); // imposta top prima del paint → niente twitch
         const inp = card.querySelector('.study-input');

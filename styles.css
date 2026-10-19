@@ -1882,7 +1882,7 @@ body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-actions {
   bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   z-index: 6;
   width: 100%;
-  background: linear-gradient(to top, var(--surface-dim, #FDF8FF) 60%, rgba(253,248,255,0));
+  background: var(--surface-dim, #FDF8FF);
   padding: 12px 8px;
   gap: 14px;
   justify-content: center;
