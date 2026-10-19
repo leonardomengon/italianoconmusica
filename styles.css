@@ -1718,10 +1718,10 @@ body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
 /* --- Barra di avanzamento onboarding --- */
 .onb-topbar { position: static; width: 100%; padding: 4px 0 0; background: none; }
 /* Barra di avanzamento in cima, senza titolo app (rimosso): la sola barra comunica il progresso. */
-.onb-splash { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 560px; padding: 0 8px 40px; margin: 0 auto; gap: 14px; }
+.onb-splash { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 560px; padding: 0 8px 40px; margin: 0 auto; gap: 8px; }
 /* Brand su una riga, fluido: grande su desktop, compatto su mobile. */
 .onb-splash .onb-brand { font-size: clamp(30px, 8.5vw, 72px); white-space: nowrap; margin: 0; }
-.onb-splash-title { margin: 0 -0.5px 6px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
+.onb-splash-title { margin: 0 -0.5px 18px; font-size: clamp(20px, 5.4vw, 40px); line-height: 1.15; font-weight: 900; color: #3D2B52; letter-spacing: -0.5px; white-space: nowrap; }
 /* Paragrafo: font leggibile e pesante, testo centrato.
    min-height riserva spazio per entrambe le versioni del testo così
    quando cambia non si sposta il bottone sotto. */
