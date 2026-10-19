@@ -211,8 +211,7 @@ if (exercise.mode === 'review') {
           // "Continuar" sono SEMPRE nel DOM, solo nascosti con .exercise-reveal-hidden
           // (visibility, non display — vedi styles.css). Così la card ha già
           // l'altezza definitiva al primo render e il click non causa reflow.
-          wrap.innerHTML = `
-            <div class="ex-steps-bar"><div class="ex-steps-fill" style="width:${pct}%"></div></div>
+          wrap.innerHTML = exerciseBarHtml(pct) + `
             <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
               <div class="exercise-header"><span class="exercise-progress">Piensa en la traducción</span></div>
               <div class="exercise-body">
@@ -256,8 +255,8 @@ if (exercise.mode === 'review') {
         }
 
         const textWithBlanks = generaVersoStudio(exercise.text || '', numBlanks, null, exercise.hint);
-        wrap.innerHTML = `
-          <div class="ex-steps-bar"><div class="ex-steps-fill" style="width:${pct}%"></div></div>
+        wrap.innerHTML = exerciseBarHtml(pct) + `
+          <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
           <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
             <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
             <div class="exercise-text">
@@ -273,6 +272,52 @@ if (exercise.mode === 'review') {
               <button class="btn btn-primary exercise-next-btn exercise-next-hidden" onclick="${nextHandler}">Siguiente →</button>
             </div>
           </div>`;
+      }
+      function exerciseBarHtml(pct) {
+        return '<div class="ex-steps-bar"><div class="ex-steps-fill" style="width:' + pct + '%"></div></div>';
+      }
+      function exerciseBarPct() {
+        if (_ripassoMode) {
+          const tot = _exerciseQueue.length || 1;
+          return Math.max(0, Math.min(100, Math.round(((_exerciseIndex + 1) / tot) * 100)));
+        }
+        return Math.max(0, Math.min(100, Math.round((_eserciziFatti / (ESERCIZI_PER_SFIDA || 1)) * 100)));
+      }
+      function updateExerciseBarAnimated() {
+        try {
+          const wrap = document.getElementById('eserciziLyrics');
+          const bar = wrap ? wrap.querySelector('.ex-steps-bar') : null;
+          const fill = bar ? bar.querySelector('.ex-steps-fill') : null;
+          if (!bar || !fill) return;
+          bar.classList.remove('ex-steps-notice');
+          const note = bar.querySelector('.ex-steps-notice-text');
+          if (note) note.remove();
+          fill.style.display = '';
+          void fill.offsetWidth;
+          const target = exerciseBarPct();
+          fill.style.width = target + '%';
+        } catch (e) {}
+      }
+      function showExerciseRepeatNotice(cb) {
+        try {
+          const wrap = document.getElementById('eserciziLyrics');
+          const bar = wrap ? wrap.querySelector('.ex-steps-bar') : null;
+          const fill = bar ? bar.querySelector('.ex-steps-fill') : null;
+          if (!bar || !fill) { if (cb) cb(); return; }
+          const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          bar.classList.add('ex-steps-notice');
+          fill.style.display = 'none';
+          let note = bar.querySelector('.ex-steps-notice-text');
+          if (!note) {
+            note = document.createElement('div');
+            note.className = 'ex-steps-notice-text';
+            bar.appendChild(note);
+          }
+          note.textContent = 'Repetiremos esta frase en breve';
+          let done = false;
+          const finish = () => { if (done) return; done = true; if (cb) cb(); };
+          setTimeout(finish, reduced ? 400 : 2200);
+        } catch (e) { if (cb) cb(); }
       }
       function renderCurrentExercise() {
         renderEsercizio(_ripassoMode ? 'ripasso' : 'studio');
@@ -321,6 +366,7 @@ if (exercise.mode === 'review') {
         setExerciseAssessmentVisible(false);
         // Il conteggio della sfida vale solo in modalità studio, non in ripasso.
         if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
+        updateExerciseBarAnimated();
         nextExercise();
       }
 
@@ -393,7 +439,7 @@ if (exercise.mode === 'review') {
         const goNext = () => {
           _exerciseIndex++;
           renderCurrentExercise();
-          if (wasCompletedViaHint) return;
+          if (wasCompletedViaHint) { showExerciseRepeatNotice(() => updateExerciseBarAnimated()); return; }
           const counter = document.querySelector('#eserciziLyrics .exercise-counter');
           if (counter) {
             counter.classList.add('highlight');
@@ -610,6 +656,7 @@ if (exercise.mode === 'review') {
           if (testoUtente === targetNormalizzato && e.target.dataset.progressCounted !== "1") {
             e.target.dataset.progressCounted = "1";
             if (!_ripassoMode) _eserciziFatti = Math.min(_eserciziFatti + 1, ESERCIZI_PER_SFIDA);
+            updateExerciseBarAnimated();
             e.target.value = rispostaCorretta;
             e.target.classList.add("is-valid");
             e.target.disabled = true;
