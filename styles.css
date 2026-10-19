@@ -1882,7 +1882,7 @@ body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-actions {
   bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   z-index: 6;
   width: 100%;
-  background: var(--surface-dim, #FDF8FF);
+  background: #fff;
   padding: 12px 8px;
   gap: 14px;
   justify-content: center;
