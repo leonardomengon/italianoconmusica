@@ -257,7 +257,6 @@ if (exercise.mode === 'review') {
         const textWithBlanks = generaVersoStudio(exercise.text || '', numBlanks, null, exercise.hint);
         wrap.innerHTML = exerciseBarHtml(pct) + `
           <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
-          <div class="exercise-card${_exerciseIndex===0?' is-hero':''}">
             <div class="exercise-header"><span class="exercise-progress">Completa la frase</span></div>
             <div class="exercise-text">
               <span class="exercise-verse-text">${textWithBlanks || '<em>Texto no disponible</em>'}</span>

@@ -1867,9 +1867,10 @@ body:has(#esercizi:not(.d-none)) .ex-steps-fill {
   background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED));
   border-radius: 999px;
   transition: width .6s ease;
+}
 body:has(#esercizi:not(.d-none)) .ex-steps-bar.ex-steps-notice {
   height: auto;
-  min-height: 8px;
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1878,13 +1879,12 @@ body:has(#esercizi:not(.d-none)) .ex-steps-bar.ex-steps-notice {
   overflow: visible;
 }
 body:has(#esercizi:not(.d-none)) .ex-steps-notice-text {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--primary-dark, #7C3AED);
   text-align: center;
   line-height: 1.3;
   animation: fadeIn .3s ease-in-out;
-}
 }
 /* Transizione tra esercizi classici: uscita in dissolvenza prima del re-render. */
 body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card.exercise-leaving {
