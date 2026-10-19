@@ -434,8 +434,9 @@
         const altLinkEl = document.getElementById(`alt-link-${index}`);
 
         if (translationEl.style.display === "block") {
+          // Chiude la traduzione ma NON rimuove .active: il tile resta
+          // violaceo perché è l'ultimo cliccato
           translationEl.style.display = "none";
-          if (verseEl) verseEl.classList.remove("active");
           if (altLinkEl) altLinkEl.classList.add("d-none");
         } else {
           // Solo l'ultimo verso toccato resta attivo (sfondo violaceo)
