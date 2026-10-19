@@ -1867,6 +1867,16 @@ body:has(#esercizi:not(.d-none)) .ex-steps-fill {
   background: linear-gradient(90deg, var(--primary, #9B5DE5), var(--secondary, #7C3AED));
   border-radius: 999px;
   transition: width 1.2s var(--onb-ease, cubic-bezier(.2,.7,.3,1));
+    /* Transizione tra esercizi classici: uscita in dissolvenza prima del re-render. */
+    body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card.exercise-leaving {
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card.exercise-leaving { transition: none; opacity: 0; transform: none; }
+    }
 }
 /* Card esercizi: piena larghezza della colonna, ingresso in dissolvenza come
    le card delle fasi onboarding (stesso keyframe/easing). */

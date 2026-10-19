@@ -382,21 +382,35 @@ if (exercise.mode === 'review') {
         });
       }
 
-      // Sostituisce nextExercise() + nextRipassoExercise().
+      // Sostituisce nextExercise() + nextRipassoExercise(). Passaggio smooth:
       function nextExercise() {
         if (_exerciseTimer || _exerciseRevealCancel) { clearExerciseTimer(); }
         const wasCompletedViaHint = _completedViaFullHint;
         _completedViaFullHint = false;
         _exercisePhase = 'translation';
-        _exerciseIndex++;
-        renderCurrentExercise();
-        // Evidenzia il contatore per 1 secondo (solo se non completato con aiuto)
-        if (wasCompletedViaHint) return;
-        const counter = document.querySelector('#eserciziLyrics .exercise-counter');
-        if (counter) {
-          counter.classList.add('highlight');
-          setTimeout(() => counter.classList.remove('highlight'), 1000);
-        }
+        const wrap = document.getElementById('eserciziLyrics');
+        const card = wrap ? wrap.querySelector('.exercise-card') : null;
+        const goNext = () => {
+          _exerciseIndex++;
+          renderCurrentExercise();
+          if (wasCompletedViaHint) return;
+          const counter = document.querySelector('#eserciziLyrics .exercise-counter');
+          if (counter) {
+            counter.classList.add('highlight');
+            setTimeout(() => counter.classList.remove('highlight'), 1000);
+          }
+        };
+        // Dissolvenza in uscita (180ms) poi render del successivo che entra già
+        if (!card || !card.isConnected) { goNext(); return; }
+        try {
+          const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduced) { goNext(); return; }
+          let done = false;
+          const finish = () => { if (done) return; done = true; goNext(); };
+          card.addEventListener('transitionend', function h(ev) { if (ev.target !== card) return; card.removeEventListener('transitionend', h); finish(); });
+          setTimeout(finish, 220);
+          requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('exercise-leaving')));
+        } catch (e) { goNext(); }
       }
 
       function togglePreferitoFromExercise(btn, exerciseIdx) {
