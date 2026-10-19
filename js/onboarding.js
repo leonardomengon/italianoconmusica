@@ -791,7 +791,7 @@
         sec.innerHTML =
           '<div class="onb-splash"><div class="onb-brand">Italiano con Musica</div>' +
           '<h1 class="onb-splash-title">Música creada para aprender</h1>' +
-          '<p class="onb-splash-sub">Los cursos utilizan canciones diseñadas para progresar en el aprendizaje del idioma.</p>' +
+          '<p class="onb-splash-sub">Los cursos utilizan <span class="onb-instr-hl">canciones diseñadas</span> para progresar en el aprendizaje del idioma.</p>' +
           '<button type="button" class="btn btn-primary onb-splash-btn">Siguiente</button></div>';
         root.appendChild(sec);
         onbFitSplashType(sec); // NEW: adatta brand/sottotitolo alla larghezza
@@ -800,9 +800,14 @@
         let splashPrimo = true;
         btnSplash.addEventListener('click', () => {
           if (splashPrimo) {
-            pSplash.textContent = 'Cada canción se centra en diferentes palabras y estructuras.';
-            btnSplash.textContent = 'Empecemos';
-            splashPrimo = false;
+            // Dissolvenza in uscita, poi cambio testo e bottone, poi rientro
+            pSplash.style.opacity = '0';
+            setTimeout(() => {
+              pSplash.innerHTML = 'Cada canción se centra en diferentes <span class="onb-instr-hl">palabras y estructuras</span>.';
+              btnSplash.textContent = 'Empecemos';
+              splashPrimo = false;
+              pSplash.style.opacity = '1';
+            }, 250);
           } else {
             onbFase(1);
           }
