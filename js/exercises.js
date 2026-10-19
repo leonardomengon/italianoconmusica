@@ -450,13 +450,7 @@ if (exercise.mode === 'review') {
         };
 
         const proceed = () => {
-          if (wasCompletedViaHint) {
-            // Mostra l'avviso nella barra, poi avanza dopo il tempo di pausa
-            showExerciseRepeatNotice(2200);
-            setTimeout(finalizeAdvance, 2200);
-          } else {
-            finalizeAdvance();
-          }
+          finalizeAdvance();
         };
 
         // Dissolvenza in uscita (180ms) poi render del successivo che entra già
@@ -634,6 +628,8 @@ if (exercise.mode === 'review') {
             btn.style.display = 'none';
             const ex = _exerciseQueue[_exerciseIndex];
             if (ex) _exerciseQueue.push({ ...ex });
+            // Mostra l'avviso immediatamente al secondo hint, non su Siguiente
+            showExerciseRepeatNotice(2200);
           }
           maybeShowNextButton();
         }
