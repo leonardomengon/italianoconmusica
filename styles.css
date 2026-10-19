@@ -1733,6 +1733,8 @@ body.onboarding-active #onboardingSection > .onb-adelante-row .btn {
 /* Fase 5: solo "guárdala en tus favoritos" in viola, il resto neutro scuro. */
 body.onboarding-active .onb-phase-header .onb-instr-base { color: #3D2B52; font-weight: 600; }
 body.onboarding-active .onb-phase-header .onb-instr-hl { color: var(--primary, #9B5DE5); font-weight: 900; }
+/* Evidenzia le parole chiave nel paragrafo dello splash. */
+.onb-splash-sub .onb-instr-hl { color: var(--primary, #9B5DE5); font-weight: 800; }
 .onb-funnel { padding-bottom: 0; }
 /* SLOT CTA riservato: segnaposto invisibile sostituito dal bottone reale */
 .onb-cta-slot { visibility: hidden; pointer-events: none; }
