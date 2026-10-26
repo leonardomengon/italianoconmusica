@@ -93,25 +93,27 @@
           <h2>Ajustes · Progreso</h2>
         </div>
       </div>
-      <div class="settings-card">
-        <p class="settings-intro">Simula distintos estados de progreso reescribiendo el guardado local. Tus notas (⭐) se conservan siempre.</p>
-        <div class="settings-stats" id="settingsStats"></div>
-      </div>
-
       <!-- Sezione Backup utente -->
       <div class="settings-card">
-        <h3 class="settings-card-title">💾 Backup</h3>
-        <p class="settings-intro">Se guarda automáticamente al abrir la app. Guarda tu código para recuperar el progreso en otro dispositivo.</p>
-        <label class="backup-label" for="userCodeDisplay">Tu código de backup</label>
-        <div class="backup-code-row">
-          <input id="userCodeDisplay" class="backup-code-input" readonly value="">
-          <button class="btn btn-outline-secondary" type="button" onclick="copiaCodiceUtente()">📋 Copiar</button>
+        <div class="backup-header" onclick="toggleBackupSection()" role="button" tabindex="0">
+          <h3 class="settings-card-title" style="margin:0;">💾 Backup</h3>
+          <span class="backup-toggle-icon">▼</span>
         </div>
-        <hr class="backup-divider">
-        <div class="settings-actions">
-          <button class="btn btn-outline-primary" type="button" onclick="openImportBackupModal()">
-            📥 Importa backup<span class="settings-btn-sub">inserisci il codice di recupero</span>
-          </button>
+        <div id="backupContent" class="backup-content collapsed">
+          <p class="settings-intro">Tus progresos y tus notas se guardan automaticamente al abrir la app, guarda tu codigo para recuperarlos en otro dispositivo</p>
+          <label class="backup-label" for="userCodeDisplay">Tu código de copia de seguridad</label>
+          <div class="backup-code-row">
+            <input id="userCodeDisplay" class="backup-code-input" readonly value="">
+            <button class="btn btn-outline-primary" type="button" onclick="copiaCodiceUtente()">
+              <span class="material-symbols-outlined">content_copy</span> Copiar
+            </button>
+          </div>
+          <hr class="backup-divider">
+          <div class="settings-actions">
+            <button class="btn btn-outline-secondary" type="button" onclick="openImportBackupModal()">
+              <span class="material-symbols-outlined">file_download</span> Importar copia de seguridad
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -187,12 +189,14 @@
   <!-- Modale import backup: inserimento codice di recupero -->
   <div id="importBackupModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle">
     <div class="progress-modal-box">
-      <h2 id="importBackupTitle">Importa backup</h2>
-      <p class="settings-intro">Inserisci il codice di backup per recuperare il progresso da un altro dispositivo.</p>
-      <label class="backup-label" for="importBackupCodeInput">Código de backup</label>
+      <h2 id="importBackupTitle">Importar copia de seguridad</h2>
+      <p class="settings-intro">Introduce el código de copia de seguridad para recuperar tu progreso desde otro dispositivo.</p>
+      <label class="backup-label" for="importBackupCodeInput">Código de copia de seguridad</label>
       <div class="backup-code-row">
         <input id="importBackupCodeInput" class="backup-code-input" placeholder="Código…" value="">
-        <button class="btn btn-outline-primary" type="button" onclick="confirmImportBackup()">⟳ Importa</button>
+        <button class="btn btn-outline-primary" type="button" onclick="confirmImportBackup()">
+          <span class="material-symbols-outlined">file_download</span> Importar
+        </button>
       </div>
       <div id="importBackupError" class="settings-gate-error d-none" role="alert"></div>
       <div class="progress-modal-actions">

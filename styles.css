@@ -1481,6 +1481,12 @@
   font-weight: 700;
   color: #D64545;
 }
+/* Sezione Backup collassabile in Impostazioni */
+.backup-header { cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.backup-toggle-icon { font-size: 12px; transition: transform .2s ease; }
+.backup-toggle-icon.expanded { transform: rotate(180deg); }
+.backup-content.collapsed { display: none; }
+
 /* ==================== BACKUP UTENTE ==================== */
 .settings-card-title {
   font-size: 18px;

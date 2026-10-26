@@ -359,6 +359,22 @@
     try { renderSettingsStats(); } catch (e) { console.warn('[settings] render stats:', e); }
   }
 
+  function toggleBackupSection() {
+    const content = document.getElementById('backupContent');
+    const icon = document.querySelector('.backup-toggle-icon');
+    if (!content || !icon) return;
+    const isCollapsed = content.classList.contains('collapsed');
+    if (isCollapsed) {
+      content.classList.remove('collapsed');
+      icon.classList.add('expanded');
+      icon.textContent = '▲';
+    } else {
+      content.classList.add('collapsed');
+      icon.classList.remove('expanded');
+      icon.textContent = '▼';
+    }
+  }
+
   function renderSettingsStats() {
     const el = document.getElementById('settingsStats');
     if (!el || !songs) return;
