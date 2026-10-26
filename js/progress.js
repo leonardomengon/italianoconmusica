@@ -24,8 +24,6 @@
   function REQUIRED_NOTES_FOR(song)   { return NOTES_LADDER[_songLevel(song)]; }
   function REQUIRED_SFIDE_FOR(song)   { return SFIDE_LADDER[_songLevel(song)]; }
   const ESERCIZI_PER_SFIDA = 14;
-  // Password di accesso alle Impostazioni (gate mostrato prima dei contenuti).
-  const SETTINGS_PASSWORD = '1324';
   let _reviewMode = false;
   let _completionLock = false;
   let _animatingMissions = false;
@@ -353,47 +351,12 @@
     _ripassoMode = false;
     resetSongViewState();
     hidePrimaryViews();
-    // Accesso protetto: mostra prima il gate con la password, non i contenuti.
-    _resetSettingsGate();
-    document.getElementById('settingsGate').classList.remove('d-none');
+    document.getElementById('settings').classList.remove('d-none');
     updateNavigation('settings');
     document.body.classList.remove('view-song');
     window.scrollTo(0, 0);
-  }
-
-  // Azzera il campo password e l'eventuale errore a ogni apertura del gate.
-  function _resetSettingsGate() {
-    const input = document.getElementById('settingsPasswordInput');
-    const error = document.getElementById('settingsPasswordError');
-    if (input) input.value = '';
-    if (error) { error.textContent = ''; error.classList.add('d-none'); }
-  }
-
-  // Verifica la password inserita: se corretta sblocca i contenuti reali
-  // delle impostazioni, altrimenti mostra un messaggio di errore.
-  function unlockSettings() {
-    const input = document.getElementById('settingsPasswordInput');
-    const error = document.getElementById('settingsPasswordError');
-    const value = input ? String(input.value).trim() : '';
-    if (value === SETTINGS_PASSWORD) {
-      renderSettingsContent();
-      return;
-    }
-    if (error) {
-      error.textContent = '❌ Contraseña incorrecta. Inténtalo de nuevo.';
-      error.classList.remove('d-none');
-    }
-    if (input) { input.value = ''; input.focus(); }
-  }
-
-  // Mostra il contenuto effettivo delle impostazioni (dopo lo sblocco).
-  function renderSettingsContent() {
-    _loadToken++;
-    document.getElementById('settingsGate')?.classList.add('d-none');
-    document.getElementById('settings').classList.remove('d-none');
     try { renderCodiceUtente(); } catch (e) { console.warn('[settings] render codice:', e); }
     try { renderSettingsStats(); } catch (e) { console.warn('[settings] render stats:', e); }
-    window.scrollTo(0, 0);
   }
 
   function renderSettingsStats() {
@@ -408,115 +371,6 @@
       <div class="settings-stat"><span class="settings-stat-num">${completed}</span><span>canciones completadas</span></div>
       <div class="settings-stat"><span class="settings-stat-num">${songs.length}</span><span>canciones totales</span></div>
       <div class="settings-stat"><span class="settings-stat-num">${completedCourses}</span><span>cursos completados (de ${groups.length})</span></div>`;
-  }
-
-  // Costruisce una voce di progresso "completata" per una canzone, riempiendo
-  // anche strofe aperte, frasi salvate, ascolti e sfide in modo che la UI
-  // mostri tutte le missioni come completate. È volontariamente SINCRONA:
-  // usa solo i testi già caricati (se presenti) e nulla di rete, così il
-  // loop di applicazione resta istantaneo e non supera il limite del preview.
-  function buildCompleteSongEntry(song) {
-    const verseKeys = uniqueMainVerseKeys((song && song.lyrics) || []);
-    const openedVerseKeys = verseKeys.slice();
-    // Valori MASSIMI del ladder: la voce deve risultare "completata" in
-    // qualunque scenario demo (parziale/totale), a prescindere dal livello.
-    const maxNotes = NOTES_LADDER[NOTES_LADDER.length - 1];
-    const savedNoteKeys = verseKeys.slice(0, maxNotes);
-    while (savedNoteKeys.length < maxNotes) {
-      savedNoteKeys.push('__test_note_' + Math.random().toString(36).slice(2, 8));
-    }
-    return {
-      completed: true,
-      completedAt: Date.now(),
-      openedVerseKeys,
-      savedNoteKeys,
-      listenedCount: LISTENS_LADDER[LISTENS_LADDER.length - 1],
-      completedSfideCount: SFIDE_LADDER[SFIDE_LADDER.length - 1]
-    };
-  }
-
-  // Applica uno scenario di avanzamento in modo deterministico (parte sempre
-  // da zero): kind = 'partial' (primo corso completato) oppure 'total'.
-  // Interamente sincrono: nessuna chiamata di rete nel loop.
-  function applyProgressScenario(kind) {
-    const groups = raggruppaPerCorso();
-    const p = defaultProgress(); // reset al progresso vuoto
-
-    if (kind === 'total') {
-      groups.forEach(g => g.songs.forEach(({ song }) => {
-        p.songs[String(song.id)] = buildCompleteSongEntry(song);
-        p.completedSongIds.push(song.id);
-      }));
-    } else if (kind === 'partial' && groups.length > 0) {
-      groups[0].songs.forEach(({ song }) => {
-        p.songs[String(song.id)] = buildCompleteSongEntry(song);
-        p.completedSongIds.push(song.id);
-      });
-    }
-
-    // currentSongId = prima canzone del corso successivo (partial) o null (total)
-    if (kind === 'partial' && groups.length > 1) {
-      const next = groups[1].songs[0].song;
-      p.currentSongId = next ? next.id : null;
-    } else {
-      p.currentSongId = null;
-    }
-
-    saveProgress(p);
-    return p;
-  }
-
-  function setProgressPartial() {
-    applyProgressScenario('partial');
-    showToast('✅ Progreso parcial aplicado: <strong>primer curso completado</strong>.');
-    showHomeView();
-  }
-
-  function setProgressTotal() {
-    applyProgressScenario('total');
-    showToast('🏁 Progreso total aplicado: <strong>todas las canciones completadas</strong>.');
-    showHomeView();
-  }
-
-  // Simula un nuevo usuario desde el primer arranque (vuelve a aparecer la
-  // selección de idioma). Se reescribe el progresso y la elección de idioma,
-  // se reinicia la propina de Mercado Pago, pero se CONSERVAN las notas.
-  async function resetProgressToNewUser() {
-    try { localStorage.removeItem('onboardingCompleted'); } catch (e) {}
-    try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
-    try { localStorage.removeItem('appLangChoice'); } catch (e) {}
-    try { localStorage.removeItem('mpCursosOfertados'); } catch (e) {}
-    // Azzera anche il registro anti-duplicati degli eventi mission_completed:
-    // senza questa pulizia, dopo un reset le missioni ri-completate non
-    // verrebbero mai piu loggate (le chiavi appMissionLogged_<songId> restano).
-    try {
-      Object.keys(localStorage)
-        .filter(k => k.indexOf('appMissionLogged_') === 0)
-        .forEach(k => localStorage.removeItem(k));
-    } catch (e) {}
-    // Reset esplicito dello STATO IN MEMORIA. Azzerare solo il localStorage
-    // non basta: variabili di modulo come _reviewMode restano attive tra un
-    // "Nuovo utente" e l'altro. recordSavedNoteForProgress() fa
-    // "if (_reviewMode || !currentSongBackup) return;" quindi con _reviewMode
-    // true la missione "frasi salvate" NON progredisce al secondo onboarding.
-    try { _reviewMode = false; } catch (e) {}
-    try { _completionLock = false; } catch (e) {}
-    try { _animatingMissions = false; } catch (e) {}
-    try { _onboardingActive = false; } catch (e) {}
-    try { _sfidaCountedSession = false; } catch (e) {}
-    try { currentSongId = null; } catch (e) {}
-    try { currentSongBackup = null; } catch (e) {}
-
-    // Conserva 'mieiAppunti' e ricostruisci indice in memoria e badge.
-    rebuildSavedIndex();
-    updateAppuntiBadge();
-
-    // Ricarica COMPLETA della pagina: al riavvio boot.js riesegue
-    // fetchSongs -> applicaSceltaLingua (modale lingua, perche appLangChoice
-    // e stato rimosso) -> avviaOnboarding, con TUTTO lo stato in memoria
-    // vergine. Senza questo reload l'onboarding non riparte da solo e un
-    // _reviewMode residuo puo impedire il riconteggio delle missioni.
-    location.reload();
   }
 
   async function openCurrentSong() { const s=getCurrentSong(); if (s) { _exerciseMode=false; _exerciseQueue=[]; _exerciseIndex=0; _reviewMode=false; await openSong(s.id); } }

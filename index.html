@@ -86,24 +86,6 @@
      <!-- <div id="completedEmpty" class="empty-state d-none">No has completado ninguna canción todavía.</div> -->
     </section>
 
-    <!-- Gate di accesso alle Impostazioni: richiede la password prima dei contenuti -->
-    <section id="settingsGate" class="d-none fade-in">
-      <div class="section-heading">
-        <div>
-          <h2>Ajustes · Acceso</h2>
-        </div>
-      </div>
-      <div class="settings-card">
-        <p class="settings-intro">Área reservada. Introduce la contraseña para acceder a los ajustes.</p>
-        <label class="backup-label" for="settingsPasswordInput">Contraseña</label>
-        <div class="backup-code-row">
-          <input id="settingsPasswordInput" class="backup-code-input" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" onkeydown="if(event.key==='Enter'){unlockSettings()}">
-          <button class="btn btn-outline-primary" type="button" onclick="unlockSettings()">Entrar</button>
-        </div>
-        <div id="settingsPasswordError" class="settings-gate-error d-none" role="alert"></div>
-      </div>
-    </section>
-
     <!-- Sezione Impostazioni: utile per testare diversi stati di avanzamento -->
     <section id="settings" class="d-none fade-in">
       <div class="section-heading">
@@ -114,17 +96,6 @@
       <div class="settings-card">
         <p class="settings-intro">Simula distintos estados de progreso reescribiendo el guardado local. Tus notas (⭐) se conservan siempre.</p>
         <div class="settings-stats" id="settingsStats"></div>
-        <div class="settings-actions">
-          <button class="btn btn-outline-secondary" type="button" onclick="resetProgressToNewUser()">
-            🆕 Nuevo usuario<span class="settings-btn-sub">avvio completo (scelta lingua)</span>
-          </button>
-          <button class="btn btn-outline-primary" type="button" onclick="setProgressPartial()">
-            📘 Progreso parcial<span class="settings-btn-sub">primer curso completado</span>
-          </button>
-          <button class="btn btn-primary" type="button" onclick="setProgressTotal()">
-            🏁 Progreso total<span class="settings-btn-sub">todas las canciones y cursos</span>
-          </button>
-        </div>
       </div>
 
       <!-- Sezione Backup utente -->
@@ -137,10 +108,10 @@
           <button class="btn btn-outline-secondary" type="button" onclick="copiaCodiceUtente()">📋 Copiar</button>
         </div>
         <hr class="backup-divider">
-        <label class="backup-label" for="backupCodeInput">Restaurar desde otro dispositivo</label>
-        <div class="backup-code-row">
-          <input id="backupCodeInput" class="backup-code-input" placeholder="Código…" value="">
-          <button class="btn btn-outline-primary" type="button" onclick="handleRecuperaBackup()">⟳ Restaurar</button>
+        <div class="settings-actions">
+          <button class="btn btn-outline-primary" type="button" onclick="openImportBackupModal()">
+            📥 Importa backup<span class="settings-btn-sub">inserisci il codice di recupero</span>
+          </button>
         </div>
       </div>
     </section>
@@ -209,6 +180,23 @@
       <p id="onbEndMsg">Ya empezaste a estudiar tu primera cancion. Completa las misiones para desbloquear la siguiente.</p> <!-- PIANO-5: modale finale breve -->
       <div class="progress-modal-actions">
         <button id="onbEndClose" class="btn btn-primary" type="button">¡Continuar!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale import backup: inserimento codice di recupero -->
+  <div id="importBackupModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle">
+    <div class="progress-modal-box">
+      <h2 id="importBackupTitle">Importa backup</h2>
+      <p class="settings-intro">Inserisci il codice di backup per recuperare il progresso da un altro dispositivo.</p>
+      <label class="backup-label" for="importBackupCodeInput">Código de backup</label>
+      <div class="backup-code-row">
+        <input id="importBackupCodeInput" class="backup-code-input" placeholder="Código…" value="">
+        <button class="btn btn-outline-primary" type="button" onclick="confirmImportBackup()">⟳ Importa</button>
+      </div>
+      <div id="importBackupError" class="settings-gate-error d-none" role="alert"></div>
+      <div class="progress-modal-actions">
+        <button class="btn btn-outline-secondary" type="button" onclick="closeImportBackupModal()">Cancelar</button>
       </div>
     </div>
   </div>

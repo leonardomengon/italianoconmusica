@@ -103,11 +103,26 @@
         }
       }
 
-      async function handleRecuperaBackup() {
-        const inp = document.getElementById('backupCodeInput');
+      function openImportBackupModal() {
+        const modal = document.getElementById('importBackupModal');
+        const input = document.getElementById('importBackupCodeInput');
+        const error = document.getElementById('importBackupError');
+        if (input) input.value = '';
+        if (error) { error.textContent = ''; error.classList.add('d-none'); }
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeImportBackupModal() {
+        const modal = document.getElementById('importBackupModal');
+        if (modal) modal.classList.remove('open');
+      }
+
+      async function confirmImportBackup() {
+        const inp = document.getElementById('importBackupCodeInput');
         if (!inp) return;
         const ok = await recuperaBackup(inp.value.trim());
         if (ok) {
+          closeImportBackupModal();
           setTimeout(() => { location.reload(); }, 900);
         }
       }

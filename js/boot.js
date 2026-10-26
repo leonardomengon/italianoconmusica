@@ -36,6 +36,9 @@
                   document.getElementById('editModal').classList.remove('open');
                   _editId = null;
               }
+              if (document.getElementById('importBackupModal').classList.contains('open')) {
+                  document.getElementById('importBackupModal').classList.remove('open');
+              }
           }
       });
 
