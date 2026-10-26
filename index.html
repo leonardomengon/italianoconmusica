@@ -90,7 +90,7 @@
     <section id="settings" class="d-none fade-in">
       <div class="section-heading">
         <div>
-          <h2>Ajustes · Progreso</h2>
+          <h2>Ajustes</h2>
         </div>
       </div>
       <!-- Sezione Backup utente -->
@@ -107,11 +107,8 @@
             <button class="btn btn-outline-primary" type="button" onclick="copiaCodiceUtente()">
               <span class="material-symbols-outlined">content_copy</span> Copiar
             </button>
-          </div>
-          <hr class="backup-divider">
-          <div class="settings-actions">
             <button class="btn btn-outline-secondary" type="button" onclick="openImportBackupModal()">
-              <span class="material-symbols-outlined">file_download</span> Importar copia de seguridad
+              <span class="material-symbols-outlined">file_download</span> Importar
             </button>
           </div>
         </div>
@@ -190,12 +187,12 @@
   <div id="importBackupModal" class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle">
     <div class="progress-modal-box">
       <h2 id="importBackupTitle">Importar copia de seguridad</h2>
-      <p class="settings-intro">Introduce el código de copia de seguridad para recuperar tu progreso desde otro dispositivo.</p>
-      <label class="backup-label" for="importBackupCodeInput">Código de copia de seguridad</label>
+      <p class="settings-intro">Introduce el código backup para recuperar tu progreso.</p>
+      <label class="backup-label" for="importBackupCodeInput">Código de backup</label>
       <div class="backup-code-row">
         <input id="importBackupCodeInput" class="backup-code-input" placeholder="Código…" value="">
         <button class="btn btn-outline-primary" type="button" onclick="confirmImportBackup()">
-          <span class="material-symbols-outlined">file_download</span> Importar
+          <span class="material-symbols-outlined">file_download</span>
         </button>
       </div>
       <div id="importBackupError" class="settings-gate-error d-none" role="alert"></div>
