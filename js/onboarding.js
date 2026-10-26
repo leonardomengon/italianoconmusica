@@ -406,6 +406,8 @@
       // ==================== DISPATCHER FASI ====================
       function onbFase(n) { // PIANO: dispatcher su fasi attive (6 rimossa, hint integrato in onbFav)
         _onbPhase = n;
+        // Log evento: ingresso fase onboarding
+        try { logEvent('onboarding_phase_entered', { phase: n }); } catch (e) {}
         _onbAdelanteShown = false;
         let wrap;
         if (n === 1) {
@@ -808,6 +810,8 @@
       function onbComplete() {
         if (!_onboardingActive) return;
         _onboardingActive = false;
+        // Log evento: completamento onboarding
+        try { logEvent('onboarding_completed', { phase: _onbPhase, songId: String(_onbSong?.id || '') }); } catch (e) {}
         document.body.classList.remove('onboarding-active', 'onboarding-revealed');
         try { localStorage.setItem(ONB_COMPLETED_KEY, ONB_COMPLETED_VALUE); } catch (e) {}
         onbClear();
@@ -827,6 +831,8 @@
       // ==================== ENTRY POINT ====================
       async function avviaOnboarding() {
         if (onbIsDone()) return;
+        // Log evento: inizio onboarding
+        try { logEvent('onboarding_started', { songId: String(s?.id || ''), tutorial: true }); } catch (e) {}
         // Nascondi subito il loader di app (evita race sul _loadToken → spinner infinito).
         if (typeof hideAppLoader === 'function') hideAppLoader();
         // Canzone del tutorial: PIN esplicito. Non usare getCurrentSong() perché
