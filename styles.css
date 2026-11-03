@@ -34,12 +34,26 @@
       --onb-dur-fast: .2s;
       --onb-dur: .35s;
     }
+    /* ==================== DARK MODE VARIABLES ==================== */
+    body.dark {
+      --surface: #0F0E17;
+      --surface-dim: #1A1925;
+      --surface-border: #3A394A;
+      --surface-border-dark: #5A596A;
+      --text-main: #F3F0FF;
+      --text-muted: #9A95AD;
+      --primary: #8B5CF6;
+      --primary-dark: #7C3AED;
+      --secondary: #A78BFA;
+      --secondary-dark: #6D28D9;
+    }
     * { box-sizing: border-box; }
     body {
       font-family: var(--font-body);
       font-optical-sizing: none;
-      background: #ffffff;
+      background: var(--surface, #ffffff);
       color: var(--text-main);
+      transition: background-color .3s ease, color .3s ease;
       padding-top: calc(var(--header-h) + 4px + var(--header-gap));
       padding-bottom: 160px; padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
       font-weight: 700;
@@ -57,7 +71,7 @@
       position: fixed;
       inset: 0;
       z-index: 10000;
-      background: #ffffff;
+      background: var(--surface, #ffffff);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -80,7 +94,7 @@
       left: 0;
       width: 100%;
       height: var(--header-h);
-      background: #fff;
+      background: var(--surface, #fff);
       border-bottom: 4px solid var(--surface-border);
       z-index: 1050;
       padding: 0 28px;
@@ -125,8 +139,8 @@
     }
     .btn-outline-secondary,
     #editModalCancel {
-      background: #fff !important;
-      color: #9A8FB5 !important;
+      background: var(--surface, #fff) !important;
+      color: var(--text-muted, #9A8FB5) !important;
       border: 2px solid var(--surface-border) !important;
       border-bottom: 4px solid var(--surface-border) !important;
     }

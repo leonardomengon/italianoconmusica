@@ -120,5 +120,7 @@
         }
         // Backup automatico + metrica di utilizzo: fire-and-forget, non blocca l'avvio.
         if (typeof sincronizzaBackup === 'function') { sincronizzaBackup(); }
+        // Inizializza modalità oscura (legge preferenza salvata e applica classe .dark).
+        if (typeof initDarkMode === 'function') { initDarkMode(); }
       })();
 

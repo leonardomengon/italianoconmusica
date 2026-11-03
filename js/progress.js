@@ -375,6 +375,40 @@
     }
   }
 
+  // ==================== DARK MODE ====================
+  const DARK_MODE_KEY = 'appDarkMode';
+
+  function isDarkMode() {
+    try { return localStorage.getItem(DARK_MODE_KEY) === 'true'; } catch (e) { return false; }
+  }
+
+  function setDarkMode(enabled) {
+    try { localStorage.setItem(DARK_MODE_KEY, String(enabled)); } catch (e) {}
+    const btn = document.getElementById('darkModeToggle');
+    if (enabled) {
+      document.body.classList.add('dark');
+      if (btn) btn.innerHTML = '<span class="material-symbols-outlined">light_mode</span> Desactivar';
+    } else {
+      document.body.classList.remove('dark');
+      if (btn) btn.innerHTML = '<span class="material-symbols-outlined">dark_mode</span> Activar';
+    }
+  }
+
+  function toggleDarkMode() {
+    setDarkMode(!isDarkMode());
+  }
+
+  function initDarkMode() {
+    if (isDarkMode()) {
+      document.body.classList.add('dark');
+      const btn = document.getElementById('darkModeToggle');
+      if (btn) btn.innerHTML = '<span class="material-symbols-outlined">light_mode</span> Desactivar';
+    } else {
+      const btn = document.getElementById('darkModeToggle');
+      if (btn) btn.innerHTML = '<span class="material-symbols-outlined">dark_mode</span> Activar';
+    }
+  }
+
   function renderSettingsStats() {
     const el = document.getElementById('settingsStats');
     if (!el || !songs) return;
