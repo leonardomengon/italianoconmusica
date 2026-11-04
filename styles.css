@@ -36,16 +36,198 @@
     }
     /* ==================== DARK MODE VARIABLES ==================== */
     body.dark {
+      /* Superfici */
       --surface: #0F0E17;
       --surface-dim: #1A1925;
       --surface-border: #3A394A;
       --surface-border-dark: #5A596A;
+      /* Testi */
       --text-main: #F3F0FF;
       --text-muted: #9A95AD;
+      /* Brand */
       --primary: #8B5CF6;
       --primary-dark: #7C3AED;
       --secondary: #A78BFA;
       --secondary-dark: #6D28D9;
+      --danger: #F43F5E;
+      --danger-dark: #E11D48;
+      /* Onboarding ridefiniti per contrasto scuro */
+      --onb-header-bg: #1A1925;
+      --onb-header-border: #3A394A;
+      --onb-header-text: #C4B5FD;
+      --onb-success-bg: #14532D;
+      --onb-success-bg2: #166534;
+      --onb-success-border: #4ADE80;
+      --onb-success-text: #86EFAC;
+      --onb-success-hint: #4ADE80;
+      --onb-step-track: #3A394A;
+    }
+
+    /* ==================== DARK MODE OVERRIDES (colori hard-coded) ==================== */
+    body.dark {
+      /* Sfondi generici */
+      background: #0F0E17 !important;
+    }
+
+    /* Header e loader */
+    body.dark #mainHeader {
+      background: #0F0E17 !important;
+      border-bottom-color: #3A394A !important;
+    }
+    body.dark .app-loader {
+      background: #0F0E17 !important;
+    }
+
+    /* Bottom navigation */
+    body.dark .bottom-nav {
+      background: #0F0E17 !important;
+      border-top-color: #3A394A !important;
+    }
+    body.dark .bottom-nav-item {
+      color: #9A95AD !important;
+    }
+    body.dark .bottom-nav-item.active {
+      color: #8B5CF6 !important;
+    }
+
+    /* Card e contenitori generici */
+    body.dark .settings-card,
+    body.dark .exercise-card,
+    body.dark .course-body,
+    body.dark .course-group,
+    body.dark .appunti-section,
+    body.dark .alt-overlay-content,
+    body.dark .progress-modal-box,
+    body.dark #editModalBox,
+    body.dark .onb-landing-card,
+    body.dark .onb-instruction,
+    body.dark .onb-static,
+    body.dark .course-missions-section,
+    body.dark .course-missions-sfida.unlocked,
+    body.dark .mission-row,
+    body.dark .card,
+    body.dark #appuntiSection,
+    body.dark .appunto-item,
+    body.dark #searchControls,
+    body.dark .song-card,
+    body.dark .course-song-row,
+    body.dark .course-tile {
+      background: #1A1925 !important;
+      border-color: #3A394A !important;
+      color: #F3F0FF !important;
+    }
+
+    /* Input, textarea, select */
+    body.dark input,
+    body.dark textarea,
+    body.dark select {
+      background: #1A1925 !important;
+      color: #F3F0FF !important;
+      border-color: #3A394A !important;
+    }
+    body.dark input::placeholder,
+    body.dark textarea::placeholder,
+    body.dark select::placeholder {
+      color: #6B6580 !important;
+    }
+
+    /* Testi principali hard-coded -> bianco */
+    body.dark .card-title,
+    body.dark #songTitle,
+    body.dark .alt-close-btn:hover,
+    body.dark .alt-phrase-main,
+    body.dark #appuntiSection h2,
+    body.dark .ripasso-info h3,
+    body.dark .progress-modal-box h2,
+    body.dark .lang-choice-buttons button,
+    body.dark .onb-splash-title,
+    body.dark .onb-instr-base,
+    body.dark .mission-name,
+    body.dark .onboarding-lead {
+      color: #F3F0FF !important;
+    }
+
+    /* Testi secondari hard-coded -> grigio chiaro */
+    body.dark .card-text,
+    body.dark #songArtist,
+    body.dark .alt-close-btn,
+    body.dark .appunti-count-info,
+    body.dark .missions-count,
+    body.dark .progress-modal-box p,
+    body.dark .onb-tagline,
+    body.dark .onb-landing-copy,
+    body.dark .course-song-sub,
+    body.dark .course-song-locked .course-song-sub {
+      color: #9A95AD !important;
+    }
+
+    /* Bottoni secondari e outline */
+    body.dark .btn-outline-secondary,
+    body.dark #editModalCancel {
+      background: #1A1925 !important;
+      color: #9A95AD !important;
+      border-color: #3A394A !important;
+    }
+
+    /* Bottoni con colori hard-coded specifici */
+    body.dark .btn-outline-warning {
+      background: #2A2515 !important;
+      color: #FCD34D !important;
+      border-color: #4A3A10 !important;
+    }
+    body.dark .btn-del-note {
+      background: #4A151E !important;
+      color: #F43F5E !important;
+      border-color: #6B1F2E !important;
+    }
+    body.dark .btn-edit-note {
+      background: #1E2A40 !important;
+      color: #8B5CF6 !important;
+      border-color: #3A5F9F !important;
+    }
+    body.dark .btn-challenge-locked {
+      background: #3A394A !important;
+      color: #6B6580 !important;
+      border-color: #5A596A !important;
+    }
+
+    /* Divider e linee */
+    body.dark .backup-divider,
+    body.dark hr,
+    body.dark .course-missions-divider {
+      border-top-color: #3A394A !important;
+    }
+
+    /* Onboarding specifici */
+    body.dark body.onboarding-active .onb-step-track {
+      background: #3A394A !important;
+    }
+    body.dark .onb-fb-icon {
+      background: #1A1925 !important;
+      border-color: #3A394A !important;
+      color: #9A95AD !important;
+    }
+    body.dark .onb-static:hover {
+      background: #1A1925 !important;
+    }
+
+    /* Scrollbar */
+    body.dark ::-webkit-scrollbar-track {
+      background: #1A1925 !important;
+    }
+    body.dark ::-webkit-scrollbar-thumb {
+      background: #3A394A !important;
+    }
+    body.dark ::-webkit-scrollbar-thumb:hover {
+      background: #5A596A !important;
+    }
+
+    /* Ombre adattate allo scuro */
+    body.dark .shadow,
+    body.dark [class*="shadow"],
+    body.dark .song-completed-banner,
+    body.dark .toast {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
     }
     * { box-sizing: border-box; }
     body {

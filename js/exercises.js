@@ -150,7 +150,7 @@
           if (isRipasso) {
             wrap.innerHTML = `<div class="exercise-card text-center p-4">
               <div class="celebration-icon">🎉</div>
-              <h3 style="font-weight:900;color:#3D2B52;">¡Repaso completado!</h3>
+              <h3 style="font-weight:900;color:var(--text-main);">¡Repaso completado!</h3>
               <p class="text-muted">Has completado ${_exerciseQueue.length} ejercicios de tus notas.</p>
               <div class="exercise-actions">
                 <button class="btn btn-primary" onclick="openRipasso()">🔀 Nuevo repaso</button>
@@ -169,7 +169,7 @@
               wrap.innerHTML = `
                 <div class="exercise-card text-center p-4">
                   <div class="celebration-icon">🎉</div>
-                  <h3 style="font-weight:900;color:#3D2B52;">¡Canción completada!</h3>
+                  <h3 style="font-weight:900;color:var(--text-main);">¡Canción completada!</h3>
                   <p class="text-muted">${songCompletedMessage(nextSong)}</p>
                   <div class="exercise-actions">
                     <button class="btn btn-primary" type="button" onclick="window.router ? router.navigate('#/') : location.reload()">Volver a inicio</button>
@@ -181,7 +181,7 @@
               wrap.innerHTML = `
                 <div class="exercise-card text-center p-4">
                   <div class="celebration-icon">🍾</div>
-                  <h3 style="font-weight:900;color:#3D2B52;">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
+                  <h3 style="font-weight:900;color:var(--text-main);">¡Desafío completado! (${sfideCompleted}/${REQUIRED_SFIDE()})</h3>
                   <p class="text-muted">${(() => { const tot = _exerciseQueue.length; const pensa = _exerciseQueue.filter(ex => ex.mode === 'review').length; const completa = tot - pensa; return `Has completado el lote de ${tot} ejercicios (${pensa} piensa, ${completa} completa).`; })()}</p>
                   <div class="exercise-actions">
                     <button class="btn btn-primary" onclick="generaCodaEsercizi(currentSongBackup); renderCurrentExercise();">🔀 Nuevo desafío</button>

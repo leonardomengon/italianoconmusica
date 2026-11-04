@@ -359,13 +359,13 @@
               const textWithBlanks = generaVersoStudio(frase.text, 1, null, frase.hint);
               const hintHTML = frase.hint && frase.hint.trim()
                   ? `
-                    <div class="translation" style="display:block; opacity:0.85; border-left-color:#5B9BF6;">
-                      <span style="color:#7B6F8C;">💡 ${escapeHtml(frase.hint)}</span>
+                    <div class="translation" style="display:block; opacity:0.85; border-left-color:var(--primary-dark);">
+                      <span style="color:var(--text-muted);">💡 ${escapeHtml(frase.hint)}</span>
                     </div>
                   `
                   : `
-                    <div class="translation" style="display:block; opacity:0.6; border-left-color:#7B6F8C;">
-                      <span style="color:#7B6F8C; font-size:0.85em;"><em>Traducción no disponible</em></span>
+                    <div class="translation" style="display:block; opacity:0.6; border-left-color:var(--text-muted);">
+                      <span style="color:var(--text-muted); font-size:0.85em;"><em>Traducción no disponible</em></span>
                     </div>
                   `;
 
