@@ -229,6 +229,36 @@
     body.dark .toast {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
     }
+
+    /* ==================== CANZONE / VERSI / TRADUZIONI ==================== */
+    body.dark .current-song-card {
+      background: #1A1925 !important;
+    }
+    body.dark .badge-song {
+      background: #2A2515 !important;
+    }
+    body.dark .song-tag-pill {
+      background: color-mix(in srgb, var(--primary) 25%, #1A1925) !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .song-tag-pills-hero .song-tag-pill {
+      background: rgba(255,255,255,.15) !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .verse {
+      background: #1A1925 !important;
+      border-color: #3A394A !important;
+    }
+    body.dark .translation,
+    body.dark .alt-phrase-translation,
+    body.dark .appunto-traduzione {
+      background: #1A1925 !important;
+      color: #F3F0FF !important;
+      border-color: #3A394A !important;
+    }
+    body.dark .toggle-hint {
+      color: var(--text-muted) !important;
+    }
     * { box-sizing: border-box; }
     body {
       font-family: var(--font-body);
