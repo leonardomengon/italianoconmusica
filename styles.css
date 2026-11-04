@@ -259,6 +259,65 @@
     body.dark .toggle-hint {
       color: var(--text-muted) !important;
     }
+
+    /* ==================== ALTRE CLASSI RICHIESTE ==================== */
+    body.dark .player-fixed {
+      background: #0F0E17 !important;
+      border-top-color: #3A394A !important;
+    }
+    body.dark .mission-icon {
+      background: #2A2515 !important;
+    }
+    body.dark .mission-row.done .mission-icon {
+      background: #3A1F2E !important;
+    }
+    body.dark .mission-icon-chip {
+      background: #2A2515 !important;
+    }
+    body.dark .mission-icon-chip.done {
+      background: #3A1F2E !important;
+    }
+    body.dark .mission-icon-badge {
+      background: #3A394A !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .mission-icon-chip.done .mission-icon-badge {
+      background: #4A495A !important;
+    }
+    body.dark .mission-icon-status {
+      color: #9A95AD !important;
+    }
+    body.dark .next-song-lock {
+      background: #3A394A !important;
+      color: #9A95AD !important;
+    }
+    body.dark .alt-phrase-item {
+      background: #1A1925 !important;
+      border-color: #3A394A !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .alt-phrase-item.active {
+      background: #2A2515 !important;
+      border-color: var(--primary) !important;
+    }
+    body.dark .alt-phrase-main {
+      color: #F3F0FF !important;
+    }
+    body.dark .container {
+      background: var(--surface) !important;
+    }
+    body.dark .course-tab {
+      border-color: color-mix(in srgb, var(--primary) 35%, #1A1925) !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .course-tab.active {
+      background: var(--primary) !important;
+      color: #fff !important;
+    }
+    body.dark .course-temas-body {
+      background: #2A2515 !important;
+      color: #F3F0FF !important;
+    }
     * { box-sizing: border-box; }
     body {
       font-family: var(--font-body);
