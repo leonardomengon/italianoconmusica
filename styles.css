@@ -318,6 +318,34 @@
       background: #2A2515 !important;
       color: #F3F0FF !important;
     }
+
+    /* ==================== PLAYER MISSIONI / BOTTONI ==================== */
+    body.dark .player-missions-swap {
+      background: #1A1925 !important;
+      border-color: #3A394A !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+    }
+    body.dark #custom-player .btn-missions {
+      background: #1A1925 !important;
+      color: #8B5CF6 !important;
+      border-color: #8B5CF6 !important;
+      border-bottom-color: #7C3AED !important;
+    }
+
+    /* ==================== COURSE-TAB / COURSE-TEMAS-BODY (rinforzo) ==================== */
+    body.dark .course-tab {
+      background: #1A1925 !important;
+      border-color: color-mix(in srgb, var(--primary) 35%, #1A1925) !important;
+      color: #F3F0FF !important;
+    }
+    body.dark .course-tab.active {
+      background: var(--primary) !important;
+      color: #fff !important;
+      border-color: var(--primary) !important;
+    }
+    body.dark .course-tab:not(.active) {
+      background: #1A1925 !important;
+    }
     * { box-sizing: border-box; }
     body {
       font-family: var(--font-body);
