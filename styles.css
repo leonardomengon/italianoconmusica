@@ -2257,3 +2257,6 @@ body:has(#esercizi:not(.d-none)) .exercise-actions .btn-primary {
 body:has(#esercizi:not(.d-none)) #eserciziLyrics .exercise-card.text-center {
   animation: none;
 }
+
+/* Dark mode fixes for specific elements */
+body.dark .course-missions-section { background: #1A1925 !important; border-color: #3A394A !important; box-shadow: none !important; }body.dark .course-missions-sfida { background: #1A1925 !important; border-color: #3A394A !important; opacity: 1 !important; filter: none !important; }body.dark .course-missions-sfida.unlocked { background: #1A1925 !important; border-color: #3A394A !important; opacity: 1 !important; filter: none !important; }body.dark .course-missions-sfida .mission-row { background: #1A1925 !important; }body.dark .section-heading h2, body.dark .path-summary h1, body.dark .section-heading { color: #F3F0FF !important; }body.dark .d-flex.align-items-center.gap-2.flex-grow-1 strong, body.dark .d-flex.align-items-center.gap-2.flex-grow-1 .toggle-hint, body.dark .d-flex.justify-content-between.text-muted.mt-1 { color: #F3F0FF !important; font-weight: 900 !important; }body.dark .text-muted { color: #9A95AD !important; }
