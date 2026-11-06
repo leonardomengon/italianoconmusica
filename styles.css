@@ -837,6 +837,16 @@
     .exercise-text-clickable { cursor: pointer; }
     .exercise-text-clickable:hover { border-color: var(--surface-border-dark); }
     .exercise-text-clickable:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
+    /* Animazione sottile di espansione/contrazione per suggerire che l'elemento è cliccabile */
+    .exercise-text-clickable:hover,
+    .exercise-text-clickable:focus-visible {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
     /* Freccia di espansione: piccola, sottile, coerente con i versi della canzone */
     .exercise-text-clickable .toggle-hint,
     .exercise-text.revealing .toggle-hint {
