@@ -93,34 +93,12 @@
           <h2>Ajustes</h2>
         </div>
       </div>
-      <!-- Sezione Backup utente -->
-      <div class="settings-card">
-        <div class="backup-header" onclick="toggleBackupSection()" role="button" tabindex="0">
-          <h3 class="settings-card-title" style="margin:0;">💾 Backup</h3>
-          <span class="backup-toggle-icon">▼</span>
-        </div>
-        <div id="backupContent" class="backup-content collapsed">
-          <p class="settings-intro">Tus progresos y tus notas se guardan automaticamente al abrir la app, guarda tu codigo para recuperarlos en otro dispositivo</p>
-          <label class="backup-label" for="userCodeDisplay">Tu código de copia de seguridad</label>
-          <div class="backup-code-row">
-            <input id="userCodeDisplay" class="backup-code-input" readonly value="">
-          </div>
-          <div class="backup-actions-row">
-            <button class="btn btn-outline-primary" type="button" onclick="copiaCodiceUtente()">
-              <span class="material-symbols-outlined">content_copy</span> Copiar
-            </button>
-            <button class="btn btn-outline-secondary" type="button" onclick="openImportBackupModal()">
-              <span class="material-symbols-outlined">file_download</span> Importar
-            </button>
-          </div>
-        </div>
-      </div>
-
+     
       <!-- Card Instagram -->
       <div class="settings-card">
         <h3 class="settings-card-title">Síguenos en Instagram</h3>
         <a href="https://www.instagram.com/italiano.conmusica/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="width:100%; justify-content:center;">
-          <span class="material-symbols-outlined">camera_alt</span> @italiano.conmusica
+          <span class="material-symbols-outlined">center_focus_weak</span> @italiano.conmusica
         </a>
       </div>
 
@@ -144,6 +122,30 @@
           </button>
         </div>
       </div>
+
+       <!-- Sezione Backup utente -->
+      <div class="settings-card">
+        <div class="backup-header" onclick="toggleBackupSection()" role="button" tabindex="0">
+          <h3 class="settings-card-title" style="margin:0;">💾 Backup</h3>
+          <span class="backup-toggle-icon">▼</span>
+        </div>
+        <div id="backupContent" class="backup-content collapsed">
+          <p class="settings-intro">Tus progresos y tus notas se guardan automaticamente al abrir la app, guarda tu codigo para recuperarlos en otro dispositivo</p>
+          <label class="backup-label" for="userCodeDisplay">Tu código de copia de seguridad</label>
+          <div class="backup-code-row">
+            <input id="userCodeDisplay" class="backup-code-input" readonly value="">
+          </div>
+          <div class="backup-actions-row">
+            <button class="btn btn-outline-primary" type="button" onclick="copiaCodiceUtente()">
+              <span class="material-symbols-outlined">content_copy</span> Copiar
+            </button>
+            <button class="btn btn-outline-secondary" type="button" onclick="openImportBackupModal()">
+              <span class="material-symbols-outlined">file_download</span> Importar
+            </button>
+          </div>
+        </div>
+      </div>
+
     </section>
 
 
